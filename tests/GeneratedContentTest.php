@@ -1,9 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Dompdf\Tests;
 
 use Dompdf\Dompdf;
 use Dompdf\FrameDecorator\AbstractFrameDecorator;
-use Dompdf\Tests\TestCase;
 
 final class GeneratedContentTest extends TestCase
 {
@@ -11,7 +13,7 @@ final class GeneratedContentTest extends TestCase
     {
         return [
             // TODO: Heredocs can be nicely indented starting with PHP 7.3
-            "basic counter" => [
+            'basic counter' => [
                 <<<HTML
 <!DOCTYPE html>
 <html>
@@ -34,10 +36,10 @@ span::before {
 HTML
 ,
                 [
-                    "div" => ["1-2-3-"]
-                ]
+                    'div' => ['1-2-3-'],
+                ],
             ],
-            "nested counters" => [
+            'nested counters' => [
                 <<<HTML
 <!DOCTYPE html>
 <html>
@@ -74,17 +76,17 @@ span::before {
 HTML
 ,
                 [
-                    "span" => [
-                        "1 Item 1",
-                        "2 Item 2",
-                        "2.1 Item 3",
-                        "2.2 Item 4",
-                        "2.3 Item 5",
-                        "3 Item 6"
-                    ]
-                ]
+                    'span' => [
+                        '1 Item 1',
+                        '2 Item 2',
+                        '2.1 Item 3',
+                        '2.2 Item 4',
+                        '2.3 Item 5',
+                        '3 Item 6',
+                    ],
+                ],
             ],
-            "auto reset nested" => [
+            'auto reset nested' => [
                 <<<HTML
 <!DOCTYPE html>
 <html>
@@ -126,17 +128,17 @@ span::before {
 HTML
 ,
                 [
-                    "span" => [
-                        "1|0 Item 1",
-                        "2|0 Item 2",
-                        "2|1 Item 3",
-                        "2|2 Item 4",
-                        "2|3 Item 5",
-                        "3|0 Item 6",
-                        "3|1 Item 7",
-                        "3|2 Item 8"
-                    ]
-                ]
+                    'span' => [
+                        '1|0 Item 1',
+                        '2|0 Item 2',
+                        '2|1 Item 3',
+                        '2|2 Item 4',
+                        '2|3 Item 5',
+                        '3|0 Item 6',
+                        '3|1 Item 7',
+                        '3|2 Item 8',
+                    ],
+                ],
             ],
             // Note: There have been spec changes in regards to how `counter-reset`
             // is supposed to work in cases like the following. Firefox 82+
@@ -144,7 +146,7 @@ HTML
             // and older Firefox versions:
             // * https://github.com/mdn/content/issues/13293
             // * https://github.com/w3c/csswg-drafts/issues/5477
-            "sibling reset" => [
+            'sibling reset' => [
                 <<<HTML
 <!DOCTYPE html>
 <html>
@@ -187,22 +189,22 @@ li::before {
 HTML
 ,
                 [
-                    "li" => [
-                        "1 Item 1",
-                        "1.1 Item 2",
-                        "1.2 Item 3",
-                        "1.1 Item 4",
-                        "1.2 Item 5",
-                        "2 Item 6",
-                        "2.1 Item 7",
-                        "2.2 Item 8"
-                    ]
-                ]
+                    'li' => [
+                        '1 Item 1',
+                        '1.1 Item 2',
+                        '1.2 Item 3',
+                        '1.1 Item 4',
+                        '1.2 Item 5',
+                        '2 Item 6',
+                        '2.1 Item 7',
+                        '2.2 Item 8',
+                    ],
+                ],
             ],
 
             // Tests from the CSS2.1 Conformance Test Suite
             // http://test.csswg.org/suites/css21_dev/20110323/
-            "counters-scope-000" => [
+            'counters-scope-000' => [
                 <<<HTML
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
@@ -246,13 +248,13 @@ HTML
 HTML
 ,
                 [
-                    "div" => [
-                        "122111 133331",
-                        "122111 133331"
-                    ]
-                ]
+                    'div' => [
+                        '122111 133331',
+                        '122111 133331',
+                    ],
+                ],
             ],
-            "counters-scope-001" => [
+            'counters-scope-001' => [
                 <<<HTML
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
@@ -287,13 +289,13 @@ HTML
 HTML
 ,
                 [
-                    "div" => [
-                        "B1-B2-B2.1-B2.2-A2.3-B2.4-A2.5-A2.6-B2.7-B2.8-A2.9-A2.10-A2.11-A3-",
-                        "B1-B2-B2.1-B2.2-A2.3-B2.4-A2.5-A2.6-B2.7-B2.8-A2.9-A2.10-A2.11-A3-"
-                    ]
-                ]
+                    'div' => [
+                        'B1-B2-B2.1-B2.2-A2.3-B2.4-A2.5-A2.6-B2.7-B2.8-A2.9-A2.10-A2.11-A3-',
+                        'B1-B2-B2.1-B2.2-A2.3-B2.4-A2.5-A2.6-B2.7-B2.8-A2.9-A2.10-A2.11-A3-',
+                    ],
+                ],
             ],
-            "counters-scope-002" => [
+            'counters-scope-002' => [
                 <<<HTML
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
@@ -328,13 +330,13 @@ HTML
 HTML
 ,
                 [
-                    "div" => [
-                        "B1-B1.1-B1.2-A1.3-A1.4-A2-",
-                        "B1-B1.1-B1.2-A1.3-A1.4-A2-"
-                    ]
-                ]
+                    'div' => [
+                        'B1-B1.1-B1.2-A1.3-A1.4-A2-',
+                        'B1-B1.1-B1.2-A1.3-A1.4-A2-',
+                    ],
+                ],
             ],
-            "counters-scope-003" => [
+            'counters-scope-003' => [
                 <<<HTML
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
@@ -369,13 +371,13 @@ HTML
 HTML
 ,
                 [
-                    "div" => [
-                        "B1-B2-B3-A4-A4.1-A5-",
-                        "B1-B2-B3-A4-A4.1-A5-"
-                    ]
-                ]
+                    'div' => [
+                        'B1-B2-B3-A4-A4.1-A5-',
+                        'B1-B2-B3-A4-A4.1-A5-',
+                    ],
+                ],
             ],
-            "counters-scope-004" => [
+            'counters-scope-004' => [
                 <<<HTML
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
@@ -410,13 +412,13 @@ HTML
 HTML
 ,
                 [
-                    "div" => [
-                        "1 1 R1.1 1.1",
-                        "1 1 R1.1 1.1"
-                    ]
-                ]
+                    'div' => [
+                        '1 1 R1.1 1.1',
+                        '1 1 R1.1 1.1',
+                    ],
+                ],
             ],
-            "counters-scope-implied-000" => [
+            'counters-scope-implied-000' => [
                 <<<HTML
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
@@ -448,13 +450,13 @@ HTML
 HTML
 ,
                 [
-                    "div" => [
-                        "00",
-                        "00"
-                    ]
-                ]
+                    'div' => [
+                        '00',
+                        '00',
+                    ],
+                ],
             ],
-            "counters-scope-implied-001" => [
+            'counters-scope-implied-001' => [
                 <<<HTML
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
@@ -488,13 +490,13 @@ HTML
 HTML
 ,
                 [
-                    "div" => [
-                        "0 1",
-                        "0 1"
-                    ]
-                ]
+                    'div' => [
+                        '0 1',
+                        '0 1',
+                    ],
+                ],
             ],
-            "counters-scope-implied-002" => [
+            'counters-scope-implied-002' => [
                 <<<HTML
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
@@ -529,17 +531,17 @@ HTML
 HTML
 ,
                 [
-                    "div" => [
-                        "B1 0 1 1.0",
-                        "B1 0 1 1.0"
-                    ]
-                ]
+                    'div' => [
+                        'B1 0 1 1.0',
+                        'B1 0 1 1.0',
+                    ],
+                ],
             ],
 
             // Involving page breaks
             // Check that generated content is handled correctly after a page
             // break if font mapping forces a text-frame split
-            "font mapping with page break" => [
+            'font mapping with page break' => [
                 <<<HTML
 <!DOCTYPE html>
 <html>
@@ -576,13 +578,13 @@ div::before {
 HTML
 ,
                 [
-                    "div" => [
-                        "Box ∉ 1",
-                        "Box ∉ 2",
-                        "Box ∉ 3",
-                        "Box ∉ 4"
-                    ]
-                ]
+                    'div' => [
+                        'Box ∉ 1',
+                        'Box ∉ 2',
+                        'Box ∉ 3',
+                        'Box ∉ 4',
+                    ],
+                ],
             ],
         ];
     }
@@ -605,16 +607,16 @@ HTML
         $dompdf = new Dompdf();
         $dompdf->setCallbacks([
             [
-                "event" => "begin_frame",
-                "f" => function (AbstractFrameDecorator $frame) use ($expectedContent, &$content) {
+                'event' => 'begin_frame',
+                'f' => function (AbstractFrameDecorator $frame) use ($expectedContent, &$content) {
                     $node = $frame->get_node();
                     $name = $node->nodeName;
 
                     if (isset($expectedContent[$name])) {
                         $content[$name][] = $node->textContent;
                     }
-                }
-            ]
+                },
+            ],
         ]);
 
         $dompdf->loadHtml($html);

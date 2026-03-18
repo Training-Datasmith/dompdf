@@ -1,9 +1,12 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf;
 
 class Options
@@ -78,10 +81,10 @@ class Options
     * @var array
     */
     private $allowedProtocols = [
-        "data://" => ["rules" => []],
-        "file://" => ["rules" => []],
-        "http://" => ["rules" => []],
-        "https://" => ["rules" => []]
+        'data://' => ['rules' => []],
+        'file://' => ['rules' => []],
+        'http://' => ['rules' => []],
+        'https://' => ['rules' => []],
     ];
 
     /**
@@ -103,7 +106,7 @@ class Options
      *
      * @var string
      */
-    private $defaultMediaType = "screen";
+    private $defaultMediaType = 'screen';
 
     /**
      * The default paper size.
@@ -113,7 +116,7 @@ class Options
      *
      * @var string|float[]
      */
-    private $defaultPaperSize = "letter";
+    private $defaultPaperSize = 'letter';
 
     /**
      * The default paper orientation.
@@ -122,7 +125,7 @@ class Options
      *
      * @var string
      */
-    private $defaultPaperOrientation = "portrait";
+    private $defaultPaperOrientation = 'portrait';
 
     /**
      * The default font family
@@ -131,7 +134,7 @@ class Options
      *
      * @var string
      */
-    private $defaultFont = "serif";
+    private $defaultFont = 'serif';
 
     /**
      * Image DPI setting
@@ -314,7 +317,7 @@ class Options
      *
      * @var string
      */
-    private $pdfBackend = "CPDF";
+    private $pdfBackend = 'CPDF';
 
     /**
      * PDFlib license key
@@ -330,7 +333,7 @@ class Options
      *
      * @var string
      */
-    private $pdflibLicense = "";
+    private $pdflibLicense = '';
 
     /**
      * HTTP context created with stream_context_create()
@@ -347,14 +350,14 @@ class Options
      */
     public function __construct(?array $attributes = null)
     {
-        $rootDir = realpath(__DIR__ . "/../");
+        $rootDir = realpath(__DIR__ . '/../');
         $this->setChroot([$rootDir]);
         $this->setRootDir($rootDir);
         $this->setTempDir(sys_get_temp_dir());
-        $this->setFontDir($rootDir . "/lib/fonts");
+        $this->setFontDir($rootDir . '/lib/fonts');
         $this->setFontCache($this->getFontDir());
 
-        $ver = "";
+        $ver = '';
         $versionFile = realpath(__DIR__ . '/../VERSION');
         if (file_exists($versionFile) && ($version = file_get_contents($versionFile)) !== false) {
             $version = trim($version);
@@ -363,15 +366,15 @@ class Options
             }
         }
         $this->setHttpContext([
-            "http" => [
-                "follow_location" => false,
-                "user_agent" => "Dompdf$ver https://github.com/dompdf/dompdf"
-            ]
+            'http' => [
+                'follow_location' => false,
+                'user_agent' => "Dompdf$ver https://github.com/dompdf/dompdf",
+            ],
         ]);
 
-        $this->setAllowedProtocols(["data://", "file://", "http://", "https://"]);
+        $this->setAllowedProtocols(['data://', 'file://', 'http://', 'https://']);
 
-        $this->setArtifactPathValidation([$this, "validateArtifactPath"]);
+        $this->setArtifactPathValidation([$this, 'validateArtifactPath']);
 
         if (null !== $attributes) {
             $this->set($attributes);
@@ -391,20 +394,20 @@ class Options
 
         foreach ($attributes as $key => $value) {
             $methodForMatch = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $key))));
-            $methodForCall = "set" . ucfirst($methodForMatch);
+            $methodForCall = 'set' . ucfirst($methodForMatch);
 
             if ($methodForMatch === 'enablePhp') {
-                $methodForCall = "setIsPhpEnabled";
+                $methodForCall = 'setIsPhpEnabled';
             } elseif ($methodForMatch === 'enableRemote') {
-                $methodForCall = "setIsRemoteEnabled";
+                $methodForCall = 'setIsRemoteEnabled';
             } elseif ($methodForMatch === 'enablePdfA') {
-                $methodForCall = "setIsPdfAEnabled";
+                $methodForCall = 'setIsPdfAEnabled';
             } elseif ($methodForMatch === 'enableJavascript') {
-                $methodForCall = "setIsJavascriptEnabled";
+                $methodForCall = 'setIsJavascriptEnabled';
             } elseif ($methodForMatch === 'enableHtml5Parser') {
-                $methodForCall = "setIsHtml5ParserEnabled";
+                $methodForCall = 'setIsHtml5ParserEnabled';
             } elseif ($methodForMatch === 'enableFontSubsetting') {
-                $methodForCall = "setIsFontSubsettingEnabled";
+                $methodForCall = 'setIsFontSubsettingEnabled';
             }
 
             if (method_exists($this, $methodForCall)) {
@@ -422,26 +425,26 @@ class Options
     public function get($key)
     {
         $methodForMatch = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $key))));
-        $methodForCall = "get" . ucfirst($methodForMatch);
-        
+        $methodForCall = 'get' . ucfirst($methodForMatch);
+
         if ($methodForMatch === 'enablePhp') {
-            $methodForCall = "getIsPhpEnabled";
+            $methodForCall = 'getIsPhpEnabled';
         } elseif ($methodForMatch === 'enableRemote') {
-            $methodForCall = "getIsRemoteEnabled";
+            $methodForCall = 'getIsRemoteEnabled';
         } elseif ($methodForMatch === 'enablePdfA') {
-            $methodForCall = "getIsPdfAEnabled";
+            $methodForCall = 'getIsPdfAEnabled';
         } elseif ($methodForMatch === 'enableJavascript') {
-            $methodForCall = "getIsJavascriptEnabled";
+            $methodForCall = 'getIsJavascriptEnabled';
         } elseif ($methodForMatch === 'enableHtml5Parser') {
-            $methodForCall = "getIsHtml5ParserEnabled";
+            $methodForCall = 'getIsHtml5ParserEnabled';
         } elseif ($methodForMatch === 'enableFontSubsetting') {
-            $methodForCall = "getIsFontSubsettingEnabled";
+            $methodForCall = 'getIsFontSubsettingEnabled';
         }
 
         if (method_exists($this, $methodForCall)) {
             return $this->{$methodForCall}();
         }
-        
+
         return null;
     }
 
@@ -525,7 +528,7 @@ class Options
         }
         $this->allowedProtocols = [];
         foreach ($protocols as $protocol => $config) {
-            $this->addAllowedProtocol($protocol, ...($config["rules"] ?? []));
+            $this->addAllowedProtocol($protocol, ...($config['rules'] ?? []));
         }
         return $this;
     }
@@ -543,21 +546,21 @@ class Options
         if (empty($rules)) {
             $rules = [];
             switch ($protocol) {
-                case "data://":
+                case 'data://':
                     break;
-                case "file://":
-                    $rules[] = [$this, "validateLocalUri"];
+                case 'file://':
+                    $rules[] = [$this, 'validateLocalUri'];
                     break;
-                case "http://":
-                case "https://":
-                    $rules[] = [$this, "validateRemoteUri"];
+                case 'http://':
+                case 'https://':
+                    $rules[] = [$this, 'validateRemoteUri'];
                     break;
-                case "phar://":
-                    $rules[] = [$this, "validatePharUri"];
+                case 'phar://':
+                    $rules[] = [$this, 'validatePharUri'];
                     break;
             }
         }
-        $this->allowedProtocols[$protocol] = ["rules" => $rules];
+        $this->allowedProtocols[$protocol] = ['rules' => $rules];
         return $this;
     }
 
@@ -737,10 +740,10 @@ class Options
      */
     public function setDefaultFont($defaultFont): self
     {
-        if (!($defaultFont === null || trim($defaultFont) === "")) {
+        if (!($defaultFont === null || trim($defaultFont) === '')) {
             $this->defaultFont = $defaultFont;
         } else {
-            $this->defaultFont = "serif";
+            $this->defaultFont = 'serif';
         }
         return $this;
     }
@@ -827,7 +830,7 @@ class Options
      */
     public function setFontCache($fontCache): self
     {
-        if (!is_callable($this->artifactPathValidation) || ($this->artifactPathValidation)($fontCache, "fontCache") === true) {
+        if (!is_callable($this->artifactPathValidation) || ($this->artifactPathValidation)($fontCache, 'fontCache') === true) {
             $this->fontCache = $fontCache;
         }
         return $this;
@@ -847,7 +850,7 @@ class Options
      */
     public function setFontDir($fontDir): self
     {
-        if (!is_callable($this->artifactPathValidation) || ($this->artifactPathValidation)($fontDir, "fontDir") === true) {
+        if (!is_callable($this->artifactPathValidation) || ($this->artifactPathValidation)($fontDir, 'fontDir') === true) {
             $this->fontDir = $fontDir;
         }
         return $this;
@@ -1021,7 +1024,7 @@ class Options
         if (is_array($allowedRemoteHosts)) {
             // Set hosts to lowercase
             foreach ($allowedRemoteHosts as &$host) {
-                $host = mb_strtolower($host, "UTF-8");
+                $host = mb_strtolower($host, 'UTF-8');
             }
 
             unset($host);
@@ -1071,7 +1074,7 @@ class Options
      */
     public function setLogOutputFile($logOutputFile): self
     {
-        if (!is_callable($this->artifactPathValidation) || ($this->artifactPathValidation)($logOutputFile, "logOutputFile") === true) {
+        if (!is_callable($this->artifactPathValidation) || ($this->artifactPathValidation)($logOutputFile, 'logOutputFile') === true) {
             $this->logOutputFile = $logOutputFile;
         }
         return $this;
@@ -1091,7 +1094,7 @@ class Options
      */
     public function setTempDir($tempDir): self
     {
-        if (!is_callable($this->artifactPathValidation) || ($this->artifactPathValidation)($tempDir, "tempDir") === true) {
+        if (!is_callable($this->artifactPathValidation) || ($this->artifactPathValidation)($tempDir, 'tempDir') === true) {
             $this->tempDir = $tempDir;
         }
         return $this;
@@ -1111,7 +1114,7 @@ class Options
      */
     public function setRootDir($rootDir): self
     {
-        if (!is_callable($this->artifactPathValidation) || ($this->artifactPathValidation)($rootDir, "rootDir") === true) {
+        if (!is_callable($this->artifactPathValidation) || ($this->artifactPathValidation)($rootDir, 'rootDir') === true) {
             $this->rootDir = $rootDir;
         }
         return $this;
@@ -1147,14 +1150,13 @@ class Options
         return $this->httpContext;
     }
 
-
     public function validateArtifactPath(?string $path, string $option): bool
     {
         if ($path === null) {
             return true;
         }
         $parsed_uri = parse_url($path);
-        if ($parsed_uri === false || (array_key_exists("scheme", $parsed_uri) && strtolower($parsed_uri["scheme"]) === "phar")) {
+        if ($parsed_uri === false || (array_key_exists('scheme', $parsed_uri) && strtolower($parsed_uri['scheme']) === 'phar')) {
             return false;
         }
         return true;
@@ -1163,10 +1165,10 @@ class Options
     public function validateLocalUri(string $uri): array
     {
         if (strlen($uri) === 0) {
-            return [false, "The URI must not be empty."];
+            return [false, 'The URI must not be empty.'];
         }
 
-        $realfile = realpath(str_replace("file://", "", $uri));
+        $realfile = realpath(str_replace('file://', '', $uri));
 
         $dirs = $this->chroot;
         $dirs[] = $this->rootDir;
@@ -1179,11 +1181,11 @@ class Options
             }
         }
         if ($chrootValid !== true) {
-            return [false, "Permission denied. The file could not be found under the paths specified by Options::chroot."];
+            return [false, 'Permission denied. The file could not be found under the paths specified by Options::chroot.'];
         }
 
         if (!$realfile) {
-            return [false, "File not found."];
+            return [false, 'File not found.'];
         }
 
         return [true, null];
@@ -1192,29 +1194,29 @@ class Options
     public function validatePharUri(string $uri)
     {
         if (strlen($uri) === 0) {
-            return [false, "The URI must not be empty."];
+            return [false, 'The URI must not be empty.'];
         }
 
-        $file = substr(substr($uri, 0, strpos($uri, ".phar") + 5), 7);
+        $file = substr(substr($uri, 0, strpos($uri, '.phar') + 5), 7);
         return $this->validateLocalUri($file);
     }
 
     public function validateRemoteUri(string $uri): array
     {
         if (strlen($uri) === 0) {
-            return [false, "The URI must not be empty."];
+            return [false, 'The URI must not be empty.'];
         }
 
         if (!$this->isRemoteEnabled) {
-            return [false, "Remote file requested, but remote file download is disabled."];
+            return [false, 'Remote file requested, but remote file download is disabled.'];
         }
 
         if (is_array($this->allowedRemoteHosts) && count($this->allowedRemoteHosts) > 0) {
             $host = parse_url($uri, PHP_URL_HOST);
-            $host = mb_strtolower($host, "UTF-8");
+            $host = mb_strtolower($host, 'UTF-8');
 
             if (!in_array($host, $this->allowedRemoteHosts, true)) {
-                return [false, "Remote host is not in allowed list: " . $host];
+                return [false, 'Remote host is not in allowed list: ' . $host];
             }
         }
 

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Dompdf\Tests\FrameReflower;
 
 use Dompdf\FrameReflower\Image;

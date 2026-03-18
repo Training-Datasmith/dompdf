@@ -1,9 +1,12 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf\Renderer;
 
 use Dompdf\Adapter\CPDF;
@@ -17,7 +20,7 @@ use Dompdf\Frame;
 class Text extends AbstractRenderer
 {
     /** Thickness of underline. Screen: 0.08, print: better less, e.g. 0.04 */
-    const DECO_THICKNESS = 0.02;
+    public const DECO_THICKNESS = 0.02;
 
     //Tweaking if $base and $descent are not accurate.
     //Check method_exists( $this->_canvas, "get_cpdf" )
@@ -26,26 +29,26 @@ class Text extends AbstractRenderer
     //  But $size and $size-$height seem to be accurate enough
 
     /** Relative to bottom of text, as fraction of height */
-    const UNDERLINE_OFFSET = 0.0;
+    public const UNDERLINE_OFFSET = 0.0;
 
     /** Relative to top of text */
-    const OVERLINE_OFFSET = 0.0;
+    public const OVERLINE_OFFSET = 0.0;
 
     /** Relative to centre of text. */
-    const LINETHROUGH_OFFSET = 0.0;
+    public const LINETHROUGH_OFFSET = 0.0;
 
     /** How far to extend lines past either end, in pt */
-    const DECO_EXTENSION = 0.0;
+    public const DECO_EXTENSION = 0.0;
 
     /**
      * @param \Dompdf\FrameDecorator\Text $frame
      */
-    function render(Frame $frame): void
+    public function render(Frame $frame): void
     {
         $style = $frame->get_style();
         $text = $frame->get_text();
 
-        if ($text === "") {
+        if ($text === '') {
             return;
         }
 
@@ -57,7 +60,7 @@ class Text extends AbstractRenderer
         $ml = $style->margin_left;
         $pl = $style->padding_left;
         $bl = $style->border_left_width;
-        $x += (float) $style->length_in_pt([$ml, $pl, $bl], $cb["w"]);
+        $x += (float) $style->length_in_pt([$ml, $pl, $bl], $cb['w']);
 
         $font = $style->font_family;
         $size = $style->font_size;
@@ -72,9 +75,16 @@ class Text extends AbstractRenderer
           $text
         );*/
 
-        $this->_canvas->text($x, $y, $text,
-            $font, $size,
-            $style->color, $word_spacing, $letter_spacing);
+        $this->_canvas->text(
+            $x,
+            $y,
+            $text,
+            $font,
+            $size,
+            $style->color,
+            $word_spacing,
+            $letter_spacing
+        );
 
         $line = $frame->get_containing_line();
 
@@ -95,12 +105,12 @@ class Text extends AbstractRenderer
         if ($this->_canvas instanceof CPDF) {
             $cpdf_font = $this->_canvas->get_cpdf()->fonts[$style->font_family];
 
-            if (isset($cpdf_font["UnderlinePosition"])) {
-                $underline_position = $cpdf_font["UnderlinePosition"] / 1000;
+            if (isset($cpdf_font['UnderlinePosition'])) {
+                $underline_position = $cpdf_font['UnderlinePosition'] / 1000;
             }
 
-            if (isset($cpdf_font["UnderlineThickness"])) {
-                $line_thickness = $size * ($cpdf_font["UnderlineThickness"] / 1000);
+            if (isset($cpdf_font['UnderlineThickness'])) {
+                $line_thickness = $size * ($cpdf_font['UnderlineThickness'] / 1000);
             }
         }
 
@@ -120,7 +130,7 @@ class Text extends AbstractRenderer
         while (isset($stack[0])) {
             $f = array_pop($stack);
 
-            if (($text_deco = $f->get_style()->text_decoration) === "none") {
+            if (($text_deco = $f->get_style()->text_decoration) === 'none') {
                 continue;
             }
 
@@ -131,15 +141,15 @@ class Text extends AbstractRenderer
                 default:
                     continue 2;
 
-                case "underline":
+                case 'underline':
                     $deco_y += $base - $descent + $underline_offset + $line_thickness / 2;
                     break;
 
-                case "overline":
+                case 'overline':
                     $deco_y += $overline_offset + $line_thickness / 2;
                     break;
 
-                case "line-through":
+                case 'line-through':
                     $deco_y += $base * 0.7 + $linethrough_offset;
                     break;
             }
@@ -155,7 +165,7 @@ class Text extends AbstractRenderer
         if ($options->getDebugLayout() && $options->getDebugLayoutLines()) {
             $fontMetrics = $this->_dompdf->getFontMetrics();
             $textWidth = $fontMetrics->getTextWidth($text, $font, $size, $word_spacing, $letter_spacing);
-            $this->debugLayout([$x, $y, $textWidth, $frame_font_size], "orange", [0.5, 0.5]);
+            $this->debugLayout([$x, $y, $textWidth, $frame_font_size], 'orange', [0.5, 0.5]);
         }
     }
 }

@@ -1,8 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Dompdf\Tests\OutputTest;
 
-use Dompdf\Options;
 use Dompdf\Dompdf;
+use Dompdf\Options;
 use SplFileInfo;
 
 final class Dataset
@@ -30,11 +33,11 @@ final class Dataset
     public function referenceFile(): SplFileInfo
     {
         $path = $this->file->getPath();
-        $name = $this->file->getBasename("." . $this->file->getExtension());
+        $name = $this->file->getBasename('.' . $this->file->getExtension());
         return new SplFileInfo("$path/$name.pdf");
     }
 
-    public function render(string $backend = "cpdf"): Dompdf
+    public function render(string $backend = 'cpdf'): Dompdf
     {
         $options = new Options();
         $options->setPdfBackend($backend);

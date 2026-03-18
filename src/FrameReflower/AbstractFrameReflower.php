@@ -1,9 +1,12 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf\FrameReflower;
 
 use Dompdf\Css\Content\Attr;
@@ -30,7 +33,6 @@ use Dompdf\FrameDecorator\Block;
  */
 abstract class AbstractFrameReflower
 {
-
     /**
      * Frame for this reflower
      *
@@ -55,7 +57,7 @@ abstract class AbstractFrameReflower
     /**
      * AbstractFrameReflower constructor.
      */
-    function __construct(AbstractFrameDecorator $frame)
+    public function __construct(AbstractFrameDecorator $frame)
     {
         $this->_frame = $frame;
         $this->_min_max_child_cache = null;
@@ -65,7 +67,7 @@ abstract class AbstractFrameReflower
     /**
      * @return Dompdf
      */
-    function get_dompdf()
+    public function get_dompdf()
     {
         return $this->_frame->get_dompdf();
     }
@@ -87,7 +89,7 @@ abstract class AbstractFrameReflower
         $style = $frame->get_style();
 
         switch ($style->position) {
-            case "absolute":
+            case 'absolute':
                 $parent = $frame->find_positioned_parent();
                 if ($parent !== $frame->get_root()) {
                     $parent_style = $parent->get_style();
@@ -96,22 +98,23 @@ abstract class AbstractFrameReflower
                     //       is not possible until reflow has completed;
                     //       we'll fall back to the parent's containing block,
                     //       which is wrong for auto-height parents
-                    if ($parent_style->height === "auto") {
+                    if ($parent_style->height === 'auto') {
                         $parent_containing_block = $parent->get_containing_block();
-                        $containing_block_height = $parent_containing_block["h"] -
+                        $containing_block_height = $parent_containing_block['h'] -
                             (float)$parent_style->length_in_pt([
                                 $parent_style->margin_top,
                                 $parent_style->margin_bottom,
                                 $parent_style->border_top_width,
-                                $parent_style->border_bottom_width
-                            ], $parent_containing_block["w"]);
+                                $parent_style->border_bottom_width,
+                            ], $parent_containing_block['w']);
                     } else {
-                        $containing_block_height = $parent_padding_box["h"];
+                        $containing_block_height = $parent_padding_box['h'];
                     }
-                    $frame->set_containing_block($parent_padding_box["x"], $parent_padding_box["y"], $parent_padding_box["w"], $containing_block_height);
+                    $frame->set_containing_block($parent_padding_box['x'], $parent_padding_box['y'], $parent_padding_box['w'], $containing_block_height);
                     break;
                 }
-            case "fixed":
+                // no break
+            case 'fixed':
                 $root = $frame->get_root();
                 $parent = $frame->get_parent();
                 do {
@@ -122,7 +125,7 @@ abstract class AbstractFrameReflower
                     $parent = $parents_parent;
                 } while ($parent);
                 $initial_cb = $parent->get_containing_block();
-                $frame->set_containing_block($initial_cb["x"], $initial_cb["y"], $initial_cb["w"], $initial_cb["h"]);
+                $frame->set_containing_block($initial_cb['x'], $initial_cb['y'], $initial_cb['w'], $initial_cb['h']);
                 break;
             default:
                 // Nothing to do, containing block already set via parent
@@ -148,23 +151,23 @@ abstract class AbstractFrameReflower
         $cb = $frame->get_containing_block();
         $style = $frame->get_style();
 
-        $t = $style->length_in_pt($style->margin_top, $cb["w"]);
-        $b = $style->length_in_pt($style->margin_bottom, $cb["w"]);
+        $t = $style->length_in_pt($style->margin_top, $cb['w']);
+        $b = $style->length_in_pt($style->margin_bottom, $cb['w']);
 
         // Handle 'auto' values
-        if ($t === "auto") {
-            $style->set_used("margin_top", 0.0);
+        if ($t === 'auto') {
+            $style->set_used('margin_top', 0.0);
             $t = 0.0;
         }
 
-        if ($b === "auto") {
-            $style->set_used("margin_bottom", 0.0);
+        if ($b === 'auto') {
+            $style->set_used('margin_bottom', 0.0);
             $b = 0.0;
         }
 
         // Collapse vertical margins:
         $n = $frame->get_next_sibling();
-        if ( $n && !($n->is_block_level() && $n->is_in_flow()) ) {
+        if ($n && !($n->is_block_level() && $n->is_in_flow())) {
             while ($n = $n->get_next_sibling()) {
                 if ($n->is_block_level() && $n->is_in_flow()) {
                     break;
@@ -179,17 +182,17 @@ abstract class AbstractFrameReflower
 
         if ($n) {
             $n_style = $n->get_style();
-            $n_t = (float)$n_style->length_in_pt($n_style->margin_top, $cb["w"]);
+            $n_t = (float)$n_style->length_in_pt($n_style->margin_top, $cb['w']);
 
             $b = $this->get_collapsed_margin_length($b, $n_t);
-            $style->set_used("margin_bottom", $b);
-            $n_style->set_used("margin_top", 0.0);
+            $style->set_used('margin_bottom', $b);
+            $n_style->set_used('margin_top', 0.0);
         }
 
         // Collapse our first child's margin, if there is no border or padding
         if ($style->border_top_width == 0 && $style->length_in_pt($style->padding_top) == 0) {
             $f = $this->_frame->get_first_child();
-            if ( $f && !($f->is_block_level() && $f->is_in_flow()) ) {
+            if ($f && !($f->is_block_level() && $f->is_in_flow())) {
                 while ($f = $f->get_next_sibling()) {
                     if ($f->is_block_level() && $f->is_in_flow()) {
                         break;
@@ -205,18 +208,18 @@ abstract class AbstractFrameReflower
             // Margins are collapsed only between block-level boxes
             if ($f) {
                 $f_style = $f->get_style();
-                $f_t = (float)$f_style->length_in_pt($f_style->margin_top, $cb["w"]);
+                $f_t = (float)$f_style->length_in_pt($f_style->margin_top, $cb['w']);
 
                 $t = $this->get_collapsed_margin_length($t, $f_t);
-                $style->set_used("margin_top", $t);
-                $f_style->set_used("margin_top", 0.0);
+                $style->set_used('margin_top', $t);
+                $f_style->set_used('margin_top', 0.0);
             }
         }
 
         // Collapse our last child's margin, if there is no border or padding
         if ($style->border_bottom_width == 0 && $style->length_in_pt($style->padding_bottom) == 0) {
             $l = $this->_frame->get_last_child();
-            if ( $l && !($l->is_block_level() && $l->is_in_flow()) ) {
+            if ($l && !($l->is_block_level() && $l->is_in_flow())) {
                 while ($l = $l->get_prev_sibling()) {
                     if ($l->is_block_level() && $l->is_in_flow()) {
                         break;
@@ -232,11 +235,11 @@ abstract class AbstractFrameReflower
             // Margins are collapsed only between block-level boxes
             if ($l) {
                 $l_style = $l->get_style();
-                $l_b = (float)$l_style->length_in_pt($l_style->margin_bottom, $cb["w"]);
+                $l_b = (float)$l_style->length_in_pt($l_style->margin_bottom, $cb['w']);
 
                 $b = $this->get_collapsed_margin_length($b, $l_b);
-                $style->set_used("margin_bottom", $b);
-                $l_style->set_used("margin_bottom", 0.0);
+                $style->set_used('margin_bottom', $b);
+                $l_style->set_used('margin_bottom', 0.0);
             }
         }
     }
@@ -253,11 +256,11 @@ abstract class AbstractFrameReflower
         if ($l1 < 0 && $l2 < 0) {
             return min($l1, $l2); // min(x, y) = - max(abs(x), abs(y)), if x < 0 && y < 0
         }
-        
+
         if ($l1 < 0 || $l2 < 0) {
             return $l1 + $l2; // x + y = x - abs(y), if y < 0
         }
-        
+
         return max($l1, $l2);
     }
 
@@ -271,24 +274,24 @@ abstract class AbstractFrameReflower
     {
         $style = $frame->get_style();
 
-        if ($style->position === "relative") {
+        if ($style->position === 'relative') {
             $cb = $frame->get_containing_block();
-            $top = $style->length_in_pt($style->top, $cb["h"]);
-            $right = $style->length_in_pt($style->right, $cb["w"]);
-            $bottom = $style->length_in_pt($style->bottom, $cb["h"]);
-            $left = $style->length_in_pt($style->left, $cb["w"]);
+            $top = $style->length_in_pt($style->top, $cb['h']);
+            $right = $style->length_in_pt($style->right, $cb['w']);
+            $bottom = $style->length_in_pt($style->bottom, $cb['h']);
+            $left = $style->length_in_pt($style->left, $cb['w']);
 
             // FIXME RTL case:
             // if ($left !== "auto" && $right !== "auto") $left = -$right;
-            if ($left === "auto" && $right === "auto") {
+            if ($left === 'auto' && $right === 'auto') {
                 $left = 0;
-            } elseif ($left === "auto") {
+            } elseif ($left === 'auto') {
                 $left = -$right;
             }
 
-            if ($top === "auto" && $bottom === "auto") {
+            if ($top === 'auto' && $bottom === 'auto') {
                 $top = 0;
-            } elseif ($top === "auto") {
+            } elseif ($top === 'auto') {
                 $top = -$bottom;
             }
 
@@ -296,7 +299,7 @@ abstract class AbstractFrameReflower
         }
     }
 
-    abstract function reflow(?Block $block = null);
+    abstract public function reflow(?Block $block = null);
 
     /**
      * Resolve the `min-width` property.
@@ -311,7 +314,7 @@ abstract class AbstractFrameReflower
         $style = $this->_frame->get_style();
         $min_width = $style->min_width;
 
-        return $min_width !== "auto"
+        return $min_width !== 'auto'
             ? $style->length_in_pt($min_width, $cbw ?? 0)
             : 0.0;
     }
@@ -329,7 +332,7 @@ abstract class AbstractFrameReflower
         $style = $this->_frame->get_style();
         $max_width = $style->max_width;
 
-        return $max_width !== "none"
+        return $max_width !== 'none'
             ? $style->length_in_pt($max_width, $cbw ?? INF)
             : INF;
     }
@@ -347,7 +350,7 @@ abstract class AbstractFrameReflower
         $style = $this->_frame->get_style();
         $min_height = $style->min_height;
 
-        return $min_height !== "auto"
+        return $min_height !== 'auto'
             ? $style->length_in_pt($min_height, $cbh ?? 0)
             : 0.0;
     }
@@ -365,7 +368,7 @@ abstract class AbstractFrameReflower
         $style = $this->_frame->get_style();
         $max_height = $style->max_height;
 
-        return $max_height !== "none"
+        return $max_height !== 'none'
             ? $style->length_in_pt($style->max_height, $cbh ?? INF)
             : INF;
     }
@@ -390,19 +393,19 @@ abstract class AbstractFrameReflower
             $inline_max = 0;
 
             // Add all adjacent inline widths together to calculate max width
-            while ($iter->valid() && ($iter->current()->is_inline_level() || $iter->current()->get_style()->display === "-dompdf-image")) {
+            while ($iter->valid() && ($iter->current()->is_inline_level() || $iter->current()->get_style()->display === '-dompdf-image')) {
                 /** @var AbstractFrameDecorator */
                 $child = $iter->current();
                 $child->get_reflower()->_set_content();
                 $minmax = $child->get_min_max_width();
 
-                if (in_array($child->get_style()->white_space, ["pre", "nowrap"], true)) {
-                    $inline_min += $minmax["min"];
+                if (in_array($child->get_style()->white_space, ['pre', 'nowrap'], true)) {
+                    $inline_min += $minmax['min'];
                 } else {
-                    $low[] = $minmax["min"];
+                    $low[] = $minmax['min'];
                 }
 
-                $inline_max += $minmax["max"];
+                $inline_max += $minmax['max'];
                 $iter->next();
             }
 
@@ -467,7 +470,7 @@ abstract class AbstractFrameReflower
             $style->border_left_width,
             $style->border_right_width,
             $style->margin_left,
-            $style->margin_right
+            $style->margin_right,
         ];
 
         // The containing block is not defined yet, treat percentages as 0
@@ -475,7 +478,7 @@ abstract class AbstractFrameReflower
         $min += $delta;
         $max += $delta;
 
-        return $this->_min_max_cache = [$min, $max, "min" => $min, "max" => $max];
+        return $this->_min_max_cache = [$min, $max, 'min' => $min, 'max' => $max];
     }
 
     /**
@@ -491,50 +494,36 @@ abstract class AbstractFrameReflower
         $style = $frame->get_style();
         $content = $style->content;
 
-        if ($content === "normal" || $content === "none") {
+        if ($content === 'normal' || $content === 'none') {
             return null;
         }
 
         $quotes = $style->quotes;
-        $text = "";
+        $text = '';
 
         foreach ($content as $val) {
             if ($val instanceof StringPart) {
                 $text .= $val->string;
-            }
-
-            elseif ($val instanceof OpenQuote) {
+            } elseif ($val instanceof OpenQuote) {
                 // FIXME: Take quotation depth into account
-                if ($quotes !== "none" && isset($quotes[0][0])) {
+                if ($quotes !== 'none' && isset($quotes[0][0])) {
                     $text .= $quotes[0][0];
                 }
-            }
-
-            elseif ($val instanceof CloseQuote) {
+            } elseif ($val instanceof CloseQuote) {
                 // FIXME: Take quotation depth into account
-                if ($quotes !== "none" && isset($quotes[0][1])) {
+                if ($quotes !== 'none' && isset($quotes[0][1])) {
                     $text .= $quotes[0][1];
                 }
-            }
-            
-            elseif ($val instanceof NoOpenQuote) {
+            } elseif ($val instanceof NoOpenQuote) {
                 // FIXME: Increment quotation depth
-            }
-
-            elseif ($val instanceof NoCloseQuote) {
+            } elseif ($val instanceof NoCloseQuote) {
                 // FIXME: Decrement quotation depth
-            }
-
-            elseif ($val instanceof Attr) {
+            } elseif ($val instanceof Attr) {
                 $text .= $frame->get_parent()->get_node()->getAttribute($val->attribute);
-            }
-
-            elseif ($val instanceof Counter) {
+            } elseif ($val instanceof Counter) {
                 $p = $frame->lookup_counter_frame($val->name, true);
                 $text .= $p->counter_value($val->name, $val->style);
-            }
-
-            elseif ($val instanceof Counters) {
+            } elseif ($val instanceof Counters) {
                 $p = $frame->lookup_counter_frame($val->name, true);
                 $tmp = [];
                 while ($p) {
@@ -562,15 +551,15 @@ abstract class AbstractFrameReflower
 
         $style = $frame->get_style();
 
-        if (($reset = $style->counter_reset) !== "none") {
+        if (($reset = $style->counter_reset) !== 'none') {
             $frame->reset_counters($reset);
         }
 
-        if (($increment = $style->counter_increment) !== "none") {
+        if (($increment = $style->counter_increment) !== 'none') {
             $frame->increment_counters($increment);
         }
 
-        if ($frame->get_node()->nodeName === "dompdf_generated") {
+        if ($frame->get_node()->nodeName === 'dompdf_generated') {
             $content = $this->resolve_content();
 
             if ($content !== null) {

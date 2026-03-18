@@ -1,9 +1,12 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf\Renderer;
 
 use Dompdf\Frame;
@@ -13,7 +16,7 @@ use Dompdf\Frame;
  */
 class TableRow extends Block
 {
-    function render(Frame $frame): void
+    public function render(Frame $frame): void
     {
         $style = $frame->get_style();
         $node = $frame->get_node();

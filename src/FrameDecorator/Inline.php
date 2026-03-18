@@ -1,14 +1,17 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf\FrameDecorator;
 
 use Dompdf\Dompdf;
-use Dompdf\Frame;
 use Dompdf\Exception;
+use Dompdf\Frame;
 
 /**
  * Decorates frames for inline layout
@@ -17,7 +20,6 @@ use Dompdf\Exception;
  */
 class Inline extends AbstractFrameDecorator
 {
-
     /**
      * Vertical padding, border, and margin do not apply when determining the
      * height for inline frames.
@@ -47,7 +49,7 @@ class Inline extends AbstractFrameDecorator
         }
 
         if ($child->get_parent() !== $this) {
-            throw new Exception("Unable to split: frame is not a child of this one.");
+            throw new Exception('Unable to split: frame is not a child of this one.');
         }
 
         $this->revert_counter_increment();
@@ -73,17 +75,17 @@ class Inline extends AbstractFrameDecorator
         $split_style->border_bottom_left_radius = 0.0;
 
         // If this is a generated node don't propagate the content style
-        if ($split->get_node()->nodeName == "dompdf_generated") {
-            $split_style->content = "normal";
+        if ($split->get_node()->nodeName == 'dompdf_generated') {
+            $split_style->content = 'normal';
         }
 
         //On continuation of inline element on next line,
         //don't repeat non-horizontally repeatable background images
         //See e.g. in testcase image_variants, long descriptions
-        if (($url = $style->background_image) && $url !== "none"
-            && ($repeat = $style->background_repeat) && $repeat !== "repeat" && $repeat !== "repeat-x"
+        if (($url = $style->background_image) && $url !== 'none'
+            && ($repeat = $style->background_repeat) && $repeat !== 'repeat' && $repeat !== 'repeat-x'
         ) {
-            $split_style->background_image = "none";
+            $split_style->background_image = 'none';
         }
 
         $this->get_parent()->insert_child_after($split, $this);

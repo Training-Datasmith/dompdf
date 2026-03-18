@@ -1,9 +1,12 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf\Renderer;
 
 use Dompdf\Frame;
@@ -20,7 +23,7 @@ class Image extends Block
     /**
      * @param ImageFrameDecorator $frame
      */
-    function render(Frame $frame): void
+    public function render(Frame $frame): void
     {
         $style = $frame->get_style();
         $node = $frame->get_node();
@@ -38,7 +41,7 @@ class Image extends Block
 
         $src = $frame->get_image_url();
 
-        if (Cache::is_broken($src) && ($alt = $node->getAttribute("alt")) !== "") {
+        if (Cache::is_broken($src) && ($alt = $node->getAttribute('alt')) !== '') {
             $font = $style->font_family;
             $size = $style->font_size;
             $word_spacing = $style->word_spacing;
@@ -68,6 +71,6 @@ class Image extends Block
         }
 
         $this->addNamedDest($node);
-        $this->debugBlockLayout($frame, "blue");
+        $this->debugBlockLayout($frame, 'blue');
     }
 }

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Dompdf\Tests\Css;
 
 use Dompdf\Css\Color;
@@ -10,32 +13,32 @@ class ColorTest extends TestCase
     {
         return [
             // Color names
-            ["red", [1, 0, 0, 1.0]],
-            ["lime", [0, 1, 0, 1.0]],
-            ["blue", [0, 0, 1, 1.0]],
+            ['red', [1, 0, 0, 1.0]],
+            ['lime', [0, 1, 0, 1.0]],
+            ['blue', [0, 0, 1, 1.0]],
 
             // Hex notation
-            ["#f00", [1, 0, 0, 1.0]],
-            ["#f003", [1, 0, 0, 0.2]],
-            ["#ff0000", [1, 0, 0, 1.0]],
-            ["#ff000033", [1, 0, 0, 0.2]],
-            ["#FFFFFF00", [1, 1, 1, 0.0]],
+            ['#f00', [1, 0, 0, 1.0]],
+            ['#f003', [1, 0, 0, 0.2]],
+            ['#ff0000', [1, 0, 0, 1.0]],
+            ['#ff000033', [1, 0, 0, 0.2]],
+            ['#FFFFFF00', [1, 1, 1, 0.0]],
 
             // Functional rgb syntax (space-separated)
-            ["rgb(255 0 0)", [1, 0, 0, 1.0]],
-            ["rgb(255 0 0/0.2)", [1, 0, 0, 0.2]],
-            ["rgb( 255 0 0 / 0.2 )", [1, 0, 0, 0.2]],
-            ["rgb(100% 0% 0% / 20%)", [1, 0, 0, 0.2]],
-            ["rgba(255 0 0)", [1, 0, 0, 1.0]],
-            ["rgba(255 0 0/0.2)", [1, 0, 0, 0.2]],
+            ['rgb(255 0 0)', [1, 0, 0, 1.0]],
+            ['rgb(255 0 0/0.2)', [1, 0, 0, 0.2]],
+            ['rgb( 255 0 0 / 0.2 )', [1, 0, 0, 0.2]],
+            ['rgb(100% 0% 0% / 20%)', [1, 0, 0, 0.2]],
+            ['rgba(255 0 0)', [1, 0, 0, 1.0]],
+            ['rgba(255 0 0/0.2)', [1, 0, 0, 0.2]],
 
             // Functional rgb syntax (comma-separated)
-            ["rgb(255, 0, 0)", [1, 0, 0, 1.0]],
-            ["rgb(255, 0, 0, 0.2)", [1, 0, 0, 0.2]],
-            ["rgb( 255,0,0,0.2 )", [1, 0, 0, 0.2]],
-            ["rgb(100%, 0%, 0%, 20%)", [1, 0, 0, 0.2]],
-            ["rgba(255, 0, 0)", [1, 0, 0, 1.0]],
-            ["rgba(255, 0, 0, 0.2)", [1, 0, 0, 0.2]],
+            ['rgb(255, 0, 0)', [1, 0, 0, 1.0]],
+            ['rgb(255, 0, 0, 0.2)', [1, 0, 0, 0.2]],
+            ['rgb( 255,0,0,0.2 )', [1, 0, 0, 0.2]],
+            ['rgb(100%, 0%, 0%, 20%)', [1, 0, 0, 0.2]],
+            ['rgba(255, 0, 0)', [1, 0, 0, 1.0]],
+            ['rgba(255, 0, 0, 0.2)', [1, 0, 0, 0.2]],
         ];
     }
 
@@ -48,11 +51,11 @@ class ColorTest extends TestCase
         $color = Color::parse($value);
 
         if (!is_array($color)) {
-            $this->fail("Failed to parse valid color declaration");
+            $this->fail('Failed to parse valid color declaration');
         }
 
         [$r, $g, $b] = $color;
-        $alpha = $color["alpha"];
+        $alpha = $color['alpha'];
 
         $this->assertEquals($expected, [$r, $g, $b, $alpha]);
     }

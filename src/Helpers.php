@@ -1,9 +1,12 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf;
 
 class Helpers
@@ -20,17 +23,17 @@ class Helpers
     public static function pre_r($mixed, $return = false): ?string
     {
         if ($return) {
-            return "<pre>" . print_r($mixed, true) . "</pre>";
+            return '<pre>' . print_r($mixed, true) . '</pre>';
         }
 
-        if (php_sapi_name() !== "cli") {
-            echo "<pre>";
+        if (php_sapi_name() !== 'cli') {
+            echo '<pre>';
         }
 
         print_r($mixed);
 
-        if (php_sapi_name() !== "cli") {
-            echo "</pre>";
+        if (php_sapi_name() !== 'cli') {
+            echo '</pre>';
         } else {
             echo "\n";
         }
@@ -55,44 +58,44 @@ class Helpers
      */
     public static function build_url($protocol, $host, string $base_path, $url, $chrootDirs = [])
     {
-        $protocol = mb_strtolower($protocol, "UTF-8");
+        $protocol = mb_strtolower($protocol, 'UTF-8');
         if (empty($protocol)) {
-            $protocol = "file://";
+            $protocol = 'file://';
         }
-        if ($url === "") {
+        if ($url === '') {
             return null;
         }
 
-        $url_lc = mb_strtolower($url, "UTF-8");
+        $url_lc = mb_strtolower($url, 'UTF-8');
 
         // Is the url already fully qualified, a Data URI, or a reference to a named anchor?
         // File-protocol URLs may require additional processing (e.g. for URLs with a relative path)
         if (
             (
-                mb_strpos($url_lc, "://") !== false
-                && !in_array(substr($url_lc, 0, 7), ["file://", "phar://"], true)
+                mb_strpos($url_lc, '://') !== false
+                && !in_array(substr($url_lc, 0, 7), ['file://', 'phar://'], true)
             )
-            || mb_substr($url_lc, 0, 1) === "#"
-            || mb_strpos($url_lc, "data:") === 0
-            || mb_strpos($url_lc, "mailto:") === 0
-            || mb_strpos($url_lc, "tel:") === 0
+            || mb_substr($url_lc, 0, 1) === '#'
+            || mb_strpos($url_lc, 'data:') === 0
+            || mb_strpos($url_lc, 'mailto:') === 0
+            || mb_strpos($url_lc, 'tel:') === 0
         ) {
             return $url;
         }
 
-        $res = "";
-        if (strpos($url_lc, "file://") === 0) {
+        $res = '';
+        if (strpos($url_lc, 'file://') === 0) {
             $url = substr($url, 7);
-            $protocol = "file://";
-        } elseif (strpos($url_lc, "phar://") === 0) {
-            $res = substr($url, strpos($url_lc, ".phar")+5);
-            $url = substr($url, 7, strpos($url_lc, ".phar")-2);
-            $protocol = "phar://";
+            $protocol = 'file://';
+        } elseif (strpos($url_lc, 'phar://') === 0) {
+            $res = substr($url, strpos($url_lc, '.phar') + 5);
+            $url = substr($url, 7, strpos($url_lc, '.phar') - 2);
+            $protocol = 'phar://';
         }
 
-        $ret = "";
+        $ret = '';
 
-        $is_local_path = in_array($protocol, ["file://", "phar://"], true);
+        $is_local_path = in_array($protocol, ['file://', 'phar://'], true);
 
         if ($is_local_path) {
             //On Windows local file, an abs path can begin also with a '\' or a drive letter and colon
@@ -104,7 +107,7 @@ class Helpers
                 $ret .= realpath($base_path) . '/';
             }
             $ret .= $url;
-            $ret = preg_replace('/\?(.*)$/', "", $ret);
+            $ret = preg_replace('/\?(.*)$/', '', $ret);
 
             $filepath = realpath($ret);
             if ($filepath !== false) {
@@ -114,7 +117,7 @@ class Helpers
             if ($url[0] == '/' && !empty($chrootDirs)) {
                 foreach ($chrootDirs as $dir) {
                     $ret = realpath($dir) . $url;
-                    $ret = preg_replace('/\?(.*)$/', "", $ret);
+                    $ret = preg_replace('/\?(.*)$/', '', $ret);
 
                     if ($filepath = realpath($ret)) {
                         return "$protocol$filepath$res";
@@ -147,16 +150,17 @@ class Helpers
         $host     = $parsed_url['host'] ?? '';
         $port     = isset($parsed_url['port']) ? ':' . $parsed_url['port'] : '';
         $user     = $parsed_url['user'] ?? '';
-        $pass     = isset($parsed_url['pass']) ? ':' . $parsed_url['pass']  : '';
+        $pass     = isset($parsed_url['pass']) ? ':' . $parsed_url['pass'] : '';
         $pass     = ($user || $pass) ? "$pass@" : '';
         $path     = $parsed_url['path'] ?? '';
         $query    = isset($parsed_url['query']) ? '?' . $parsed_url['query'] : '';
         $fragment = isset($parsed_url['fragment']) ? '#' . $parsed_url['fragment'] : '';
-        
+
         // partially reproduced from https://stackoverflow.com/a/1243431/264628
         /* replace '//' or '/./' or '/foo/../' with '/' */
         $re = ['#(/\.?/)#', '#/(?!\.\.)[^/]+/\.\./#'];
-        for ($n=1; $n>0; $path=preg_replace($re, '/', $path, -1, $n)) {}
+        for ($n = 1; $n > 0; $path = preg_replace($re, '/', $path, -1, $n)) {
+        }
 
         return "$scheme$user$pass$host$port$path$query$fragment";
     }
@@ -175,8 +179,8 @@ class Helpers
     public static function buildContentDispositionHeader($dispositionType, $filename): string
     {
         $encoding = mb_detect_encoding($filename);
-        $fallbackfilename = mb_convert_encoding($filename, "ISO-8859-1", $encoding);
-        $fallbackfilename = str_replace("\"", "", $fallbackfilename);
+        $fallbackfilename = mb_convert_encoding($filename, 'ISO-8859-1', $encoding);
+        $fallbackfilename = str_replace('"', '', $fallbackfilename);
         $encodedfilename = rawurlencode($filename);
 
         $contentDisposition = "Content-Disposition: $dispositionType; filename=\"$fallbackfilename\"";
@@ -202,13 +206,13 @@ class Helpers
     public static function dec2roman($num): string
     {
 
-        static $ones = ["", "i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix"];
-        static $tens = ["", "x", "xx", "xxx", "xl", "l", "lx", "lxx", "lxxx", "xc"];
-        static $hund = ["", "c", "cc", "ccc", "cd", "d", "dc", "dcc", "dccc", "cm"];
-        static $thou = ["", "m", "mm", "mmm"];
+        static $ones = ['', 'i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix'];
+        static $tens = ['', 'x', 'xx', 'xxx', 'xl', 'l', 'lx', 'lxx', 'lxxx', 'xc'];
+        static $hund = ['', 'c', 'cc', 'ccc', 'cd', 'd', 'dc', 'dcc', 'dccc', 'cm'];
+        static $thou = ['', 'm', 'mm', 'mmm'];
 
         if (!is_numeric($num)) {
-            throw new Exception("dec2roman() requires a numeric argument.");
+            throw new Exception('dec2roman() requires a numeric argument.');
         }
 
         if ($num >= 4000 || $num <= 0) {
@@ -217,20 +221,24 @@ class Helpers
 
         $num = strrev((string)$num);
 
-        $ret = "";
+        $ret = '';
         switch (mb_strlen($num)) {
             /** @noinspection PhpMissingBreakStatementInspection */
             case 4:
                 $ret .= $thou[$num[3]];
-            /** @noinspection PhpMissingBreakStatementInspection */
+                /** @noinspection PhpMissingBreakStatementInspection */
+                // no break
             case 3:
                 $ret .= $hund[$num[2]];
-            /** @noinspection PhpMissingBreakStatementInspection */
+                /** @noinspection PhpMissingBreakStatementInspection */
+                // no break
             case 2:
                 $ret .= $tens[$num[1]];
-            /** @noinspection PhpMissingBreakStatementInspection */
+                /** @noinspection PhpMissingBreakStatementInspection */
+                // no break
             case 1:
                 $ret .= $ones[$num[0]];
+                // no break
             default:
                 break;
         }
@@ -249,7 +257,7 @@ class Helpers
     public static function dec2base26($num): string
     {
         if (!is_numeric($num)) {
-            throw new Exception("dec2base26() requires a numeric argument.");
+            throw new Exception('dec2base26() requires a numeric argument.');
         }
 
         $num = intval($num);
@@ -286,7 +294,7 @@ class Helpers
      */
     public static function is_percent($value): bool
     {
-        return is_string($value) && false !== mb_strpos($value, "%");
+        return is_string($value) && false !== mb_strpos($value, '%');
     }
 
     /**
@@ -301,9 +309,9 @@ class Helpers
     {
         $expression = '/^data:(?P<mime>[a-z0-9\/+-.]+)(;charset=(?P<charset>[a-z0-9-])+)?(?P<base64>;base64)?\,(?P<data>.*)?/is';
         if (!preg_match($expression, $data_uri, $match)) {
-            $parts = explode(",", $data_uri);
+            $parts = explode(',', $data_uri);
             $parts[0] = preg_replace('/\\s/', '', $parts[0]);
-            if (preg_match('/\\s/', $data_uri) && !preg_match($expression, implode(",", $parts), $match)) {
+            if (preg_match('/\\s/', $data_uri) && !preg_match($expression, implode(',', $parts), $match)) {
                 return false;
             }
         }
@@ -333,17 +341,18 @@ class Helpers
      * @param string $uri The URI to encode
      * @return string The original URL with special characters encoded
      */
-    public static function encodeURI($uri): ?string {
+    public static function encodeURI($uri): ?string
+    {
         $unescaped = [
-            '%2D'=>'-','%5F'=>'_','%2E'=>'.','%21'=>'!', '%7E'=>'~',
-            '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')'
+            '%2D' => '-','%5F' => '_','%2E' => '.','%21' => '!', '%7E' => '~',
+            '%2A' => '*', '%27' => "'", '%28' => '(', '%29' => ')',
         ];
         $reserved = [
-            '%3B'=>';','%2C'=>',','%2F'=>'/','%3F'=>'?','%3A'=>':',
-            '%40'=>'@','%26'=>'&','%3D'=>'=','%2B'=>'+','%24'=>'$'
+            '%3B' => ';','%2C' => ',','%2F' => '/','%3F' => '?','%3A' => ':',
+            '%40' => '@','%26' => '&','%3D' => '=','%2B' => '+','%24' => '$',
         ];
         $score = [
-            '%23'=>'#'
+            '%23' => '#',
         ];
         return preg_replace(
             '/%25([a-fA-F0-9]{2,2})/',
@@ -483,84 +492,84 @@ class Helpers
      */
     public static function explode_url($url): array
     {
-        $protocol = "";
-        $host = "";
-        $path = "";
-        $file = "";
-        $res = "";
+        $protocol = '';
+        $host = '';
+        $path = '';
+        $file = '';
+        $res = '';
 
         $arr = parse_url($url);
-        if ( isset($arr["scheme"]) ) {
-            $arr["scheme"] = mb_strtolower($arr["scheme"], "UTF-8");
+        if (isset($arr['scheme'])) {
+            $arr['scheme'] = mb_strtolower($arr['scheme'], 'UTF-8');
         }
 
-        if (isset($arr["scheme"]) && $arr["scheme"] !== "file" && $arr["scheme"] !== "phar" && strlen($arr["scheme"]) > 1) {
-            $protocol = $arr["scheme"] . "://";
+        if (isset($arr['scheme']) && $arr['scheme'] !== 'file' && $arr['scheme'] !== 'phar' && strlen($arr['scheme']) > 1) {
+            $protocol = $arr['scheme'] . '://';
 
-            if (isset($arr["user"])) {
-                $host .= $arr["user"];
+            if (isset($arr['user'])) {
+                $host .= $arr['user'];
 
-                if (isset($arr["pass"])) {
-                    $host .= ":" . $arr["pass"];
+                if (isset($arr['pass'])) {
+                    $host .= ':' . $arr['pass'];
                 }
 
-                $host .= "@";
+                $host .= '@';
             }
 
-            if (isset($arr["host"])) {
-                $host .= $arr["host"];
+            if (isset($arr['host'])) {
+                $host .= $arr['host'];
             }
 
-            if (isset($arr["port"])) {
-                $host .= ":" . $arr["port"];
+            if (isset($arr['port'])) {
+                $host .= ':' . $arr['port'];
             }
 
-            if (isset($arr["path"]) && $arr["path"] !== "") {
+            if (isset($arr['path']) && $arr['path'] !== '') {
                 // Do we have a trailing slash?
-                if ($arr["path"][mb_strlen($arr["path"], "8bit") - 1] === "/") {
-                    $path = $arr["path"];
-                    $file = "";
+                if ($arr['path'][mb_strlen($arr['path'], '8bit') - 1] === '/') {
+                    $path = $arr['path'];
+                    $file = '';
                 } else {
-                    $path = rtrim(dirname($arr["path"]), '/\\') . "/";
-                    $file = basename($arr["path"]);
+                    $path = rtrim(dirname($arr['path']), '/\\') . '/';
+                    $file = basename($arr['path']);
                 }
             }
 
-            if (isset($arr["query"])) {
-                $file .= "?" . $arr["query"];
+            if (isset($arr['query'])) {
+                $file .= '?' . $arr['query'];
             }
 
-            if (isset($arr["fragment"])) {
-                $file .= "#" . $arr["fragment"];
+            if (isset($arr['fragment'])) {
+                $file .= '#' . $arr['fragment'];
             }
 
         } else {
 
-            $protocol = "";
-            $host = ""; // localhost, really
+            $protocol = '';
+            $host = ''; // localhost, really
 
-            $i = mb_stripos($url, "://", 0, "UTF-8");
+            $i = mb_stripos($url, '://', 0, 'UTF-8');
             if ($i !== false) {
-                $protocol = mb_strtolower(mb_substr($url, 0, $i + 3, "UTF-8"), "UTF-8");
-                $url = mb_substr($url, $i + 3, null, "UTF-8");
+                $protocol = mb_strtolower(mb_substr($url, 0, $i + 3, 'UTF-8'), 'UTF-8');
+                $url = mb_substr($url, $i + 3, null, 'UTF-8');
             } else {
-                $protocol = "file://";
+                $protocol = 'file://';
             }
 
-            if ($protocol === "phar://") {
-                $res = substr($url, stripos($url, ".phar")+5);
-                $url = substr($url, 7, stripos($url, ".phar")-2);
+            if ($protocol === 'phar://') {
+                $res = substr($url, stripos($url, '.phar') + 5);
+                $url = substr($url, 7, stripos($url, '.phar') - 2);
             }
 
             $file = basename($url);
-            $path = dirname($url) . "/";
+            $path = dirname($url) . '/';
         }
         return [$protocol, $host, $path, $file,
-            "protocol" => $protocol,
-            "host" => $host,
-            "path" => $path,
-            "file" => $file,
-            "resource" => $res];
+            'protocol' => $protocol,
+            'host' => $host,
+            'path' => $path,
+            'file' => $file,
+            'resource' => $res];
     }
 
     /**
@@ -575,7 +584,7 @@ class Helpers
         if (isset($_DOMPDF_DEBUG_TYPES[$type]) && ($_dompdf_show_warnings || $_dompdf_debug)) {
             $arr = debug_backtrace();
 
-            echo basename($arr[0]["file"]) . " (" . $arr[0]["line"] . "): " . $arr[1]["function"] . ": ";
+            echo basename($arr[0]['file']) . ' (' . $arr[0]['line'] . '): ' . $arr[1]['function'] . ': ';
             Helpers::pre_r($msg);
         }
     }
@@ -619,19 +628,19 @@ class Helpers
      */
     public static function uniord(string $c, ?string $encoding = null)
     {
-        if (function_exists("mb_ord")) {
+        if (function_exists('mb_ord')) {
             if (PHP_VERSION_ID < 80000 && $encoding === null) {
                 // in PHP < 8 the encoding argument, if supplied, must be a valid encoding
-                $encoding = "UTF-8";
+                $encoding = 'UTF-8';
             }
             return mb_ord($c, $encoding);
         }
 
-        if ($encoding != "UTF-8" && $encoding !== null) {
-            $c = mb_convert_encoding($c, "UTF-8", $encoding);
+        if ($encoding != 'UTF-8' && $encoding !== null) {
+            $c = mb_convert_encoding($c, 'UTF-8', $encoding);
         }
 
-        $length = mb_strlen(mb_substr($c, 0, 1, "UTF-8"), "8bit");
+        $length = mb_strlen(mb_substr($c, 0, 1, 'UTF-8'), '8bit');
         $ord = false;
         $bytes = [];
         $numbytes = 1;
@@ -694,10 +703,10 @@ class Helpers
      */
     public static function unichr(int $c, ?string $encoding = null)
     {
-        if (function_exists("mb_chr")) {
+        if (function_exists('mb_chr')) {
             if (PHP_VERSION_ID < 80000 && $encoding === null) {
                 // in PHP < 8 the encoding argument, if supplied, must be a valid encoding
-                $encoding = "UTF-8";
+                $encoding = 'UTF-8';
             }
             return mb_chr($c, $encoding);
         }
@@ -756,7 +765,7 @@ class Helpers
 
         return [
             $r, $g, $b,
-            "r" => $r, "g" => $g, "b" => $b
+            'r' => $r, 'g' => $g, 'b' => $b,
         ];
     }
 
@@ -774,14 +783,14 @@ class Helpers
 
         // Custom types
         $types = [
-            IMAGETYPE_JPEG => "jpeg",
-            IMAGETYPE_GIF  => "gif",
-            IMAGETYPE_BMP  => "bmp",
-            IMAGETYPE_PNG  => "png",
-            IMAGETYPE_WEBP => "webp"
+            IMAGETYPE_JPEG => 'jpeg',
+            IMAGETYPE_GIF  => 'gif',
+            IMAGETYPE_BMP  => 'bmp',
+            IMAGETYPE_PNG  => 'png',
+            IMAGETYPE_WEBP => 'webp',
         ];
         if (defined('IMAGETYPE_SVG')) {
-            $types[IMAGETYPE_SVG] = "svg";
+            $types[IMAGETYPE_SVG] = 'svg';
         }
 
         if (isset($cache[$filename])) {
@@ -799,12 +808,12 @@ class Helpers
             [$data] = Helpers::getFileContent($filename, $context);
 
             if ($data !== null) {
-                if (substr($data, 0, 2) === "BM") {
-                    $meta = unpack("vtype/Vfilesize/Vreserved/Voffset/Vheadersize/Vwidth/Vheight", $data);
-                    $width = (int) $meta["width"];
-                    $height = (int) $meta["height"];
-                    $type = "bmp";
-                } elseif (strpos($data, "<svg") !== false) {
+                if (substr($data, 0, 2) === 'BM') {
+                    $meta = unpack('vtype/Vfilesize/Vreserved/Voffset/Vheadersize/Vwidth/Vheight', $data);
+                    $width = (int) $meta['width'];
+                    $height = (int) $meta['height'];
+                    $type = 'bmp';
+                } elseif (strpos($data, '<svg') !== false) {
                     $doc = new \Svg\Document();
                     if (property_exists($doc, 'allowExternalReferences')) {
                         $doc->allowExternalReferences = true;
@@ -814,7 +823,7 @@ class Helpers
                     [$width, $height] = $doc->getDimensions();
                     $width = (float) $width;
                     $height = (float) $height;
-                    $type = "svg";
+                    $type = 'svg';
                 }
             }
         }
@@ -829,12 +838,12 @@ class Helpers
      */
     public static function imagecreatefrombmp(string $filename)
     {
-        if (!function_exists("imagecreatetruecolor")) {
-            trigger_error("The PHP GD extension is required, but is not installed.", E_ERROR);
+        if (!function_exists('imagecreatetruecolor')) {
+            trigger_error('The PHP GD extension is required, but is not installed.', E_ERROR);
             return false;
         }
 
-        if (function_exists("imagecreatefrombmp") && ($im = imagecreatefrombmp($filename)) !== false) {
+        if (function_exists('imagecreatefrombmp') && ($im = imagecreatefrombmp($filename)) !== false) {
             return $im;
         }
 
@@ -1021,8 +1030,8 @@ class Helpers
         $content = null;
         $headers = null;
         [$protocol] = Helpers::explode_url($uri);
-        $is_local_path = in_array(strtolower($protocol), ["", "file://", "phar://"], true);
-        $can_use_curl = in_array(strtolower($protocol), ["http://", "https://"], true) && function_exists('curl_exec');
+        $is_local_path = in_array(strtolower($protocol), ['', 'file://', 'phar://'], true);
+        $can_use_curl = in_array(strtolower($protocol), ['http://', 'https://'], true) && function_exists('curl_exec');
 
         set_error_handler([self::class, 'record_warnings']);
 
@@ -1040,7 +1049,7 @@ class Helpers
                 if ($result !== false) {
                     $content = $result;
                 }
-                if (version_compare(PHP_VERSION, "8.4.0", ">=")) {
+                if (version_compare(PHP_VERSION, '8.4.0', '>=')) {
                     $headers = \http_get_last_response_headers();
                     \http_clear_last_response_headers();
                 } elseif (isset($http_response_header)) {
@@ -1070,32 +1079,32 @@ class Helpers
                 }
                 foreach ($context_options as $stream => $options) {
                     foreach ($options as $option => $value) {
-                        $key = strtolower($stream) . ":" . strtolower($option);
+                        $key = strtolower($stream) . ':' . strtolower($option);
                         switch ($key) {
-                            case "curl:curl_verify_ssl_host":
+                            case 'curl:curl_verify_ssl_host':
                                 curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, !$value ? 0 : 2);
                                 break;
-                            case "curl:max_redirects":
+                            case 'curl:max_redirects':
                                 curl_setopt($curl, CURLOPT_MAXREDIRS, $value);
                                 break;
-                            case "http:follow_location":
+                            case 'http:follow_location':
                                 curl_setopt($curl, CURLOPT_FOLLOWLOCATION, $value);
                                 break;
-                            case "http:header":
+                            case 'http:header':
                                 if (is_string($value)) {
                                     curl_setopt($curl, CURLOPT_HTTPHEADER, [$value]);
                                 } else {
                                     curl_setopt($curl, CURLOPT_HTTPHEADER, $value);
                                 }
                                 break;
-                            case "http:timeout":
+                            case 'http:timeout':
                                 curl_setopt($curl, CURLOPT_TIMEOUT, $value);
                                 break;
-                            case "http:user_agent":
+                            case 'http:user_agent':
                                 curl_setopt($curl, CURLOPT_USERAGENT, $value);
                                 break;
-                            case "curl:curl_verify_ssl_peer":
-                            case "ssl:verify_peer":
+                            case 'curl:curl_verify_ssl_peer':
+                            case 'ssl:verify_peer':
                                 curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, $value);
                                 break;
                         }
@@ -1127,24 +1136,24 @@ class Helpers
 
     public static function mb_ucwords(string $str): string
     {
-        $max_len = mb_strlen($str, "UTF-8");
+        $max_len = mb_strlen($str, 'UTF-8');
         if ($max_len === 1) {
-            return mb_strtoupper($str, "UTF-8");
+            return mb_strtoupper($str, 'UTF-8');
         }
 
-        $str = mb_strtoupper(mb_substr($str, 0, 1, "UTF-8"), "UTF-8") . mb_substr($str, 1, null, "UTF-8");
+        $str = mb_strtoupper(mb_substr($str, 0, 1, 'UTF-8'), 'UTF-8') . mb_substr($str, 1, null, 'UTF-8');
 
         foreach ([' ', '.', ',', '!', '?', '-', '+'] as $s) {
             $pos = 0;
-            while (($pos = mb_strpos($str, $s, $pos, "UTF-8")) !== false) {
+            while (($pos = mb_strpos($str, $s, $pos, 'UTF-8')) !== false) {
                 $pos++;
                 // Nothing to do if the separator is the last char of the string
                 if ($pos < $max_len) {
                     // If the char we want to upper is the last char there is nothing to append behind
                     if ($pos + 1 < $max_len) {
-                        $str = mb_substr($str, 0, $pos, "UTF-8") . mb_strtoupper(mb_substr($str, $pos, 1, "UTF-8"), "UTF-8") . mb_substr($str, $pos + 1, null, "UTF-8");
+                        $str = mb_substr($str, 0, $pos, 'UTF-8') . mb_strtoupper(mb_substr($str, $pos, 1, 'UTF-8'), 'UTF-8') . mb_substr($str, $pos + 1, null, 'UTF-8');
                     } else {
-                        $str = mb_substr($str, 0, $pos, "UTF-8") . mb_strtoupper(mb_substr($str, $pos, 1, "UTF-8"), "UTF-8");
+                        $str = mb_substr($str, 0, $pos, 'UTF-8') . mb_strtoupper(mb_substr($str, $pos, 1, 'UTF-8'), 'UTF-8');
                     }
                 }
             }

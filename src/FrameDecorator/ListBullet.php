@@ -1,13 +1,15 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf\FrameDecorator;
 
 use Dompdf\Dompdf;
-use Dompdf\Frame;
 
 /**
  * Decorates frames for list bullet rendering
@@ -44,7 +46,7 @@ class ListBullet extends AbstractFrameDecorator
     {
         $style = $this->_frame->get_style();
 
-        if ($style->list_style_type === "none") {
+        if ($style->list_style_type === 'none') {
             return 0.0;
         }
 
@@ -58,7 +60,7 @@ class ListBullet extends AbstractFrameDecorator
     {
         $style = $this->_frame->get_style();
 
-        if ($style->list_style_type === "none") {
+        if ($style->list_style_type === 'none') {
             return 0.0;
         }
 
@@ -72,7 +74,7 @@ class ListBullet extends AbstractFrameDecorator
     {
         $style = $this->get_style();
 
-        if ($style->list_style_type === "none") {
+        if ($style->list_style_type === 'none') {
             return 0.0;
         }
 
@@ -88,7 +90,7 @@ class ListBullet extends AbstractFrameDecorator
     {
         $style = $this->get_style();
 
-        if ($style->list_style_type === "none") {
+        if ($style->list_style_type === 'none') {
             return 0.0;
         }
 

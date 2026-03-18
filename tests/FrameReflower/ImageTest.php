@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Dompdf\Tests\FrameReflower;
 
 use Dompdf\Css\Style;
@@ -142,7 +145,7 @@ class ImageTest extends TestCase
                 'get_parent' => $parentFrame,
                 'get_dompdf->getOptions->getDpi' => 75,
                 'get_image_url' => dirname(__DIR__) . '/_files/jamaica.jpg',
-                'get_dompdf->getHttpContext' => null
+                'get_dompdf->getHttpContext' => null,
             ]
         );
 

@@ -1,19 +1,22 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Dompdf\Tests\Css;
 
 use DOMDocument;
 use DOMElement;
-use DOMXPath;
 use Dompdf\Css\Stylesheet;
 use Dompdf\Dompdf;
 use Dompdf\Frame\FrameTree;
 use Dompdf\Tests\TestCase;
+use DOMXPath;
 
 class SelectorTest extends TestCase
 {
     private function stylesheet()
     {
-        return new class(new Dompdf()) extends Stylesheet {
+        return new class (new Dompdf()) extends Stylesheet {
             public function specificity(string $selector, int $origin = self::ORIG_AUTHOR): int
             {
                 return parent::specificity($selector, $origin);
@@ -32,7 +35,7 @@ class SelectorTest extends TestCase
         // does before passing it to `selectorToXpath`.
         // See `Stylesheet::_parse_sections()`
         $patterns = ["/\s+/", "/\s+([>.:+~#])\s+/"];
-        $replacements = [" ", "\\1"];
+        $replacements = [' ', '\\1'];
 
         return preg_replace($patterns, $replacements, $selector);
     }
@@ -44,8 +47,8 @@ class SelectorTest extends TestCase
         // the root element (`html`) is expected to be matched
         return [
             // Next-sibling combinator
-            "next sibling 1" => [
-                "h1 + p",
+            'next sibling 1' => [
+                'h1 + p',
                 '<body>
                     <h1></h1>
                     <p data-match></p>
@@ -53,10 +56,10 @@ class SelectorTest extends TestCase
                     <h1></h1>
                     <div></div>
                     <p></p>
-                </body>'
+                </body>',
             ],
-            "next sibling 2" => [
-                "h1 + .child",
+            'next sibling 2' => [
+                'h1 + .child',
                 '<body>
                     <h1></h1>
                     <p></p>
@@ -65,10 +68,10 @@ class SelectorTest extends TestCase
                     text
                     <p class="child" data-match></p>
                     <p></p>
-                </body>'
+                </body>',
             ],
-            "next sibling 3" => [
-                "h1 + p.child",
+            'next sibling 3' => [
+                'h1 + p.child',
                 '<body>
                     <h1></h1>
                     <p></p>
@@ -76,12 +79,12 @@ class SelectorTest extends TestCase
                     <h1></h1>
                     <p class="child" data-match></p>
                     <p></p>
-                </body>'
+                </body>',
             ],
 
             // Following-sibling combinator
-            "following sibling 1" => [
-                "h1 ~ p",
+            'following sibling 1' => [
+                'h1 ~ p',
                 '<body>
                     <h1></h1>
                     <p data-match></p>
@@ -90,81 +93,81 @@ class SelectorTest extends TestCase
                         <p></p>
                     </div>
                     <p data-match></p>
-                </body>'
+                </body>',
             ],
-            "following sibling 2" => [
-                "h1 ~ .child",
+            'following sibling 2' => [
+                'h1 ~ .child',
                 '<body>
                     <h1></h1>
                     <p class="child" data-match></p>
                     <p class="child" data-match></p>
-                </body>'
+                </body>',
             ],
-            "following sibling 3" => [
-                "h1 ~ p.child",
+            'following sibling 3' => [
+                'h1 ~ p.child',
                 '<body>
                     <h1></h1>
                     <p></p>
                     <div class="child"></div>
-                </body>'
+                </body>',
             ],
 
             // ID selector
-            "id 1" => [
-                "#test",
-                '<body><p id="test" data-match></p></body>'
+            'id 1' => [
+                '#test',
+                '<body><p id="test" data-match></p></body>',
             ],
-            "id 2" => [
-                "p#test",
-                '<body><p id="test" data-match></p></body>'
+            'id 2' => [
+                'p#test',
+                '<body><p id="test" data-match></p></body>',
             ],
-            "id 3" => [
-                "div#test",
-                '<body><p id="test"></p></body>'
+            'id 3' => [
+                'div#test',
+                '<body><p id="test"></p></body>',
             ],
-            "id 4" => [
-                "#test",
-                '<body><p id="test test"></p></body>'
+            'id 4' => [
+                '#test',
+                '<body><p id="test test"></p></body>',
             ],
 
             // Class selector
-            "class 1" => [
-                ".test",
-                '<body><p class="test" data-match></p></body>'
+            'class 1' => [
+                '.test',
+                '<body><p class="test" data-match></p></body>',
             ],
-            "class 2" => [
-                "p.test",
+            'class 2' => [
+                'p.test',
                 '<body>
                     <p class="test more" data-match></p>
                     <div class="test"></div>
-                </body>'
+                </body>',
             ],
-            "class 3" => [
-                ".test.more",
+            'class 3' => [
+                '.test.more',
                 '<body>
                     <p class="test more" data-match></p>
                     <div class="
                     more
                     test
                     " data-match></div>
-                </body>'
+                </body>',
             ],
 
             // root
-            "root 1" => [
-                ":root",
+            'root 1' => [
+                ':root',
                 '<body><div></div></body>',
-                true
+                true,
             ],
-            "root 2" => [
-                "body:root",
+            'root 2' => [
+                'body:root',
                 '<body><div></div></body>',
-                false
+                false,
             ],
 
             // first-child
-            "first-child 1" => [
-                ":first-child",
+            'first-child 1' => [
+                ':first-child',
                 '<body>
                     <div data-match>
                         <p data-match></p>
@@ -175,10 +178,10 @@ class SelectorTest extends TestCase
                         <p></p>
                     </div>
                 </body>',
-                true
+                true,
             ],
-            "first-child 2" => [
-                "body :first-child",
+            'first-child 2' => [
+                'body :first-child',
                 '<body>
                     <div data-match>
                         <p data-match></p>
@@ -188,12 +191,12 @@ class SelectorTest extends TestCase
                         <p data-match></p>
                         <p></p>
                     </div>
-                </body>'
+                </body>',
             ],
 
             // last-child
-            "last-child 1" => [
-                ":last-child",
+            'last-child 1' => [
+                ':last-child',
                 '<body data-match>
                     <div>
                         <p></p>
@@ -204,10 +207,10 @@ class SelectorTest extends TestCase
                         <p data-match></p>
                     </div>
                 </body>',
-                true
+                true,
             ],
-            "last-child 2" => [
-                "body :last-child",
+            'last-child 2' => [
+                'body :last-child',
                 '<body>
                     <div>
                         <p></p>
@@ -217,12 +220,12 @@ class SelectorTest extends TestCase
                         <p></p>
                         <p data-match></p>
                     </div>
-                </body>'
+                </body>',
             ],
 
             // only-child
-            "only-child" => [
-                ":only-child",
+            'only-child' => [
+                ':only-child',
                 '<body>
                     <div>
                         <p></p>
@@ -232,12 +235,12 @@ class SelectorTest extends TestCase
                         <p data-match></p>
                     </div>
                 </body>',
-                true
+                true,
             ],
 
             // nth-child
-            "nth-child odd" => [
-                "div > :nth-child(odd)",
+            'nth-child odd' => [
+                'div > :nth-child(odd)',
                 '<body>
                     <div>
                         <p data-match></p>
@@ -254,10 +257,10 @@ class SelectorTest extends TestCase
                         <div data-match></div>
                         <p></p>
                     </div>
-                </body>'
+                </body>',
             ],
-            "nth-child even" => [
-                "div > *:nth-child(even)",
+            'nth-child even' => [
+                'div > *:nth-child(even)',
                 '<body>
                     <div>
                         <p></p>
@@ -274,10 +277,10 @@ class SelectorTest extends TestCase
                         <p></p>
                         <div data-match></div>
                     </div>
-                </body>'
+                </body>',
             ],
-            "nth-child 1" => [
-                ":nth-child(1)",
+            'nth-child 1' => [
+                ':nth-child(1)',
                 '<body>
                     <div data-match>
                         <p data-match></p>
@@ -288,10 +291,10 @@ class SelectorTest extends TestCase
                         <p></p>
                     </div>
                 </body>',
-                true
+                true,
             ],
-            "nth-child 2" => [
-                ":nth-child(2)",
+            'nth-child 2' => [
+                ':nth-child(2)',
                 '<body data-match>
                     <div>
                         <p></p>
@@ -302,10 +305,10 @@ class SelectorTest extends TestCase
                         <p data-match></p>
                         <p></p>
                     </div>
-                </body>'
+                </body>',
             ],
-            "nth-child 3" => [
-                "div > p:nth-child(3n + 1)",
+            'nth-child 3' => [
+                'div > p:nth-child(3n + 1)',
                 '<body>
                     <div>
                         <p data-match></p>
@@ -322,10 +325,10 @@ class SelectorTest extends TestCase
                     <div>
                         <p data-match></p>
                     </div>
-                </body>'
+                </body>',
             ],
-            "nth-child 4" => [
-                ".child:nth-child(2n + 2)",
+            'nth-child 4' => [
+                '.child:nth-child(2n + 2)',
                 '<body>
                     <div>
                         <p class="child"></p>
@@ -338,10 +341,10 @@ class SelectorTest extends TestCase
                     <div>
                         <p class="child"></p>
                     </div>
-                </body>'
+                </body>',
             ],
-            "nth-child 5" => [
-                ".child:nth-child(n + 4)",
+            'nth-child 5' => [
+                '.child:nth-child(n + 4)',
                 '<body>
                     <div>
                         <p class="child"></p>
@@ -353,10 +356,10 @@ class SelectorTest extends TestCase
                     <div>
                         <p class="child"></p>
                     </div>
-                </body>'
+                </body>',
             ],
-            "nth-child 6" => [
-                "div > :nth-child(-n + 3)",
+            'nth-child 6' => [
+                'div > :nth-child(-n + 3)',
                 '<body>
                     <div>
                         <p data-match></p>
@@ -368,12 +371,12 @@ class SelectorTest extends TestCase
                     <div>
                         <p data-match></p>
                     </div>
-                </body>'
+                </body>',
             ],
 
             // nth-last-child
-            "nth-last-child 1" => [
-                "body :nth-last-child(2)",
+            'nth-last-child 1' => [
+                'body :nth-last-child(2)',
                 '<body>
                     <div data-match>
                         <p data-match></p>
@@ -384,10 +387,10 @@ class SelectorTest extends TestCase
                         <p data-match></p>
                         <p></p>
                     </div>
-                </body>'
+                </body>',
             ],
-            "nth-last-child 2" => [
-                "body :nth-last-child(-2n + 4)",
+            'nth-last-child 2' => [
+                'body :nth-last-child(-2n + 4)',
                 '<body>
                     <div data-match>
                         <p></p>
@@ -401,12 +404,12 @@ class SelectorTest extends TestCase
                         <p data-match></p>
                         <p></p>
                     </div>
-                </body>'
+                </body>',
             ],
 
             // first-of-type
-            "first-of-type 1" => [
-                "p:first-of-type",
+            'first-of-type 1' => [
+                'p:first-of-type',
                 '<body>
                     <div>
                         <p data-match></p>
@@ -417,10 +420,10 @@ class SelectorTest extends TestCase
                         <p data-match></p>
                         <p></p>
                     </div>
-                </body>'
+                </body>',
             ],
-            "first-of-type 2" => [
-                "body p:first-of-type",
+            'first-of-type 2' => [
+                'body p:first-of-type',
                 '<body>
                     <div>
                         <p data-match></p>
@@ -431,12 +434,12 @@ class SelectorTest extends TestCase
                         <p data-match></p>
                         <p></p>
                     </div>
-                </body>'
+                </body>',
             ],
 
             // last-of-type
-            "last-of-type 1" => [
-                "p:last-of-type",
+            'last-of-type 1' => [
+                'p:last-of-type',
                 '<body>
                     <div>
                         <p></p>
@@ -447,10 +450,10 @@ class SelectorTest extends TestCase
                         <p data-match></p>
                         <div></div>
                     </div>
-                </body>'
+                </body>',
             ],
-            "last-of-type 2" => [
-                "body p:last-of-type",
+            'last-of-type 2' => [
+                'body p:last-of-type',
                 '<body>
                     <div>
                         <p></p>
@@ -461,12 +464,12 @@ class SelectorTest extends TestCase
                         <p data-match></p>
                         <div></div>
                     </div>
-                </body>'
+                </body>',
             ],
 
             // only-of-type
-            "only-of-type" => [
-                "p:only-of-type",
+            'only-of-type' => [
+                'p:only-of-type',
                 '<body>
                     <div>
                         <p></p>
@@ -477,12 +480,12 @@ class SelectorTest extends TestCase
                         <p data-match></p>
                         <div></div>
                     </div>
-                </body>'
+                </body>',
             ],
 
             // nth-of-type
-            "nth-of-type odd" => [
-                "div > p:nth-of-type(odd)",
+            'nth-of-type odd' => [
+                'div > p:nth-of-type(odd)',
                 '<body>
                     <div>
                         <div></div>
@@ -500,10 +503,10 @@ class SelectorTest extends TestCase
                         <p data-match></p>
                         <div></div>
                     </div>
-                </body>'
+                </body>',
             ],
-            "nth-of-type even" => [
-                "div > p:nth-of-type(even)",
+            'nth-of-type even' => [
+                'div > p:nth-of-type(even)',
                 '<body>
                     <div>
                         <div></div>
@@ -520,10 +523,10 @@ class SelectorTest extends TestCase
                         <div></div>
                         <p></p>
                     </div>
-                </body>'
+                </body>',
             ],
-            "nth-of-type 1" => [
-                "p:nth-of-type(1)",
+            'nth-of-type 1' => [
+                'p:nth-of-type(1)',
                 '<body>
                     <div>
                         <div></div>
@@ -535,10 +538,10 @@ class SelectorTest extends TestCase
                         <p data-match></p>
                         <p></p>
                     </div>
-                </body>'
+                </body>',
             ],
-            "nth-of-type 2" => [
-                "p:nth-of-type(2)",
+            'nth-of-type 2' => [
+                'p:nth-of-type(2)',
                 '<body>
                     <div>
                         <p></p>
@@ -551,10 +554,10 @@ class SelectorTest extends TestCase
                         <p data-match></p>
                         <p></p>
                     </div>
-                </body>'
+                </body>',
             ],
-            "nth-of-type 3" => [
-                "div > p:nth-of-type(3n + 1)",
+            'nth-of-type 3' => [
+                'div > p:nth-of-type(3n + 1)',
                 '<body>
                     <div>
                         <div></div>
@@ -575,10 +578,10 @@ class SelectorTest extends TestCase
                         <div></div>
                         <p data-match></p>
                     </div>
-                </body>'
+                </body>',
             ],
-            "nth-of-type 4" => [
-                "p.child:nth-of-type(2n + 2)",
+            'nth-of-type 4' => [
+                'p.child:nth-of-type(2n + 2)',
                 '<body>
                     <div>
                         <div class="child"></div>
@@ -595,12 +598,12 @@ class SelectorTest extends TestCase
                         <p class="child"></p>
                         <p class="child" data-match></p>
                     </div>
-                </body>'
+                </body>',
             ],
 
             // nth-last-of-type
-            "nth-last-of-type 1" => [
-                "p:nth-last-of-type(2)",
+            'nth-last-of-type 1' => [
+                'p:nth-last-of-type(2)',
                 '<body>
                     <div>
                         <p data-match></p>
@@ -612,10 +615,10 @@ class SelectorTest extends TestCase
                         <p data-match></p>
                         <p></p>
                     </div>
-                </body>'
+                </body>',
             ],
-            "nth-last-of-type 2" => [
-                "p:nth-last-of-type(-2n + 4)",
+            'nth-last-of-type 2' => [
+                'p:nth-last-of-type(-2n + 4)',
                 '<body>
                     <div>
                         <p></p>
@@ -630,124 +633,124 @@ class SelectorTest extends TestCase
                         <p data-match></p>
                         <p></p>
                     </div>
-                </body>'
+                </body>',
             ],
 
             // link
-            "link" => [
-                ":link",
-                '<body><a href="https://example.com" data-match></a></body>'
+            'link' => [
+                ':link',
+                '<body><a href="https://example.com" data-match></a></body>',
             ],
-            "any-link" => [
-                ":any-link",
-                '<body><a href="https://example.com" data-match></a></body>'
+            'any-link' => [
+                ':any-link',
+                '<body><a href="https://example.com" data-match></a></body>',
             ],
-            "visited" => [
-                ":visited",
-                '<body><a href="https://example.com"></a></body>'
+            'visited' => [
+                ':visited',
+                '<body><a href="https://example.com"></a></body>',
             ],
 
             // attribute ~=
-            "attribute ~= 1" => [
+            'attribute ~= 1' => [
                 '[title~="multiple"]',
-                '<body><div title="multiple tokens" data-match></div></body>'
+                '<body><div title="multiple tokens" data-match></div></body>',
             ],
-            "attribute ~= 2" => [
+            'attribute ~= 2' => [
                 '[title~="mult"]',
-                '<body><div title="multiple tokens"></div></body>'
+                '<body><div title="multiple tokens"></div></body>',
             ],
-            "attribute ~= 3" => [
+            'attribute ~= 3' => [
                 '[title~="multiple tokens"]',
-                '<body><div title="multiple tokens"></div></body>'
+                '<body><div title="multiple tokens"></div></body>',
             ],
-            "attribute ~= 4" => [
+            'attribute ~= 4' => [
                 '[title~=""]',
-                '<body><div title="multiple tokens"></div><div title=""></div></body>'
+                '<body><div title="multiple tokens"></div><div title=""></div></body>',
             ],
 
             // attribute ^=
-            "attribute ^= 1" => [
+            'attribute ^= 1' => [
                 '[title^="multiple"]',
-                '<body><div title="multiple tokens" data-match></div></body>'
+                '<body><div title="multiple tokens" data-match></div></body>',
             ],
-            "attribute ^= 2" => [
+            'attribute ^= 2' => [
                 '[title^="mult"]',
-                '<body><div title="multiple tokens" data-match></div></body>'
+                '<body><div title="multiple tokens" data-match></div></body>',
             ],
-            "attribute ^= 3" => [
+            'attribute ^= 3' => [
                 '[title^="kens"]',
-                '<body><div title="multiple tokens"></div></body>'
+                '<body><div title="multiple tokens"></div></body>',
             ],
-            "attribute ^= 4" => [
+            'attribute ^= 4' => [
                 '[title^="le t"]',
-                '<body><div title="multiple tokens"></div></body>'
+                '<body><div title="multiple tokens"></div></body>',
             ],
-            "attribute ^= 5" => [
+            'attribute ^= 5' => [
                 '[title^="multiple tokens"]',
-                '<body><div title="multiple tokens" data-match></div></body>'
+                '<body><div title="multiple tokens" data-match></div></body>',
             ],
-            "attribute ^= 6" => [
+            'attribute ^= 6' => [
                 '[title^=""]',
-                '<body><div title="multiple tokens"></div><div title=""></div></body>'
+                '<body><div title="multiple tokens"></div><div title=""></div></body>',
             ],
 
             // attribute $=
-            "attribute $= 1" => [
+            'attribute $= 1' => [
                 '[title$="multiple"]',
-                '<body><div title="multiple tokens"></div></body>'
+                '<body><div title="multiple tokens"></div></body>',
             ],
-            "attribute $= 2" => [
+            'attribute $= 2' => [
                 '[title$="mult"]',
-                '<body><div title="multiple tokens"></div></body>'
+                '<body><div title="multiple tokens"></div></body>',
             ],
-            "attribute $= 3" => [
+            'attribute $= 3' => [
                 '[title$="kens"]',
-                '<body><div title="multiple tokens" data-match></div></body>'
+                '<body><div title="multiple tokens" data-match></div></body>',
             ],
-            "attribute $= 4" => [
+            'attribute $= 4' => [
                 '[title$="le t"]',
-                '<body><div title="multiple tokens"></div></body>'
+                '<body><div title="multiple tokens"></div></body>',
             ],
-            "attribute $= 5" => [
+            'attribute $= 5' => [
                 '[title$="multiple tokens"]',
-                '<body><div title="multiple tokens" data-match></div></body>'
+                '<body><div title="multiple tokens" data-match></div></body>',
             ],
-            "attribute $= 6" => [
+            'attribute $= 6' => [
                 '[title$=""]',
-                '<body><div title="multiple tokens"></div><div title=""></div></body>'
+                '<body><div title="multiple tokens"></div><div title=""></div></body>',
             ],
 
             // attribute *=
-            "attribute *= 1" => [
+            'attribute *= 1' => [
                 '[title*="multiple"]',
-                '<body><div title="multiple tokens" data-match></div></body>'
+                '<body><div title="multiple tokens" data-match></div></body>',
             ],
-            "attribute *= 2" => [
+            'attribute *= 2' => [
                 '[title*="mult"]',
-                '<body><div title="multiple tokens" data-match></div></body>'
+                '<body><div title="multiple tokens" data-match></div></body>',
             ],
-            "attribute *= 3" => [
+            'attribute *= 3' => [
                 '[title*="kens"]',
-                '<body><div title="multiple tokens" data-match></div></body>'
+                '<body><div title="multiple tokens" data-match></div></body>',
             ],
-            "attribute *= 4" => [
+            'attribute *= 4' => [
                 '[title*="le t"]',
-                '<body><div title="multiple tokens" data-match></div></body>'
+                '<body><div title="multiple tokens" data-match></div></body>',
             ],
-            "attribute *= 5" => [
+            'attribute *= 5' => [
                 '[title*="multiple tokens"]',
-                '<body><div title="multiple tokens" data-match></div></body>'
+                '<body><div title="multiple tokens" data-match></div></body>',
             ],
-            "attribute *= 6" => [
+            'attribute *= 6' => [
                 '[title*=""]',
-                '<body><div title="multiple tokens"></div><div title=""></div></body>'
+                '<body><div title="multiple tokens"></div><div title=""></div></body>',
             ],
 
             // escaped selector characteres
-            "escaped classname characters" => [
+            'escaped classname characters' => [
                 '.w-\[var\(--sidebar-width\)\]',
-                '<body><div class="w-\[var\(--sidebar-width\)\]"></div></body>'
-            ]
+                '<body><div class="w-\[var\(--sidebar-width\)\]"></div></body>',
+            ],
         ];
     }
 
@@ -769,7 +772,7 @@ class SelectorTest extends TestCase
 
         $query = $sheet->selectorToXpath($this->preProcess($selector));
         $this->assertNotNull($query);
-        $nodeList = $xpath->query($query["query"]);
+        $nodeList = $xpath->query($query['query']);
         $this->assertNotFalse($nodeList);
         $nodes = iterator_to_array($nodeList);
 
@@ -778,13 +781,13 @@ class SelectorTest extends TestCase
             $name = $node->nodeName;
 
             // Skip text nodes and head
-            if (!($node instanceof DOMElement) || $name === "head") {
+            if (!($node instanceof DOMElement) || $name === 'head') {
                 continue;
             }
 
-            $shouldMatch = $name === "html"
+            $shouldMatch = $name === 'html'
                 ? $matchRoot
-                : $node->hasAttribute("data-match");
+                : $node->hasAttribute('data-match');
             $matches = in_array($node, $nodes, true);
 
             $failureMessage = $shouldMatch
@@ -799,11 +802,11 @@ class SelectorTest extends TestCase
     {
         return [
             // Invalid selectors
-            [":unknown"],
-            ["p:unknown"],
-            ["[d~]"],
-            ["[href=x"],
-            ["[href"]
+            [':unknown'],
+            ['p:unknown'],
+            ['[d~]'],
+            ['[href=x'],
+            ['[href'],
         ];
     }
 

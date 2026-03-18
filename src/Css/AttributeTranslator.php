@@ -1,9 +1,12 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf\Css;
 
 use Dompdf\Frame;
@@ -16,7 +19,7 @@ use Dompdf\Helpers;
  */
 class AttributeTranslator
 {
-    static $_style_attr = "_html_style_attribute";
+    public static $_style_attr = '_html_style_attribute';
 
     // Munged data originally from
     // http://www.w3.org/TR/REC-html40/index/attributes.html
@@ -29,7 +32,7 @@ class AttributeTranslator
                 'middle' => 'vertical-align: middle;',
                 'top' => 'vertical-align: top;',
                 'left' => 'float: left;',
-                'right' => 'float: right;'
+                'right' => 'float: right;',
             ],
             'border' => 'border: %0.2Fpx solid;',
             'height' => '_set_px_height',
@@ -41,7 +44,7 @@ class AttributeTranslator
             'align' => [
                 'left' => 'margin-left: 0; margin-right: auto;',
                 'center' => 'margin-left: auto; margin-right: auto;',
-                'right' => 'margin-left: auto; margin-right: 0;'
+                'right' => 'margin-left: auto; margin-right: 0;',
             ],
             'bgcolor' => 'background-color: %s;',
             'border' => '_set_table_border',
@@ -56,7 +59,7 @@ class AttributeTranslator
                 'lhs' => 'border-left-style: solid;',
                 'rhs' => 'border-right-style: solid;',
                 'box' => 'border-style: solid;',
-                'border' => 'border-style: solid;'
+                'border' => 'border-style: solid;',
             ],
             'rules' => '_set_table_rules',
             'width' => 'width: %s;',
@@ -90,7 +93,7 @@ class AttributeTranslator
         ],
         //TODO: translate more form element attributes
         'input' => [
-            'size' => '_set_input_width'
+            'size' => '_set_input_width',
         ],
         'p' => [
             'align' => 'text-align: %s;',
@@ -185,27 +188,27 @@ class AttributeTranslator
     protected static $_last_basefont_size = 3;
     protected static $_font_size_lookup = [
         // For basefont support
-        -3 => "4pt",
-        -2 => "5pt",
-        -1 => "6pt",
-        0 => "7pt",
+        -3 => '4pt',
+        -2 => '5pt',
+        -1 => '6pt',
+        0 => '7pt',
 
-        1 => "8pt",
-        2 => "10pt",
-        3 => "12pt",
-        4 => "14pt",
-        5 => "18pt",
-        6 => "24pt",
-        7 => "34pt",
+        1 => '8pt',
+        2 => '10pt',
+        3 => '12pt',
+        4 => '14pt',
+        5 => '18pt',
+        6 => '24pt',
+        7 => '34pt',
 
         // For basefont support
-        8 => "48pt",
-        9 => "44pt",
-        10 => "52pt",
-        11 => "60pt",
+        8 => '48pt',
+        9 => '44pt',
+        10 => '52pt',
+        11 => '60pt',
     ];
 
-    static function translate_attributes(Frame $frame): void
+    public static function translate_attributes(Frame $frame): void
     {
         $node = $frame->get_node();
         $tag = $node->nodeName;
@@ -216,9 +219,9 @@ class AttributeTranslator
 
         $valid_attrs = self::$__ATTRIBUTE_LOOKUP[$tag];
         $attrs = $node->attributes;
-        $style = rtrim($node->getAttribute(self::$_style_attr), "; ");
-        if ($style != "") {
-            $style .= ";";
+        $style = rtrim($node->getAttribute(self::$_style_attr), '; ');
+        if ($style != '') {
+            $style .= ';';
         }
 
         foreach ($attrs as $attr => $attr_node) {
@@ -233,11 +236,11 @@ class AttributeTranslator
             // Look up $value in $target, if $target is an array:
             if (is_array($target)) {
                 if (isset($target[$value])) {
-                    $style .= " " . self::_resolve_target($node, $target[$value], $value);
+                    $style .= ' ' . self::_resolve_target($node, $target[$value], $value);
                 }
             } else {
                 // otherwise use target directly
-                $style .= " " . self::_resolve_target($node, $target, $value);
+                $style .= ' ' . self::_resolve_target($node, $target, $value);
             }
         }
 
@@ -254,18 +257,18 @@ class AttributeTranslator
      */
     protected static function _resolve_target(\DOMNode $node, $target, $value)
     {
-        if ($target[0] === "_") {
+        if ($target[0] === '_') {
             return self::$target($node, $value);
         }
 
-        return $value ? sprintf($target, $value) : "";
+        return $value ? sprintf($target, $value) : '';
     }
 
-    static function append_style(\DOMElement $node, string $new_style): void
+    public static function append_style(\DOMElement $node, string $new_style): void
     {
-        $style = rtrim($node->getAttribute(self::$_style_attr), ";");
+        $style = rtrim($node->getAttribute(self::$_style_attr), ';');
         $style .= $new_style;
-        $style = ltrim($style, ";");
+        $style = ltrim($style, ';');
         $node->setAttribute(self::$_style_attr, $style);
     }
 
@@ -278,18 +281,18 @@ class AttributeTranslator
 
         switch ($node->nodeName) {
             default:
-            case "table":
-                $query = "tr/td | thead/tr/td | tbody/tr/td | tfoot/tr/td | tr/th | thead/tr/th | tbody/tr/th | tfoot/tr/th";
+            case 'table':
+                $query = 'tr/td | thead/tr/td | tbody/tr/td | tfoot/tr/td | tr/th | thead/tr/th | tbody/tr/th | tfoot/tr/th';
                 break;
 
-            case "tbody":
-            case "tfoot":
-            case "thead":
-                $query = "tr/td | tr/th";
+            case 'tbody':
+            case 'tfoot':
+            case 'thead':
+                $query = 'tr/td | tr/th';
                 break;
 
-            case "tr":
-                $query = "td | th";
+            case 'tr':
+                $query = 'td | th';
                 break;
         }
 
@@ -337,14 +340,14 @@ class AttributeTranslator
         $v = trim($value);
 
         if (Helpers::is_percent($v)) {
-            return sprintf("width: %s;", $v);
+            return sprintf('width: %s;', $v);
         }
 
         if (is_numeric(mb_substr($v, 0, 1))) {
-            return sprintf("width: %spx;", (float) $v);
+            return sprintf('width: %spx;', (float) $v);
         }
 
-        return "";
+        return '';
     }
 
     protected static function _set_px_height(\DOMElement $node, string $value): string
@@ -352,14 +355,14 @@ class AttributeTranslator
         $v = trim($value);
 
         if (Helpers::is_percent($v)) {
-            return sprintf("height: %s;", $v);
+            return sprintf('height: %s;', $v);
         }
 
         if (is_numeric(mb_substr($v, 0, 1))) {
-            return sprintf("height: %spx;", (float) $v);
+            return sprintf('height: %spx;', (float) $v);
         }
 
-        return "";
+        return '';
     }
 
     /**
@@ -383,7 +386,7 @@ class AttributeTranslator
      */
     protected static function _set_table_border(\DOMElement $node, $value): string
     {
-        return "border-width: $value" . "px;";
+        return "border-width: $value" . 'px;';
     }
 
     /**
@@ -392,15 +395,15 @@ class AttributeTranslator
      */
     protected static function _set_table_cellspacing(\DOMElement $node, $value): string
     {
-        $style = rtrim($node->getAttribute(self::$_style_attr), ";");
+        $style = rtrim($node->getAttribute(self::$_style_attr), ';');
 
         if ($value == 0) {
-            $style .= "; border-collapse: collapse;";
+            $style .= '; border-collapse: collapse;';
         } else {
             $style .= "; border-spacing: {$value}px; border-collapse: separate;";
         }
 
-        return ltrim($style, ";");
+        return ltrim($style, ';');
     }
 
     /**
@@ -409,28 +412,28 @@ class AttributeTranslator
      */
     protected static function _set_table_rules(\DOMElement $node, $value): ?string
     {
-        $new_style = "; border-collapse: collapse;";
+        $new_style = '; border-collapse: collapse;';
 
         switch ($value) {
-            case "none":
-                $new_style .= "border-style: none;";
+            case 'none':
+                $new_style .= 'border-style: none;';
                 break;
 
-            case "groups":
+            case 'groups':
             default:
                 // FIXME: unsupported
                 return null;
 
-            case "rows":
-                $new_style .= "border-style: solid none solid none; border-width: 1px; ";
+            case 'rows':
+                $new_style .= 'border-style: solid none solid none; border-width: 1px; ';
                 break;
 
-            case "cols":
-                $new_style .= "border-style: none solid none solid; border-width: 1px; ";
+            case 'cols':
+                $new_style .= 'border-style: none solid none solid; border-width: 1px; ';
                 break;
 
-            case "all":
-                $new_style .= "border-style: solid; border-width: 1px; ";
+            case 'all':
+                $new_style .= 'border-style: solid; border-width: 1px; ';
                 break;
         }
 
@@ -442,10 +445,10 @@ class AttributeTranslator
             $cell->setAttribute(self::$_style_attr, $style);
         }
 
-        $style = rtrim($node->getAttribute(self::$_style_attr), ";");
-        $style .= "; border-collapse: collapse; ";
+        $style = rtrim($node->getAttribute(self::$_style_attr), ';');
+        $style .= '; border-collapse: collapse; ';
 
-        return ltrim($style, "; ");
+        return ltrim($style, '; ');
     }
 
     /**
@@ -454,10 +457,10 @@ class AttributeTranslator
      */
     protected static function _set_hr_size(\DOMElement $node, $value): string
     {
-        $style = rtrim($node->getAttribute(self::$_style_attr), ";");
-        $style .= "; border-width: " . max(0, $value - 2) . "; ";
+        $style = rtrim($node->getAttribute(self::$_style_attr), ';');
+        $style .= '; border-width: ' . max(0, $value - 2) . '; ';
 
-        return ltrim($style, "; ");
+        return ltrim($style, '; ');
     }
 
     /**
@@ -466,33 +469,33 @@ class AttributeTranslator
      */
     protected static function _set_hr_align(\DOMElement $node, $value): ?string
     {
-        $style = rtrim($node->getAttribute(self::$_style_attr), ";");
-        $width = $node->getAttribute("width");
+        $style = rtrim($node->getAttribute(self::$_style_attr), ';');
+        $width = $node->getAttribute('width');
 
-        if ($width == "") {
-            $width = "100%";
+        if ($width == '') {
+            $width = '100%';
         }
 
-        $remainder = 100 - (float)rtrim($width, "% ");
+        $remainder = 100 - (float)rtrim($width, '% ');
 
         switch ($value) {
-            case "left":
+            case 'left':
                 $style .= "; margin-right: $remainder %;";
                 break;
 
-            case "right":
+            case 'right':
                 $style .= "; margin-left: $remainder %;";
                 break;
 
-            case "center":
-                $style .= "; margin-left: auto; margin-right: auto;";
+            case 'center':
+                $style .= '; margin-left: auto; margin-right: auto;';
                 break;
 
             default:
                 return null;
         }
 
-        return ltrim($style, "; ");
+        return ltrim($style, '; ');
     }
 
     /**
@@ -501,12 +504,14 @@ class AttributeTranslator
      */
     protected static function _set_input_width(\DOMElement $node, $value): ?string
     {
-        if (empty($value)) { return null; }
-
-        if ($node->hasAttribute("type") && in_array(strtolower($node->getAttribute("type")), ["text","password"])) {
-            return sprintf("width: %Fem", (((int)$value * .65)+2));
+        if (empty($value)) {
+            return null;
         }
-        return sprintf("width: %upx;", (int)$value);
+
+        if ($node->hasAttribute('type') && in_array(strtolower($node->getAttribute('type')), ['text','password'])) {
+            return sprintf('width: %Fem', (((int)$value * .65) + 2));
+        }
+        return sprintf('width: %upx;', (int)$value);
     }
 
     /**
@@ -561,7 +566,7 @@ class AttributeTranslator
      */
     protected static function _set_body_link(\DOMElement $node, $value)
     {
-        $a_list = $node->getElementsByTagName("a");
+        $a_list = $node->getElementsByTagName('a');
         $value = self::_get_valid_color($value);
 
         foreach ($a_list as $a) {
@@ -592,17 +597,17 @@ class AttributeTranslator
     {
         $style = $node->getAttribute(self::$_style_attr);
 
-        if ($value[0] === "-" || $value[0] === "+") {
+        if ($value[0] === '-' || $value[0] === '+') {
             $value = self::$_last_basefont_size + (int)$value;
         }
 
         if (isset(self::$_font_size_lookup[$value])) {
-            $style .= "; font-size: " . self::$_font_size_lookup[$value] . ";";
+            $style .= '; font-size: ' . self::$_font_size_lookup[$value] . ';';
         } else {
             $style .= "; font-size: $value;";
         }
 
-        return ltrim($style, "; ");
+        return ltrim($style, '; ');
     }
 
     protected static function _set_list_style_type(\DOMElement $node, string $value): string
@@ -610,20 +615,20 @@ class AttributeTranslator
         $v = trim($value);
 
         switch ($v) {
-            case "1":
-                $type = "decimal";
+            case '1':
+                $type = 'decimal';
                 break;
-            case "a":
-                $type = "lower-alpha";
+            case 'a':
+                $type = 'lower-alpha';
                 break;
-            case "A":
-                $type = "upper-alpha";
+            case 'A':
+                $type = 'upper-alpha';
                 break;
-            case "i":
-                $type = "lower-roman";
+            case 'i':
+                $type = 'lower-roman';
                 break;
-            case "I":
-                $type = "upper-roman";
+            case 'I':
+                $type = 'upper-roman';
                 break;
             default:
                 $type = $v;

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Dompdf\Css\Content;
 
 final class StringPart extends ContentPart

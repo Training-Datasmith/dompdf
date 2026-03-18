@@ -1,9 +1,12 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf\Renderer;
 
 use Dompdf\Frame;
@@ -16,7 +19,7 @@ use Dompdf\FrameDecorator\Block as BlockFrameDecorator;
  */
 class Block extends AbstractRenderer
 {
-    function render(Frame $frame): void
+    public function render(Frame $frame): void
     {
         $style = $frame->get_style();
         $node = $frame->get_node();
@@ -25,11 +28,11 @@ class Block extends AbstractRenderer
 
         [$x, $y, $w, $h] = $frame->get_border_box();
 
-        if ($node->nodeName === "body") {
+        if ($node->nodeName === 'body') {
             // Margins should be fully resolved at this point
             $mt = $style->margin_top;
             $mb = $style->margin_bottom;
-            $h = $frame->get_containing_block("h") - $mt - $mb;
+            $h = $frame->get_containing_block('h') - $mt - $mb;
         }
 
         $border_box = [$x, $y, $w, $h];
@@ -41,7 +44,7 @@ class Block extends AbstractRenderer
 
         $this->addNamedDest($node);
         $this->addHyperlink($node, $border_box);
-        $this->debugBlockLayout($frame, "red", false);
+        $this->debugBlockLayout($frame, 'red', false);
     }
 
     /**
@@ -69,7 +72,7 @@ class Block extends AbstractRenderer
 
             foreach ($frame->get_line_boxes() as $line) {
                 $lw = $cw - $line->left - $line->right;
-                $this->debugLayout([$cx + $line->left, $line->y, $lw, $line->h], "orange");
+                $this->debugLayout([$cx + $line->left, $line->y, $lw, $line->h], 'orange');
             }
         }
     }

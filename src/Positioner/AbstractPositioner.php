@@ -1,9 +1,12 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf\Positioner;
 
 use Dompdf\FrameDecorator\AbstractFrameDecorator;
@@ -17,10 +20,9 @@ use Dompdf\FrameDecorator\AbstractFrameDecorator;
  */
 abstract class AbstractPositioner
 {
+    abstract public function position(AbstractFrameDecorator $frame): void;
 
-    abstract function position(AbstractFrameDecorator $frame): void;
-
-    function move(
+    public function move(
         AbstractFrameDecorator $frame,
         float $offset_x,
         float $offset_y,

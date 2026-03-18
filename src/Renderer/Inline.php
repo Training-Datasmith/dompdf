@@ -1,9 +1,12 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf\Renderer;
 
 use Dompdf\Frame;
@@ -15,7 +18,7 @@ use Dompdf\Frame;
  */
 class Inline extends AbstractRenderer
 {
-    function render(Frame $frame): void
+    public function render(Frame $frame): void
     {
         // Get the first in-flow child
         $child = $frame->get_first_child();
@@ -64,16 +67,16 @@ class Inline extends AbstractRenderer
         $options = $this->_dompdf->getOptions();
 
         if ($options->getDebugLayout() && $options->getDebugLayoutInline()) {
-            $this->debugLayout($border_box, "blue");
+            $this->debugLayout($border_box, 'blue');
 
             if ($options->getDebugLayoutPaddingBox()) {
                 $padding_box = [
                     $x + $style->border_left_width,
                     $y + $style->border_top_width,
                     $w - $style->border_left_width - $style->border_right_width,
-                    $h - $style->border_top_width - $style->border_bottom_width
+                    $h - $style->border_top_width - $style->border_bottom_width,
                 ];
-                $this->debugLayout($padding_box, "blue", [0.5, 0.5]);
+                $this->debugLayout($padding_box, 'blue', [0.5, 0.5]);
             }
         }
     }
@@ -89,15 +92,15 @@ class Inline extends AbstractRenderer
             }
 
             // Exclude trailing white space
-            if ($child->get_node()->nodeValue === " "
+            if ($child->get_node()->nodeValue === ' '
                 && $child->get_prev_sibling() && !$child->get_next_sibling()
             ) {
                 break;
             }
 
             $style = $child->get_style();
-            $auto_width = $style->width === "auto";
-            $auto_height = $style->height === "auto";
+            $auto_width = $style->width === 'auto';
+            $auto_height = $style->height === 'auto';
             [, , $child_w, $child_h] = $child->get_border_box();
 
             if ($auto_width || $auto_height) {
@@ -106,7 +109,7 @@ class Inline extends AbstractRenderer
                 if ($auto_width) {
                     $child_w = $child_w2;
                 }
-    
+
                 if ($auto_height) {
                     $child_h = $child_h2;
                 }

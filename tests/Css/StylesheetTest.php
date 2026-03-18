@@ -1,9 +1,12 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Dompdf\Tests\Css;
 
 use Dompdf\Css\Style;
-use Dompdf\Dompdf;
 use Dompdf\Css\Stylesheet;
+use Dompdf\Dompdf;
 use Dompdf\Tests\TestCase;
 
 class StylesheetTest extends TestCase
@@ -12,7 +15,7 @@ class StylesheetTest extends TestCase
     {
         return [
             // TODO: Heredocs can be nicely indented starting with PHP 7.3
-            "closing parenthesis in string" => [
+            'closing parenthesis in string' => [
                 <<<CSS
 li::before {
     counter-increment: c;
@@ -21,13 +24,13 @@ li::before {
 CSS
 ,
                 [
-                    "li::before" => [[
-                        "counter_increment" => "c",
-                        "content" => '")"'
-                    ]]
-                ]
+                    'li::before' => [[
+                        'counter_increment' => 'c',
+                        'content' => '")"',
+                    ]],
+                ],
             ],
-            "semicolon in url" => [
+            'semicolon in url' => [
                 <<<CSS
 div {
     background-image: url(image;\(12\).png);
@@ -35,12 +38,12 @@ div {
 CSS
 ,
                 [
-                    "div" => [[
-                        "background_image" => "url(image;\(12\).png)"
-                    ]]
-                ]
+                    'div' => [[
+                        'background_image' => "url(image;\(12\).png)",
+                    ]],
+                ],
             ],
-            "malformed data URI" => [
+            'malformed data URI' => [
                 <<<CSS
 div {
     background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==&quote;);
@@ -48,10 +51,10 @@ div {
 CSS
 ,
                 [
-                    "div" => [[
-                        "background_image" => 'url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==&quote;)'
-                    ]]
-                ]
+                    'div' => [[
+                        'background_image' => 'url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==&quote;)',
+                    ]],
+                ],
             ],
         ];
     }
@@ -95,10 +98,10 @@ CSS
      */
     public function testDataUriHandling(): void
     {
-        $basePath = realpath(__DIR__ . "/..");
+        $basePath = realpath(__DIR__ . '/..');
         $imagePath = "$basePath/_files/jamaica.jpg";
         $imageEncoded = base64_encode(file_get_contents($imagePath));
-        $dataUri = "data:image/jpeg;base64," . $imageEncoded;
+        $dataUri = 'data:image/jpeg;base64,' . $imageEncoded;
         $css = "div { background-color: #000; background-image: url(\"$dataUri\"); }";
 
         $dompdf = new Dompdf();
@@ -107,9 +110,9 @@ CSS
 
         $styles = $sheet->get_styles();
 
-        $this->assertArrayHasKey("div", $styles);
-        $this->assertSame("#000", $styles["div"][0]->get_specified("background_color"));
-        $this->assertSame("blob://", substr($sheet->resolve_url($styles["div"][0]->get_specified("background_image")), 0, 7));
-        $this->assertSame($dataUri, $styles["div"][0]->background_image);
+        $this->assertArrayHasKey('div', $styles);
+        $this->assertSame('#000', $styles['div'][0]->get_specified('background_color'));
+        $this->assertSame('blob://', substr($sheet->resolve_url($styles['div'][0]->get_specified('background_image')), 0, 7));
+        $this->assertSame($dataUri, $styles['div'][0]->background_image);
     }
 }

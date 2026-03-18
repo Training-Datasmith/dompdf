@@ -1,9 +1,12 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf\FrameDecorator;
 
 use Dompdf\Dompdf;
@@ -17,7 +20,6 @@ use Dompdf\Image\Cache;
  */
 class ListBulletImage extends ListBullet
 {
-
     /**
      * The underlying image frame
      *
@@ -42,11 +44,11 @@ class ListBulletImage extends ListBullet
     /**
      * ListBulletImage constructor.
      */
-    function __construct(Frame $frame, Dompdf $dompdf)
+    public function __construct(Frame $frame, Dompdf $dompdf)
     {
         $style = $frame->get_style();
         $url = $style->list_style_image;
-        $frame->get_node()->setAttribute("src", $url);
+        $frame->get_node()->setAttribute('src', $url);
         $this->_img = new Image($frame, $dompdf);
         parent::__construct($this->_img, $dompdf);
 
@@ -102,7 +104,7 @@ class ListBulletImage extends ListBullet
      *
      * @return string
      */
-    function get_image_url()
+    public function get_image_url()
     {
         return $this->_img->get_image_url();
     }

@@ -1,9 +1,12 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf;
 
 /**
@@ -28,23 +31,21 @@ class CanvasFactory
      *
      * @return Canvas
      */
-    static function get_instance(Dompdf $dompdf, $paper, string $orientation, ?string $class = null): object
+    public static function get_instance(Dompdf $dompdf, $paper, string $orientation, ?string $class = null): object
     {
         $backend = strtolower($dompdf->getOptions()->getPdfBackend());
 
         if (isset($class) && class_exists($class, false)) {
-            $class .= "_Adapter";
+            $class .= '_Adapter';
         } else {
-            if (($backend === "auto" || $backend === "pdflib") &&
-                class_exists("PDFLib", false)
+            if (($backend === 'auto' || $backend === 'pdflib') &&
+                class_exists('PDFLib', false)
             ) {
                 $class = \Dompdf\Adapter\PDFLib::class;
-            }
-
-            else {
+            } else {
                 if (class_exists($backend, false)) {
                     $class = $backend;
-                } elseif ($backend === "gd" && extension_loaded('gd')) {
+                } elseif ($backend === 'gd' && extension_loaded('gd')) {
                     $class = \Dompdf\Adapter\GD::class;
                 } else {
                     $class = \Dompdf\Adapter\CPDF::class;

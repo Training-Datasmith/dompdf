@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Dompdf\Tests\OutputTest;
 
 use CallbackFilterIterator;
@@ -14,14 +17,14 @@ use Symfony\Component\Process\Process;
 
 final class OutputTest extends TestCase
 {
-    private const DATASET_DIRECTORY = __DIR__ . "/../_files/OutputTest";
-    private const FAILED_OUTPUT_DIRECTORY = __DIR__ . "/../../tmp/failed-output-tests";
+    private const DATASET_DIRECTORY = __DIR__ . '/../_files/OutputTest';
+    private const FAILED_OUTPUT_DIRECTORY = __DIR__ . '/../../tmp/failed-output-tests';
 
     private static function datasetName(SplFileInfo $file): string
     {
         $prefixLength = strlen(self::DATASET_DIRECTORY);
         $path = substr($file->getPath(), $prefixLength + 1);
-        $name = $file->getBasename("." . $file->getExtension());
+        $name = $file->getBasename('.' . $file->getExtension());
         return "$path/$name";
     }
 
@@ -34,7 +37,7 @@ final class OutputTest extends TestCase
             | FilesystemIterator::CURRENT_AS_FILEINFO
             | FilesystemIterator::SKIP_DOTS;
         $filter = function (SplFileInfo $file) {
-            return $file->getExtension() === "html";
+            return $file->getExtension() === 'html';
         };
         $dir = new RecursiveDirectoryIterator(self::DATASET_DIRECTORY, $flags);
         $files = new CallbackFilterIterator(new RecursiveIteratorIterator($dir), $filter);
@@ -54,13 +57,13 @@ final class OutputTest extends TestCase
 
     protected function setUp(): void
     {
-        $process = new Process(["gs", "-v"]);
+        $process = new Process(['gs', '-v']);
         $exitCode = $process->run();
 
         if ($exitCode === 127) {
             $this->markTestSkipped(
-                "Output tests need Ghostscript to be available. If you are " .
-                "on a Debian-based system, you can use `sudo apt install ghostscript`"
+                'Output tests need Ghostscript to be available. If you are ' .
+                'on a Debian-based system, you can use `sudo apt install ghostscript`'
             );
         }
     }
@@ -74,7 +77,7 @@ final class OutputTest extends TestCase
     {
         $document = $dataset->render();
         $referenceFile = $dataset->referenceFile()->getPathname();
-        $actualOutputFile = tempnam(sys_get_temp_dir(), "dompdf_test_");
+        $actualOutputFile = tempnam(sys_get_temp_dir(), 'dompdf_test_');
 
         file_put_contents($actualOutputFile, $document->output());
 
@@ -96,10 +99,10 @@ final class OutputTest extends TestCase
     ): void {
         $command = function ($file) {
             return [
-                "gs",
-                "-q", "-dBATCH", "-dNOPAUSE", "-sstdout=%stderr",
-                "-sDEVICE=png16m", "-dGraphicsAlphaBits=4",
-                "-sOutputFile=-", $file
+                'gs',
+                '-q', '-dBATCH', '-dNOPAUSE', '-sstdout=%stderr',
+                '-sDEVICE=png16m', '-dGraphicsAlphaBits=4',
+                '-sOutputFile=-', $file,
             ];
         };
         $process1 = new Process($command($referenceFile));
@@ -112,7 +115,7 @@ final class OutputTest extends TestCase
             // The `-sstdout=%stderr` setting moves all non-device output to
             // STDERR. Since we only expect image data, consider any other
             // output a failure
-            if ($error !== "") {
+            if ($error !== '') {
                 throw new RuntimeException("Unexpected Ghostscript output: `$error`");
             }
         }
@@ -148,7 +151,7 @@ final class OutputTest extends TestCase
         $pngSignature = "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A";
         $elements = explode($pngSignature, $output);
 
-        if (count($elements) <= 1 || $elements[0] !== "") {
+        if (count($elements) <= 1 || $elements[0] !== '') {
             throw new RuntimeException("Unexpected Ghostscript output: `$output`");
         }
 

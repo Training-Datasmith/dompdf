@@ -1,14 +1,17 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf\FrameReflower;
 
-use Dompdf\Helpers;
 use Dompdf\FrameDecorator\Block as BlockFrameDecorator;
 use Dompdf\FrameDecorator\Image as ImageFrameDecorator;
+use Dompdf\Helpers;
 
 /**
  * Image reflower class
@@ -17,16 +20,15 @@ use Dompdf\FrameDecorator\Image as ImageFrameDecorator;
  */
 class Image extends AbstractFrameReflower
 {
-
     /**
      * Image constructor.
      */
-    function __construct(ImageFrameDecorator $frame)
+    public function __construct(ImageFrameDecorator $frame)
     {
         parent::__construct($frame);
     }
 
-    function reflow(?BlockFrameDecorator $block = null): void
+    public function reflow(?BlockFrameDecorator $block = null): void
     {
         $this->determine_absolute_containing_block();
 
@@ -64,7 +66,7 @@ class Image extends AbstractFrameReflower
         $min_width = $this->resolve_min_width(null);
         $percent_width = Helpers::is_percent($style->width)
             || Helpers::is_percent($style->max_width)
-            || ($style->width === "auto"
+            || ($style->width === 'auto'
                 && (Helpers::is_percent($style->height) || Helpers::is_percent($style->max_height)));
 
         // Use the specified min width as minimum when width or max width depend
@@ -99,17 +101,17 @@ class Image extends AbstractFrameReflower
         $computed_height = $style->height;
 
         $width = $cbw === null && Helpers::is_percent($computed_width)
-            ? "auto"
+            ? 'auto'
             : $style->length_in_pt($computed_width, $cbw ?? 0);
         $height = $cbh === null && Helpers::is_percent($computed_height)
-            ? "auto"
+            ? 'auto'
             : $style->length_in_pt($computed_height, $cbh ?? 0);
         $min_width = $this->resolve_min_width($cbw);
         $max_width = $this->resolve_max_width($cbw);
         $min_height = $this->resolve_min_height($cbh);
         $max_height = $this->resolve_max_height($cbh);
 
-        if ($width === "auto" && $height === "auto") {
+        if ($width === 'auto' && $height === 'auto') {
             // Use intrinsic dimensions, resampled to pt
             [$img_width, $img_height] = $frame->get_intrinsic_dimensions();
             $w = $frame->resample($img_width);
@@ -133,13 +135,13 @@ class Image extends AbstractFrameReflower
                 $width = $height * ($img_width / $img_height);
                 $width = Helpers::clamp($width, $min_width, $max_width);
             }
-        } elseif ($height === "auto") {
+        } elseif ($height === 'auto') {
             // Width is fixed, scale height according to aspect ratio
             [$img_width, $img_height] = $frame->get_intrinsic_dimensions();
             $width = Helpers::clamp((float) $width, $min_width, $max_width);
             $height = $width * ($img_height / $img_width);
             $height = Helpers::clamp($height, $min_height, $max_height);
-        } elseif ($width === "auto") {
+        } elseif ($width === 'auto') {
             // Height is fixed, scale width according to aspect ratio
             [$img_width, $img_height] = $frame->get_intrinsic_dimensions();
             $height = Helpers::clamp((float) $height, $min_height, $max_height);
@@ -164,26 +166,26 @@ class Image extends AbstractFrameReflower
 
         if ($debug_png) {
             [$img_width, $img_height] = $frame->get_intrinsic_dimensions();
-            print "resolve_dimensions() " .
-                $frame->get_style()->width . " " .
-                $frame->get_style()->height . ";" .
-                $frame->get_parent()->get_style()->width . " " .
-                $frame->get_parent()->get_style()->height . ";" .
-                $frame->get_parent()->get_parent()->get_style()->width . " " .
-                $frame->get_parent()->get_parent()->get_style()->height . ";" .
-                $img_width . " " .
-                $img_height . "|";
+            print 'resolve_dimensions() ' .
+                $frame->get_style()->width . ' ' .
+                $frame->get_style()->height . ';' .
+                $frame->get_parent()->get_style()->width . ' ' .
+                $frame->get_parent()->get_style()->height . ';' .
+                $frame->get_parent()->get_parent()->get_style()->width . ' ' .
+                $frame->get_parent()->get_parent()->get_style()->height . ';' .
+                $img_width . ' ' .
+                $img_height . '|';
         }
 
         [, , $cbw, $cbh] = $frame->get_containing_block();
         [$width, $height] = $this->calculate_size($cbw, $cbh);
 
         if ($debug_png) {
-            print $width . " " . $height . ";";
+            print $width . ' ' . $height . ';';
         }
 
-        $style->set_used("width", $width);
-        $style->set_used("height", $height);
+        $style->set_used('width', $width);
+        $style->set_used('height', $height);
     }
 
     protected function resolve_margins(): void
@@ -193,17 +195,17 @@ class Image extends AbstractFrameReflower
         // https://www.w3.org/TR/CSS21/visudet.html#inline-replaced-height
         $style = $this->_frame->get_style();
 
-        if ($style->margin_left === "auto") {
-            $style->set_used("margin_left", 0.0);
+        if ($style->margin_left === 'auto') {
+            $style->set_used('margin_left', 0.0);
         }
-        if ($style->margin_right === "auto") {
-            $style->set_used("margin_right", 0.0);
+        if ($style->margin_right === 'auto') {
+            $style->set_used('margin_right', 0.0);
         }
-        if ($style->margin_top === "auto") {
-            $style->set_used("margin_top", 0.0);
+        if ($style->margin_top === 'auto') {
+            $style->set_used('margin_top', 0.0);
         }
-        if ($style->margin_bottom === "auto") {
-            $style->set_used("margin_bottom", 0.0);
+        if ($style->margin_bottom === 'auto') {
+            $style->set_used('margin_bottom', 0.0);
         }
     }
 }

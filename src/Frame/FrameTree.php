@@ -1,18 +1,21 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf\Frame;
 
 use DOMDocument;
-use DOMNode;
 use DOMElement;
-use DOMXPath;
-
+use DOMNode;
 use Dompdf\Exception;
+
 use Dompdf\Frame;
+use DOMXPath;
 use IteratorAggregate;
 
 /**
@@ -33,17 +36,17 @@ class FrameTree implements IteratorAggregate
      * @var array
      */
     protected static $HIDDEN_TAGS = [
-        "area",
-        "base",
-        "basefont",
-        "head",
-        "style",
-        "meta",
-        "title",
-        "colgroup",
-        "noembed",
-        "param",
-        "#comment"
+        'area',
+        'base',
+        'basefont',
+        'head',
+        'style',
+        'meta',
+        'title',
+        'colgroup',
+        'noembed',
+        'param',
+        '#comment',
     ];
 
     /**
@@ -142,13 +145,13 @@ class FrameTree implements IteratorAggregate
      */
     public function build_tree(): void
     {
-        $html = $this->_dom->getElementsByTagName("html")->item(0);
+        $html = $this->_dom->getElementsByTagName('html')->item(0);
         if (is_null($html)) {
             $html = $this->_dom->firstChild;
         }
 
         if (is_null($html)) {
-            throw new Exception("Requested HTML document contains no data.");
+            throw new Exception('Requested HTML document contains no data.');
         }
 
         $this->fix_tables();
@@ -214,9 +217,9 @@ class FrameTree implements IteratorAggregate
         $nextChild = $child->nextSibling;
         $node->removeChild($child);
         if (isset($previousChild, $nextChild)) {
-            if ($previousChild->nodeName === "#text" && $nextChild->nodeName === "#text") {
+            if ($previousChild->nodeName === '#text' && $nextChild->nodeName === '#text') {
                 $previousChild->nodeValue .= $nextChild->nodeValue;
-                $this->_remove_node($node, $children, $index+1);
+                $this->_remove_node($node, $children, $index + 1);
             }
         }
         array_splice($children, $index, 1);
@@ -256,7 +259,7 @@ class FrameTree implements IteratorAggregate
 
             // Skip non-displaying nodes
             if (in_array($nodeName, self::$HIDDEN_TAGS)) {
-                if ($nodeName !== "head" && $nodeName !== "style") {
+                if ($nodeName !== 'head' && $nodeName !== 'style') {
                     $this->_remove_node($node, $children, $index);
                 } else {
                     $index++;
@@ -264,12 +267,12 @@ class FrameTree implements IteratorAggregate
                 continue;
             }
             // Skip empty text nodes
-            if ($nodeName === "#text" && $child->nodeValue === "") {
+            if ($nodeName === '#text' && $child->nodeValue === '') {
                 $this->_remove_node($node, $children, $index);
                 continue;
             }
             // Skip empty image nodes
-            if ($nodeName === "img" && $child->getAttribute("src") === "") {
+            if ($nodeName === 'img' && $child->getAttribute('src') === '') {
                 $this->_remove_node($node, $children, $index);
                 continue;
             }
@@ -290,7 +293,7 @@ class FrameTree implements IteratorAggregate
      */
     public function insert_node(DOMElement $node, DOMElement $new_node, $pos)
     {
-        if ($pos === "after" || !$node->firstChild) {
+        if ($pos === 'after' || !$node->firstChild) {
             $node->appendChild($new_node);
         } else {
             $node->insertBefore($new_node, $node->firstChild);
@@ -298,14 +301,14 @@ class FrameTree implements IteratorAggregate
 
         $this->_build_tree_r($new_node);
 
-        $frame_id = $new_node->getAttribute("frame_id");
+        $frame_id = $new_node->getAttribute('frame_id');
         $frame = $this->get_frame($frame_id);
 
-        $parent_id = $node->getAttribute("frame_id");
+        $parent_id = $node->getAttribute('frame_id');
         $parent = $this->get_frame($parent_id);
 
         if ($parent) {
-            if ($pos === "before") {
+            if ($pos === 'before') {
                 $parent->prepend_child($frame, false);
             } else {
                 $parent->append_child($frame, false);

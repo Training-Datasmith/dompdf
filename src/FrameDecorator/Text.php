@@ -1,14 +1,17 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf\FrameDecorator;
 
 use Dompdf\Dompdf;
-use Dompdf\Frame;
 use Dompdf\Exception;
+use Dompdf\Frame;
 
 /**
  * Decorates Frame objects for text layout
@@ -39,10 +42,10 @@ class Text extends AbstractFrameDecorator
      * Text constructor.
      * @throws Exception
      */
-    function __construct(Frame $frame, Dompdf $dompdf)
+    public function __construct(Frame $frame, Dompdf $dompdf)
     {
         if (!$frame->is_text_node()) {
-            throw new Exception("Text_Decorator can only be applied to #text nodes.");
+            throw new Exception('Text_Decorator can only be applied to #text nodes.');
         }
 
         parent::__construct($frame, $dompdf);
@@ -55,18 +58,18 @@ class Text extends AbstractFrameDecorator
     public function trim_trailing_ws(): void
     {
         $text = $this->get_text();
-        $trailing = mb_substr($text, -1, null, "UTF-8");
+        $trailing = mb_substr($text, -1, null, 'UTF-8');
 
         // White space is always collapsed to the standard space character
         // currently, so only handle that for now
-        if ($trailing === " ") {
+        if ($trailing === ' ') {
             $this->trailingWs = $trailing;
-            $this->set_text(mb_substr($text, 0, -1, "UTF-8"));
+            $this->set_text(mb_substr($text, 0, -1, 'UTF-8'));
             $this->recalculate_width();
         }
     }
 
-    function reset(): void
+    public function reset(): void
     {
         parent::reset();
         $this->text_spacing = 0.0;
@@ -90,21 +93,21 @@ class Text extends AbstractFrameDecorator
     /**
      * @return string
      */
-    function get_text()
+    public function get_text()
     {
         // FIXME: this should be in a child class (and is incorrect)
-//    if ( $this->_frame->get_style()->content !== "normal" ) {
-//      $this->_frame->get_node()->data = $this->_frame->get_style()->content;
-//      $this->_frame->get_style()->content = "normal";
-//    }
+        //    if ( $this->_frame->get_style()->content !== "normal" ) {
+        //      $this->_frame->get_node()->data = $this->_frame->get_style()->content;
+        //      $this->_frame->get_style()->content = "normal";
+        //    }
 
-//      Helpers::pre_r("---");
-//      $style = $this->_frame->get_style();
-//      var_dump($text = $this->_frame->get_node()->data);
-//      var_dump($asc = utf8_decode($text));
-//      for ($i = 0; $i < strlen($asc); $i++)
-//        Helpers::pre_r("$i: " . $asc[$i] . " - " . ord($asc[$i]));
-//      Helpers::pre_r("width: " . $this->_dompdf->getFontMetrics()->getTextWidth($text, $style->font_family, $style->font_size));
+        //      Helpers::pre_r("---");
+        //      $style = $this->_frame->get_style();
+        //      var_dump($text = $this->_frame->get_node()->data);
+        //      var_dump($asc = utf8_decode($text));
+        //      for ($i = 0; $i < strlen($asc); $i++)
+        //        Helpers::pre_r("$i: " . $asc[$i] . " - " . ord($asc[$i]));
+        //      Helpers::pre_r("width: " . $this->_dompdf->getFontMetrics()->getTextWidth($text, $style->font_family, $style->font_size));
 
         return $this->_frame->get_node()->data;
     }
@@ -137,7 +140,7 @@ class Text extends AbstractFrameDecorator
     {
         $style = $this->_frame->get_style();
         $pb = $this->_frame->get_padding_box();
-        $pb[3] = $pb["h"] = (float) $style->length_in_pt($style->height);
+        $pb[3] = $pb['h'] = (float) $style->length_in_pt($style->height);
         return $pb;
     }
 
@@ -161,7 +164,7 @@ class Text extends AbstractFrameDecorator
         $letter_spacing = $style->letter_spacing;
         $text_width = $fontMetrics->getTextWidth($text, $font, $size, $word_spacing, $letter_spacing);
 
-        $style->set_used("width", $text_width);
+        $style->set_used('width', $text_width);
         return $text_width;
     }
 
@@ -173,7 +176,7 @@ class Text extends AbstractFrameDecorator
      * @param bool $split_parent Whether to split parent inline frames.
      * @return Text|null
      */
-    function split_text(int $offset, bool $split_parent = true): ?self
+    public function split_text(int $offset, bool $split_parent = true): ?self
     {
         if ($offset === 0) {
             return null;
@@ -190,7 +193,7 @@ class Text extends AbstractFrameDecorator
         $split_style = $deco->get_style();
 
         if ($this->mapped_font !== null) {
-            $split_style->set_used("font_family", $this->mapped_font);
+            $split_style->set_used('font_family', $this->mapped_font);
             $deco->mapped_font = $this->mapped_font;
         }
 
@@ -218,7 +221,7 @@ class Text extends AbstractFrameDecorator
      * @param int $offset
      * @param int $count
      */
-    function delete_text($offset, $count): void
+    public function delete_text($offset, $count): void
     {
         $this->_frame->get_node()->deleteData($offset, $count);
     }
@@ -226,7 +229,7 @@ class Text extends AbstractFrameDecorator
     /**
      * @param string $text
      */
-    function set_text($text): void
+    public function set_text($text): void
     {
         $this->_frame->get_node()->data = $text;
     }
@@ -235,7 +238,7 @@ class Text extends AbstractFrameDecorator
      * Determines the optimal font that applies to the frame and splits
      * the frame where the optimal font changes.
      */
-    function apply_font_mapping(): void
+    public function apply_font_mapping(): void
     {
         if ($this->mapped_font !== null) {
             return;
@@ -248,12 +251,12 @@ class Text extends AbstractFrameDecorator
         $charMapping = $fontMetrics->mapTextToFonts($this->get_text(), $families, $subtype, 1);
 
         if (isset($charMapping[0])) {
-            if ($charMapping[0]["length"] !== 0) {
-                $this->split_text($charMapping[0]["length"], false);
+            if ($charMapping[0]['length'] !== 0) {
+                $this->split_text($charMapping[0]['length'], false);
             }
-            $mapped_font = $charMapping[0]["font"];
+            $mapped_font = $charMapping[0]['font'];
             if ($mapped_font !== null) {
-                $style->set_used("font_family", $mapped_font);
+                $style->set_used('font_family', $mapped_font);
                 $this->mapped_font = $mapped_font;
             }
         }

@@ -1,9 +1,12 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf\FrameDecorator;
 
 use Dompdf\Dompdf;
@@ -18,7 +21,6 @@ use Dompdf\Image\Cache;
  */
 class Image extends AbstractFrameDecorator
 {
-
     /**
      * The path to the image file (note that remote images are
      * downloaded locally to Options:tempDir).
@@ -40,12 +42,12 @@ class Image extends AbstractFrameDecorator
      * @param Frame $frame the frame to decorate
      * @param DOMPDF $dompdf the document's dompdf object (required to resolve relative & remote urls)
      */
-    function __construct(Frame $frame, Dompdf $dompdf)
+    public function __construct(Frame $frame, Dompdf $dompdf)
     {
         parent::__construct($frame, $dompdf);
 
         $node = $frame->get_node();
-        $url = $node->getAttribute("src");
+        $url = $node->getAttribute('src');
 
         $debug_png = $dompdf->getOptions()->getDebugPng();
         if ($debug_png) {
@@ -60,7 +62,7 @@ class Image extends AbstractFrameDecorator
             $dompdf->getOptions()
         );
 
-        if (Cache::is_broken($this->_image_url) && ($alt = $node->getAttribute("alt")) !== "") {
+        if (Cache::is_broken($this->_image_url) && ($alt = $node->getAttribute('alt')) !== '') {
             $fontMetrics = $dompdf->getFontMetrics();
             $style = $frame->get_style();
             $font = $style->font_family;
@@ -101,7 +103,7 @@ class Image extends AbstractFrameDecorator
      *
      * @return string The url of this image
      */
-    function get_image_url()
+    public function get_image_url()
     {
         return $this->_image_url;
     }
@@ -111,7 +113,7 @@ class Image extends AbstractFrameDecorator
      *
      * @return string The image's error message
      */
-    function get_image_msg()
+    public function get_image_msg()
     {
         return $this->_image_msg;
     }

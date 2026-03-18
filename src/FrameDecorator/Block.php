@@ -1,9 +1,12 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf\FrameDecorator;
 
 use Dompdf\Dompdf;
@@ -43,7 +46,7 @@ class Block extends AbstractFrameDecorator
     /**
      * Block constructor.
      */
-    function __construct(Frame $frame, Dompdf $dompdf)
+    public function __construct(Frame $frame, Dompdf $dompdf)
     {
         parent::__construct($frame, $dompdf);
 
@@ -52,7 +55,7 @@ class Block extends AbstractFrameDecorator
         $this->dangling_markers = [];
     }
 
-    function reset(): void
+    public function reset(): void
     {
         parent::reset();
 
@@ -64,7 +67,7 @@ class Block extends AbstractFrameDecorator
     /**
      * @return LineBox
      */
-    function get_current_line_box()
+    public function get_current_line_box()
     {
         return $this->_line_boxes[$this->_cl];
     }
@@ -72,7 +75,7 @@ class Block extends AbstractFrameDecorator
     /**
      * @return int
      */
-    function get_current_line_number()
+    public function get_current_line_number()
     {
         return $this->_cl;
     }
@@ -80,7 +83,7 @@ class Block extends AbstractFrameDecorator
     /**
      * @return LineBox[]
      */
-    function get_line_boxes()
+    public function get_line_boxes()
     {
         return $this->_line_boxes;
     }
@@ -89,7 +92,7 @@ class Block extends AbstractFrameDecorator
      * @param int $line_number
      * @return int
      */
-    function set_current_line_number($line_number)
+    public function set_current_line_number($line_number)
     {
         $line_boxes_count = count($this->_line_boxes);
         $cl = max(min($line_number, $line_boxes_count), 0);
@@ -99,7 +102,7 @@ class Block extends AbstractFrameDecorator
     /**
      * @param int $i
      */
-    function clear_line($i): void
+    public function clear_line($i): void
     {
         if (isset($this->_line_boxes[$i])) {
             unset($this->_line_boxes[$i]);

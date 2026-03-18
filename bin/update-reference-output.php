@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 use Dompdf\Tests\OutputTest\Dataset;
 use Dompdf\Tests\OutputTest\OutputTest;
 
@@ -10,11 +12,11 @@ use Dompdf\Tests\OutputTest\OutputTest;
  *   files for all test cases with a path starting with the specified prefix
  *   (paths considered relative to the parent `OutputTest` directory)
  */
-require __DIR__ . "/../vendor/autoload.php";
+require __DIR__ . '/../vendor/autoload.php';
 
-$pathTest = $argv[1] ?? "";
+$pathTest = $argv[1] ?? '';
 $datasets = OutputTest::datasets();
-$include = $pathTest !== ""
+$include = $pathTest !== ''
     ? function (Dataset $set) use ($pathTest) {
         return substr($set->name, 0, strlen($pathTest)) === $pathTest;
     } : function () {
@@ -26,6 +28,6 @@ foreach ($datasets as $dataset) {
         continue;
     }
 
-    echo "Updating " . $dataset->name . PHP_EOL;
+    echo 'Updating ' . $dataset->name . PHP_EOL;
     $dataset->updateReferenceFile();
 }

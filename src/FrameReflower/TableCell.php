@@ -1,9 +1,12 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf\FrameReflower;
 
 use Dompdf\Exception;
@@ -19,13 +22,13 @@ use Dompdf\Helpers;
  */
 class TableCell extends Block
 {
-    function reflow(?BlockFrameDecorator $block = null): void
+    public function reflow(?BlockFrameDecorator $block = null): void
     {
         /** @var TableCellFrameDecorator */
         $frame = $this->_frame;
         $table = TableFrameDecorator::find_parent_table($frame);
         if ($table === null) {
-            throw new Exception("Parent table not found for table cell");
+            throw new Exception('Parent table not found for table cell');
         }
 
         // Counters and generated content
@@ -40,35 +43,43 @@ class TableCell extends Block
         $cells = $cellmap->get_spanned_cells($frame);
 
         $w = 0;
-        foreach ($cells["columns"] as $i) {
+        foreach ($cells['columns'] as $i) {
             $col = $cellmap->get_column($i);
-            $w += $col["used-width"];
+            $w += $col['used-width'];
         }
 
         //FIXME?
-        $h = $frame->get_containing_block("h");
+        $h = $frame->get_containing_block('h');
 
-        $left_space = (float)$style->length_in_pt([$style->margin_left,
+        $left_space = (float)$style->length_in_pt(
+            [$style->margin_left,
                 $style->padding_left,
                 $style->border_left_width],
-            $w);
+            $w
+        );
 
-        $right_space = (float)$style->length_in_pt([$style->padding_right,
+        $right_space = (float)$style->length_in_pt(
+            [$style->padding_right,
                 $style->margin_right,
                 $style->border_right_width],
-            $w);
+            $w
+        );
 
-        $top_space = (float)$style->length_in_pt([$style->margin_top,
+        $top_space = (float)$style->length_in_pt(
+            [$style->margin_top,
                 $style->padding_top,
                 $style->border_top_width],
-            $h);
-        $bottom_space = (float)$style->length_in_pt([$style->margin_bottom,
+            $h
+        );
+        $bottom_space = (float)$style->length_in_pt(
+            [$style->margin_bottom,
                 $style->padding_bottom,
                 $style->border_bottom_width],
-            $h);
+            $h
+        );
 
         $cb_w = $w - $left_space - $right_space;
-        $style->set_used("width", $cb_w);
+        $style->set_used('width', $cb_w);
 
         $content_x = $x + $left_space;
         $content_y = $line_y = $y + $top_space;
@@ -103,17 +114,17 @@ class TableCell extends Block
         $frame->set_content_height($content_height);
 
         // Let the cellmap know our height
-        $cell_height = $height / count($cells["rows"]);
+        $cell_height = $height / count($cells['rows']);
 
         if ($style_height <= $height) {
             $cell_height += $top_space + $bottom_space;
         }
 
-        foreach ($cells["rows"] as $i) {
+        foreach ($cells['rows'] as $i) {
             $cellmap->set_row_height($i, $cell_height);
         }
 
-        $style->set_used("height", $height);
+        $style->set_used('height', $height);
 
         $this->_text_align();
         $this->vertical_align();
@@ -130,7 +141,7 @@ class TableCell extends Block
         // relative to the table width, which is not determined yet
         $style = $this->_frame->get_style();
         $width = $style->width;
-        $fixed_width = $width !== "auto" && !Helpers::is_percent($width);
+        $fixed_width = $width !== 'auto' && !Helpers::is_percent($width);
 
         [$min, $max] = $this->get_min_max_child_width();
 

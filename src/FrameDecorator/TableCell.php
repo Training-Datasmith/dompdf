@@ -1,9 +1,12 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf\FrameDecorator;
 
 use Dompdf\Dompdf;
@@ -25,13 +28,13 @@ class TableCell extends BlockFrameDecorator
     /**
      * TableCell constructor.
      */
-    function __construct(Frame $frame, Dompdf $dompdf)
+    public function __construct(Frame $frame, Dompdf $dompdf)
     {
         parent::__construct($frame, $dompdf);
         $this->content_height = 0.0;
     }
 
-    function reset(): void
+    public function reset(): void
     {
         parent::reset();
         $this->content_height = 0.0;
@@ -57,13 +60,13 @@ class TableCell extends BlockFrameDecorator
                 $style->border_top_width,
                 $style->border_bottom_width,
                 $style->padding_bottom,
-                $style->margin_bottom
+                $style->margin_bottom,
             ],
             (float)$style->length_in_pt($style->height)
         );
 
         $new_height = $height - $v_space;
-        $style->set_used("height", $new_height);
+        $style->set_used('height', $new_height);
 
         if ($new_height > $this->content_height) {
             $y_offset = 0;
@@ -71,18 +74,18 @@ class TableCell extends BlockFrameDecorator
             // Adjust our vertical alignment
             switch ($style->vertical_align) {
                 default:
-                case "baseline":
+                case 'baseline':
                     // FIXME: this isn't right
 
-                case "top":
+                case 'top':
                     // Don't need to do anything
                     return;
 
-                case "middle":
+                case 'middle':
                     $y_offset = ($new_height - $this->content_height) / 2;
                     break;
 
-                case "bottom":
+                case 'bottom':
                     $y_offset = $new_height - $this->content_height;
                     break;
             }

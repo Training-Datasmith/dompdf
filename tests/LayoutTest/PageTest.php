@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Dompdf\Tests\LayoutTest;
 
 use DOMElement;
@@ -14,7 +17,7 @@ class PageTest extends TestCase
     {
         return [
             // TODO: Heredocs can be nicely indented starting with PHP 7.3
-            "one page" => [
+            'one page' => [
                 <<<HTML
 <!DOCTYPE html>
 <html>
@@ -41,9 +44,9 @@ class PageTest extends TestCase
 HTML
 ,
                 1,
-                ["box" => 1]
+                ['box' => 1],
             ],
-            "two pages" => [
+            'two pages' => [
                 <<<HTML
 <!DOCTYPE html>
 <html>
@@ -74,7 +77,7 @@ HTML
 HTML
 ,
                 2,
-                ["box" => 2]
+                ['box' => 2],
             ],
         ];
     }
@@ -96,21 +99,21 @@ HTML
         $dompdf = new Dompdf($options);
         $dompdf->setCallbacks([
             [
-                "event" => "begin_frame",
-                "f" => function (AbstractFrameDecorator $frame, Canvas $canvas) use ($expectedPages, &$elementPages) {
+                'event' => 'begin_frame',
+                'f' => function (AbstractFrameDecorator $frame, Canvas $canvas) use ($expectedPages, &$elementPages) {
                     $node = $frame->get_node();
 
                     if (!($node instanceof DOMElement)) {
                         return;
                     }
 
-                    $class = $node->getAttribute("class");
+                    $class = $node->getAttribute('class');
 
                     if (isset($expectedPages[$class])) {
                         $elementPages[$class] = $canvas->get_page_number();
                     }
-                }
-            ]
+                },
+            ],
         ]);
 
         $dompdf->loadHtml($html);

@@ -1,9 +1,12 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf;
 
 use Dompdf\FrameDecorator\AbstractFrameDecorator;
@@ -131,7 +134,7 @@ class LineBox
 
         // Find nearest floating element
         $p = $this->_block_frame;
-        while ($p->get_style()->float === "none") {
+        while ($p->get_style()->float === 'none') {
             $parent = $p->get_parent();
 
             if (!$parent) {
@@ -206,7 +209,7 @@ class LineBox
             $floating_width = $floating_frame->get_margin_width();
 
             if (!$cb_w) {
-                $cb_w = $floating_frame->get_containing_block("w");
+                $cb_w = $floating_frame->get_containing_block('w');
             }
 
             $line_w = $this->get_width();
@@ -218,16 +221,16 @@ class LineBox
 
             // If the child is still shifted by the floating element
             if (self::$float_offset_anti_infinite_loop-- > 0 &&
-                $floating_frame->get_position("y") + $floating_frame->get_margin_height() >= $this->y &&
-                $block->get_position("x") + $block->get_margin_width() >= $floating_frame->get_position("x")
+                $floating_frame->get_position('y') + $floating_frame->get_margin_height() >= $this->y &&
+                $block->get_position('x') + $block->get_margin_width() >= $floating_frame->get_position('x')
             ) {
-                if ($float === "left") {
+                if ($float === 'left') {
                     if ($floating_frame_parent === $this->_block_frame) {
                         $inside_left_floating_width += $floating_width;
                     } else {
                         $outside_left_floating_width += $floating_width;
                     }
-                } elseif ($float === "right") {
+                } elseif ($float === 'right') {
                     if ($floating_frame_parent === $this->_block_frame) {
                         $inside_right_floating_width += $floating_width;
                     } else {
@@ -398,8 +401,8 @@ class LineBox
 
     public function __toString(): string
     {
-        $props = ["wc", "y", "w", "h", "left", "right", "br"];
-        $s = "";
+        $props = ['wc', 'y', 'w', 'h', 'left', 'right', 'br'];
+        $s = '';
         foreach ($props as $prop) {
             $s .= "$prop: " . $this->$prop . "\n";
         }

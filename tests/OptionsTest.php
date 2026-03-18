@@ -1,8 +1,10 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Dompdf\Tests;
 
 use Dompdf\Options;
-use Dompdf\Tests\TestCase;
 
 class OptionsTest extends TestCase
 {
@@ -310,7 +312,7 @@ class OptionsTest extends TestCase
             'enable_remote' => true,
             'enable_javascript' => false,
             'enable_html5_parser' => true,
-            'enable_font_subsetting' => false
+            'enable_font_subsetting' => false,
         ]);
 
         $this->assertTrue($option->getIsPhpEnabled());
@@ -336,44 +338,44 @@ class OptionsTest extends TestCase
         $this->assertFalse($option->get('enable_font_subsetting'));
     }
 
-
     public function testAllowedProtocols()
     {
-        $options = new Options(["isRemoteEnabled" => false]);
-        $options->setAllowedProtocols(["http://"]);
+        $options = new Options(['isRemoteEnabled' => false]);
+        $options->setAllowedProtocols(['http://']);
         $allowedProtocols = $options->getAllowedProtocols();
         $this->assertIsArray($allowedProtocols);
         $this->assertEquals(1, count($allowedProtocols));
-        $this->assertArrayHasKey("http://", $allowedProtocols);
-        $this->assertIsArray($allowedProtocols["http://"]);
-        $this->assertArrayHasKey("rules", $allowedProtocols["http://"]);
-        $this->assertIsArray($allowedProtocols["http://"]["rules"]);
-        $this->assertEquals(1, count($allowedProtocols["http://"]["rules"]));
-        $this->assertEquals([$options, "validateRemoteUri"], $allowedProtocols["http://"]["rules"][0]);
+        $this->assertArrayHasKey('http://', $allowedProtocols);
+        $this->assertIsArray($allowedProtocols['http://']);
+        $this->assertArrayHasKey('rules', $allowedProtocols['http://']);
+        $this->assertIsArray($allowedProtocols['http://']['rules']);
+        $this->assertEquals(1, count($allowedProtocols['http://']['rules']));
+        $this->assertEquals([$options, 'validateRemoteUri'], $allowedProtocols['http://']['rules'][0]);
 
-        [$validation_result] = $allowedProtocols["http://"]["rules"][0]("http://example.com/");
+        [$validation_result] = $allowedProtocols['http://']['rules'][0]('http://example.com/');
         $this->assertFalse($validation_result);
 
-        
         $mock_protocol = [
-            "mock://" => [
-                "rules" => [
-                    function ($uri) { return [true, null]; }
-                ]
-            ]
+            'mock://' => [
+                'rules' => [
+                    function ($uri) {
+                        return [true, null];
+                    },
+                ],
+            ],
         ];
         $options->setAllowedProtocols($mock_protocol);
         $allowedProtocols = $options->getAllowedProtocols();
         $this->assertIsArray($allowedProtocols);
         $this->assertEquals(1, count($allowedProtocols));
-        $this->assertArrayHasKey("mock://", $allowedProtocols);
-        $this->assertIsArray($allowedProtocols["mock://"]);
-        $this->assertArrayHasKey("rules", $allowedProtocols["mock://"]);
-        $this->assertIsArray($allowedProtocols["mock://"]["rules"]);
-        $this->assertEquals(1, count($allowedProtocols["mock://"]["rules"]));
-        $this->assertEquals($mock_protocol["mock://"]["rules"][0], $allowedProtocols["mock://"]["rules"][0]);
+        $this->assertArrayHasKey('mock://', $allowedProtocols);
+        $this->assertIsArray($allowedProtocols['mock://']);
+        $this->assertArrayHasKey('rules', $allowedProtocols['mock://']);
+        $this->assertIsArray($allowedProtocols['mock://']['rules']);
+        $this->assertEquals(1, count($allowedProtocols['mock://']['rules']));
+        $this->assertEquals($mock_protocol['mock://']['rules'][0], $allowedProtocols['mock://']['rules'][0]);
 
-        [$validation_result] = $allowedProtocols["mock://"]["rules"][0]("mock://example.com/");
+        [$validation_result] = $allowedProtocols['mock://']['rules'][0]('mock://example.com/');
         $this->assertTrue($validation_result);
     }
 
@@ -381,25 +383,25 @@ class OptionsTest extends TestCase
     {
         $options = new Options(['isRemoteEnabled' => true]);
         $options->setAllowedRemoteHosts(['en.wikipedia.org']);
-        $options->setAllowedProtocols(["http://"]);
+        $options->setAllowedProtocols(['http://']);
         $allowedRemoteHosts = $options->getAllowedRemoteHosts();
         $this->assertIsArray($allowedRemoteHosts);
         $this->assertEquals(1, count($allowedRemoteHosts));
-        $this->assertContains("en.wikipedia.org", $allowedRemoteHosts);
+        $this->assertContains('en.wikipedia.org', $allowedRemoteHosts);
 
         $allowedProtocols = $options->getAllowedProtocols();
         $this->assertIsArray($allowedProtocols);
         $this->assertEquals(1, count($allowedProtocols));
-        $this->assertArrayHasKey("http://", $allowedProtocols);
-        $this->assertIsArray($allowedProtocols["http://"]);
-        $this->assertArrayHasKey("rules", $allowedProtocols["http://"]);
-        $this->assertIsArray($allowedProtocols["http://"]["rules"]);
-        $this->assertEquals(1, count($allowedProtocols["http://"]["rules"]));
-        $this->assertEquals([$options, "validateRemoteUri"], $allowedProtocols["http://"]["rules"][0]);
+        $this->assertArrayHasKey('http://', $allowedProtocols);
+        $this->assertIsArray($allowedProtocols['http://']);
+        $this->assertArrayHasKey('rules', $allowedProtocols['http://']);
+        $this->assertIsArray($allowedProtocols['http://']['rules']);
+        $this->assertEquals(1, count($allowedProtocols['http://']['rules']));
+        $this->assertEquals([$options, 'validateRemoteUri'], $allowedProtocols['http://']['rules'][0]);
 
-        [$validation_result] = $allowedProtocols["http://"]["rules"][0]("http://example.com/");
+        [$validation_result] = $allowedProtocols['http://']['rules'][0]('http://example.com/');
         $this->assertFalse($validation_result);
-        [$validation_result] = $allowedProtocols["http://"]["rules"][0]("http://en.wikipedia.org/");
+        [$validation_result] = $allowedProtocols['http://']['rules'][0]('http://en.wikipedia.org/');
         $this->assertTrue($validation_result);
     }
 
@@ -408,10 +410,10 @@ class OptionsTest extends TestCase
         $options = new Options();
 
         $log_path = $options->getLogOutputFile();
-        $options->setLogOutputFile("phar://test.phar/log.html");
+        $options->setLogOutputFile('phar://test.phar/log.html');
         $this->assertEquals($log_path, $options->getLogOutputFile());
 
-        $log_path = sys_get_temp_dir() . "/log.html";
+        $log_path = sys_get_temp_dir() . '/log.html';
         $options->setLogOutputFile($log_path);
         $this->assertEquals($log_path, $options->getLogOutputFile());
 

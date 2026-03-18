@@ -1,9 +1,12 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf\FrameReflower;
 
 use Dompdf\Exception;
@@ -18,22 +21,21 @@ use Dompdf\FrameDecorator\TableRowGroup as TableRowGroupFrameDecorator;
  */
 class TableRowGroup extends AbstractFrameReflower
 {
-
     /**
      * TableRowGroup constructor.
      */
-    function __construct(TableRowGroupFrameDecorator $frame)
+    public function __construct(TableRowGroupFrameDecorator $frame)
     {
         parent::__construct($frame);
     }
 
-    function reflow(?BlockFrameDecorator $block = null): void
+    public function reflow(?BlockFrameDecorator $block = null): void
     {
         /** @var TableRowGroupFrameDecorator */
         $frame = $this->_frame;
         $page = $frame->get_root();
         $parent = $frame->get_parent();
-        $dompdf_generated = $parent->get_frame()->get_node()->nodeName === "dompdf_generated";
+        $dompdf_generated = $parent->get_frame()->get_node()->nodeName === 'dompdf_generated';
 
         // Counters and generated content
         $this->_set_content();
@@ -42,7 +44,7 @@ class TableRowGroup extends AbstractFrameReflower
         $cb = $frame->get_containing_block();
 
         foreach ($frame->get_children() as $child) {
-            $child->set_containing_block($cb["x"], $cb["y"], $cb["w"], $cb["h"]);
+            $child->set_containing_block($cb['x'], $cb['y'], $cb['w'], $cb['h']);
             $child->reflow();
 
             // Check if a split has occurred
@@ -59,7 +61,7 @@ class TableRowGroup extends AbstractFrameReflower
 
         $table = TableFrameDecorator::find_parent_table($frame);
         if ($table === null) {
-            throw new Exception("Parent table not found for table row group");
+            throw new Exception('Parent table not found for table row group');
         }
         $cellmap = $table->get_cellmap();
 
@@ -69,8 +71,8 @@ class TableRowGroup extends AbstractFrameReflower
             return;
         }
 
-        $style->set_used("width", $cellmap->get_frame_width($frame));
-        $style->set_used("height", $cellmap->get_frame_height($frame));
+        $style->set_used('width', $cellmap->get_frame_width($frame));
+        $style->set_used('height', $cellmap->get_frame_height($frame));
 
         $frame->set_position($cellmap->get_frame_position($frame));
     }

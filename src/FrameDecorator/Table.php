@@ -1,13 +1,16 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf\FrameDecorator;
 
-use Dompdf\Cellmap;
 use DOMNode;
+use Dompdf\Cellmap;
 use Dompdf\Css\Style;
 use Dompdf\Dompdf;
 use Dompdf\Frame;
@@ -25,9 +28,9 @@ class Table extends AbstractFrameDecorator
      * List of all row-group display types.
      */
     public const ROW_GROUPS = [
-        "table-row-group",
-        "table-header-group",
-        "table-footer-group"
+        'table-row-group',
+        'table-header-group',
+        'table-footer-group',
     ];
 
     /**
@@ -65,7 +68,7 @@ class Table extends AbstractFrameDecorator
         $this->_cellmap = new Cellmap($this);
 
         $style = $frame->get_style();
-        if ($style->table_layout === "fixed" && $style->width !== "auto") {
+        if ($style->table_layout === 'fixed' && $style->width !== 'auto') {
             $this->_cellmap->set_layout_fixed(true);
         }
 
@@ -207,7 +210,7 @@ class Table extends AbstractFrameDecorator
      */
     public function normalize(): void
     {
-        $column_caption = ["table-column-group", "table-column", "table-caption"];
+        $column_caption = ['table-column-group', 'table-column', 'table-caption'];
         $children = iterator_to_array($this->get_children());
         $tbody = null;
 
@@ -219,9 +222,9 @@ class Table extends AbstractFrameDecorator
                 $tbody = null;
 
                 // Add headers and footers
-                if ($display === "table-header-group") {
+                if ($display === 'table-header-group') {
                     $this->_headers[] = $child;
-                } elseif ($display === "table-footer-group") {
+                } elseif ($display === 'table-footer-group') {
                     $this->_footers[] = $child;
                 }
                 continue;
@@ -239,7 +242,7 @@ class Table extends AbstractFrameDecorator
 
             // Catch consecutive misplaced frames within a single anonymous group
             if ($tbody === null) {
-                $tbody = $this->create_anonymous_child("tbody", "table-row-group");
+                $tbody = $this->create_anonymous_child('tbody', 'table-row-group');
                 $this->insert_child_before($tbody, $child);
             }
 
@@ -248,7 +251,7 @@ class Table extends AbstractFrameDecorator
 
         // Handle empty table: Make sure there is at least one row group
         if (!$this->get_first_child()) {
-            $tbody = $this->create_anonymous_child("tbody", "table-row-group");
+            $tbody = $this->create_anonymous_child('tbody', 'table-row-group');
             $this->append_child($tbody);
         }
 
@@ -269,7 +272,7 @@ class Table extends AbstractFrameDecorator
         foreach ($children as $child) {
             $display = $child->get_style()->display;
 
-            if ($display === "table-row") {
+            if ($display === 'table-row') {
                 // Reset anonymous tr
                 $tr = null;
                 continue;
@@ -283,7 +286,7 @@ class Table extends AbstractFrameDecorator
 
             // Catch consecutive misplaced frames within a single anonymous row
             if ($tr === null) {
-                $tr = $frame->create_anonymous_child("tr", "table-row");
+                $tr = $frame->create_anonymous_child('tr', 'table-row');
                 $frame->insert_child_before($tr, $child);
             }
 
@@ -292,7 +295,7 @@ class Table extends AbstractFrameDecorator
 
         // Handle empty row group: Make sure there is at least one row
         if (!$frame->get_first_child()) {
-            $tr = $frame->create_anonymous_child("tr", "table-row");
+            $tr = $frame->create_anonymous_child('tr', 'table-row');
             $frame->append_child($tr);
         }
 
@@ -309,7 +312,7 @@ class Table extends AbstractFrameDecorator
         foreach ($children as $child) {
             $display = $child->get_style()->display;
 
-            if ($display === "table-cell") {
+            if ($display === 'table-cell') {
                 // Reset anonymous td
                 $td = null;
                 continue;
@@ -323,7 +326,7 @@ class Table extends AbstractFrameDecorator
 
             // Catch consecutive misplaced frames within a single anonymous cell
             if ($td === null) {
-                $td = $frame->create_anonymous_child("td", "table-cell");
+                $td = $frame->create_anonymous_child('td', 'table-cell');
                 $frame->insert_child_before($td, $child);
             }
 
@@ -332,7 +335,7 @@ class Table extends AbstractFrameDecorator
 
         // Handle empty row: Make sure there is at least one cell
         if (!$frame->get_first_child()) {
-            $td = $frame->create_anonymous_child("td", "table-cell");
+            $td = $frame->create_anonymous_child('td', 'table-cell');
             $frame->append_child($td);
         }
     }

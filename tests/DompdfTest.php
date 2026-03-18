@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Dompdf\Tests;
 
 use DOMDocument;
@@ -10,7 +13,6 @@ use Dompdf\FontMetrics;
 use Dompdf\Frame;
 use Dompdf\Frame\FrameTree;
 use Dompdf\Options;
-use Dompdf\Tests\TestCase;
 
 class DompdfTest extends TestCase
 {
@@ -18,9 +20,9 @@ class DompdfTest extends TestCase
     {
         $dompdf = new Dompdf();
         $this->assertInstanceOf(CPDF::class, $dompdf->getCanvas());
-        $this->assertSame("", $dompdf->getProtocol());
-        $this->assertSame("", $dompdf->getBaseHost());
-        $this->assertSame("", $dompdf->getBasePath());
+        $this->assertSame('', $dompdf->getProtocol());
+        $this->assertSame('', $dompdf->getBaseHost());
+        $this->assertSame('', $dompdf->getBasePath());
         $this->assertIsArray($dompdf->getCallbacks());
         $this->assertInstanceOf(Stylesheet::class, $dompdf->getCss());
         $this->assertNull($dompdf->getDom());
@@ -34,10 +36,11 @@ class DompdfTest extends TestCase
         $dompdf = new Dompdf();
         $dompdf->setBaseHost('test1');
         $dompdf->setBasePath('test2');
-        $dompdf->setCallbacks(['test' => ['event' => 'test', 'f' => function () {}]]);
+        $dompdf->setCallbacks(['test' => ['event' => 'test', 'f' => function () {
+        }]]);
         $dompdf->setCss(new Stylesheet($dompdf));
         $dompdf->setDom(new DOMDocument());
-        $dompdf->setHttpContext(fopen(__DIR__ . "/_files/jamaica.jpg", 'r'));
+        $dompdf->setHttpContext(fopen(__DIR__ . '/_files/jamaica.jpg', 'r'));
         $dompdf->setOptions(new Options());
         $dompdf->setProtocol('test3');
         $dompdf->setTree(new FrameTree($dompdf->getDom()));
@@ -59,11 +62,11 @@ class DompdfTest extends TestCase
 
     public static function loadHtmlProvider(): array
     {
-        $textContent = "Some – Unicode";
-        $document = function (string $encoding, string $head = "") use ($textContent) {
+        $textContent = 'Some – Unicode';
+        $document = function (string $encoding, string $head = '') use ($textContent) {
             $html = "<html><head>$head</head><body><strong>$textContent</strong></body></html>";
-            return $encoding !== "UTF-8"
-                ? mb_convert_encoding($html, $encoding, "UTF-8")
+            return $encoding !== 'UTF-8'
+                ? mb_convert_encoding($html, $encoding, 'UTF-8')
                 : $html;
         };
         $metaCharset = function (string $charset) {
@@ -78,81 +81,81 @@ class DompdfTest extends TestCase
 
         return [
             // Without encoding parameter
-            "utf-8 no encoding" => [
-                $document("UTF-8"),
+            'utf-8 no encoding' => [
+                $document('UTF-8'),
                 null,
-                $textContent
+                $textContent,
             ],
-            "utf-8 meta no encoding" => [
-                $document("UTF-8", $metaCharset("UTF-8")),
+            'utf-8 meta no encoding' => [
+                $document('UTF-8', $metaCharset('UTF-8')),
                 null,
-                $textContent
+                $textContent,
             ],
-            "windows-1252 meta no encoding 1" => [
-                $document("Windows-1252", $metaCharset("Windows-1252")),
+            'windows-1252 meta no encoding 1' => [
+                $document('Windows-1252', $metaCharset('Windows-1252')),
                 null,
-                $textContent
+                $textContent,
             ],
-            "windows-1252 meta no encoding 2" => [
-                $document("Windows-1252", $metaContent1("Windows-1252")),
+            'windows-1252 meta no encoding 2' => [
+                $document('Windows-1252', $metaContent1('Windows-1252')),
                 null,
-                $textContent
+                $textContent,
             ],
-            "windows-1252 meta no encoding 3" => [
-                $document("Windows-1252", $metaContent2("Windows-1252")),
+            'windows-1252 meta no encoding 3' => [
+                $document('Windows-1252', $metaContent2('Windows-1252')),
                 null,
-                $textContent
+                $textContent,
             ],
 
             // With encoding parameter
-            "utf-8 with encoding" => [
-                $document("UTF-8"),
-                "UTF-8",
-                $textContent
+            'utf-8 with encoding' => [
+                $document('UTF-8'),
+                'UTF-8',
+                $textContent,
             ],
-            "windows-1252 with encoding" => [
-                $document("Windows-1252"),
-                "Windows-1252",
-                $textContent
+            'windows-1252 with encoding' => [
+                $document('Windows-1252'),
+                'Windows-1252',
+                $textContent,
             ],
             // Verify that passed encoding takes precedence
-            "windows-1252 meta mismatch with encoding" => [
-                $document("Windows-1252", $metaCharset("UTF-8")),
-                "Windows-1252",
-                $textContent
+            'windows-1252 meta mismatch with encoding' => [
+                $document('Windows-1252', $metaCharset('UTF-8')),
+                'Windows-1252',
+                $textContent,
             ],
-            "utf-16 meta with encoding" => [
-                $document("UTF-16", $metaCharset("UTF-16")),
-                "UTF-16",
-                $textContent
+            'utf-16 meta with encoding' => [
+                $document('UTF-16', $metaCharset('UTF-16')),
+                'UTF-16',
+                $textContent,
             ],
 
             // With BOM
-            "utf-8 bom" => [
-                "\xEF\xBB\xBF" . $document("UTF-8"),
+            'utf-8 bom' => [
+                "\xEF\xBB\xBF" . $document('UTF-8'),
                 null,
-                $textContent
+                $textContent,
             ],
-            "utf-16be bom" => [
-                "\xFE\xFF" . $document("UTF-16BE", $metaCharset("UTF-16")),
+            'utf-16be bom' => [
+                "\xFE\xFF" . $document('UTF-16BE', $metaCharset('UTF-16')),
                 null,
-                $textContent
+                $textContent,
             ],
-            "utf-16le bom" => [
-                "\xFF\xFE" . $document("UTF-16LE", $metaCharset("UTF-16")),
+            'utf-16le bom' => [
+                "\xFF\xFE" . $document('UTF-16LE', $metaCharset('UTF-16')),
                 null,
-                $textContent
+                $textContent,
             ],
             // Verify that BOM takes precedence
-            "utf-8 bom with encoding mismatch" => [
-                "\xEF\xBB\xBF" . $document("UTF-8"),
-                "Windows-1252",
-                $textContent
+            'utf-8 bom with encoding mismatch' => [
+                "\xEF\xBB\xBF" . $document('UTF-8'),
+                'Windows-1252',
+                $textContent,
             ],
-            "utf-16le bom with encoding mismatch" => [
-                "\xFF\xFE" . $document("UTF-16LE", $metaCharset("UTF-16")),
-                "UTF-8",
-                $textContent
+            'utf-16le bom with encoding mismatch' => [
+                "\xFF\xFE" . $document('UTF-16LE', $metaCharset('UTF-16')),
+                'UTF-8',
+                $textContent,
             ],
         ];
     }
@@ -184,11 +187,11 @@ class DompdfTest extends TestCase
     public static function callbacksProvider(): array
     {
         return [
-            ["begin_page_reflow", 1],
-            ["begin_frame", 3],
-            ["end_frame", 3],
-            ["begin_page_render", 1],
-            ["end_page_render", 1]
+            ['begin_page_reflow', 1],
+            ['begin_frame', 3],
+            ['end_frame', 3],
+            ['begin_page_render', 1],
+            ['end_page_render', 1],
         ];
     }
 
@@ -203,17 +206,17 @@ class DompdfTest extends TestCase
         $dompdf = new Dompdf();
         $dompdf->setCallbacks([
             [
-                "event" => $event,
-                "f" => function ($frame, $canvas, $fontMetrics) use (&$called) {
+                'event' => $event,
+                'f' => function ($frame, $canvas, $fontMetrics) use (&$called) {
                     $this->assertInstanceOf(Frame::class, $frame);
                     $this->assertInstanceOf(Canvas::class, $canvas);
                     $this->assertInstanceOf(FontMetrics::class, $fontMetrics);
                     $called++;
-                }
-            ]
+                },
+            ],
         ]);
 
-        $dompdf->loadHtml("<html><body><p>Some text</p></body></html>");
+        $dompdf->loadHtml('<html><body><p>Some text</p></body></html>');
         $dompdf->render();
 
         $this->assertSame($numCalls, $called);
@@ -226,15 +229,15 @@ class DompdfTest extends TestCase
         $dompdf = new Dompdf();
         $dompdf->setCallbacks([
             [
-                "event" => "end_document",
-                "f" => function ($pageNumber, $pageCount, $canvas, $fontMetrics) use (&$called) {
+                'event' => 'end_document',
+                'f' => function ($pageNumber, $pageCount, $canvas, $fontMetrics) use (&$called) {
                     $called++;
                     $this->assertSame($called, $pageNumber);
                     $this->assertSame(2, $pageCount);
                     $this->assertInstanceOf(Canvas::class, $canvas);
                     $this->assertInstanceOf(FontMetrics::class, $fontMetrics);
-                }
-            ]
+                },
+            ],
         ]);
 
         $dompdf->loadHtml("<html><body><p>Page 1</p><p style='page-break-before: always;'>Page 2</p></body></html>");
@@ -246,10 +249,10 @@ class DompdfTest extends TestCase
     public static function customCanvasProvider(): array
     {
         return [
-            ["A4", "portrait", true, "auto"],
-            ["A5", "landscape", true, "A5 landscape"],
-            ["A5", "landscape", false, "A5 landscape"],
-            [[0, 0, 300, 400], "portrait", true, "300pt 400pt"]
+            ['A4', 'portrait', true, 'auto'],
+            ['A5', 'landscape', true, 'A5 landscape'],
+            ['A5', 'landscape', false, 'A5 landscape'],
+            [[0, 0, 300, 400], 'portrait', true, '300pt 400pt'],
         ];
     }
 
@@ -267,7 +270,7 @@ class DompdfTest extends TestCase
         string $cssSize
     ): void {
         $options = new Options();
-        $options->setDefaultPaperSize("Letter");
+        $options->setDefaultPaperSize('Letter');
 
         $dompdf = new Dompdf($options);
 
@@ -300,13 +303,13 @@ class DompdfTest extends TestCase
                         $text_frame_contents[] = $grandchild->get_text();
                     }
                 }
-            }
+            },
         ]]);
 
         $dompdf->loadHtml('<html><body><span>one</span><span> - two</span></body></html>');
         $dompdf->render();
 
-        $this->assertEquals("one", $text_frame_contents[0]);
-        $this->assertEquals(" - two", $text_frame_contents[1]);
+        $this->assertEquals('one', $text_frame_contents[0]);
+        $this->assertEquals(' - two', $text_frame_contents[1]);
     }
 }

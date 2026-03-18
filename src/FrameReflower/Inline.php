@@ -1,9 +1,12 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf\FrameReflower;
 
 use Dompdf\FrameDecorator\Block as BlockFrameDecorator;
@@ -20,7 +23,7 @@ class Inline extends AbstractFrameReflower
     /**
      * Inline constructor.
      */
-    function __construct(InlineFrameDecorator $frame)
+    public function __construct(InlineFrameDecorator $frame)
     {
         parent::__construct($frame);
     }
@@ -39,13 +42,13 @@ class Inline extends AbstractFrameReflower
         $style = $frame->get_style();
 
         // Resolve width, so the margin width can be checked
-        $style->set_used("width", 0.0);
+        $style->set_used('width', 0.0);
 
         $cb = $frame->get_containing_block();
         $line = $block->get_current_line_box();
         $width = $frame->get_margin_width();
 
-        if ($width > ($cb["w"] - $line->left - $line->w - $line->right)) {
+        if ($width > ($cb['w'] - $line->left - $line->w - $line->right)) {
             $block->add_line();
 
             // Find the appropriate inline ancestor to split
@@ -68,7 +71,7 @@ class Inline extends AbstractFrameReflower
         $block->add_frame_to_line($frame);
     }
 
-    function reflow(?BlockFrameDecorator $block = null): void
+    public function reflow(?BlockFrameDecorator $block = null): void
     {
         /** @var InlineFrameDecorator */
         $frame = $this->_frame;
@@ -89,21 +92,21 @@ class Inline extends AbstractFrameReflower
         // Resolve auto margins
         // https://www.w3.org/TR/CSS21/visudet.html#inline-width
         // https://www.w3.org/TR/CSS21/visudet.html#inline-non-replaced
-        if ($style->margin_left === "auto") {
-            $style->set_used("margin_left", 0.0);
+        if ($style->margin_left === 'auto') {
+            $style->set_used('margin_left', 0.0);
         }
-        if ($style->margin_right === "auto") {
-            $style->set_used("margin_right", 0.0);
+        if ($style->margin_right === 'auto') {
+            $style->set_used('margin_right', 0.0);
         }
-        if ($style->margin_top === "auto") {
-            $style->set_used("margin_top", 0.0);
+        if ($style->margin_top === 'auto') {
+            $style->set_used('margin_top', 0.0);
         }
-        if ($style->margin_bottom === "auto") {
-            $style->set_used("margin_bottom", 0.0);
+        if ($style->margin_bottom === 'auto') {
+            $style->set_used('margin_bottom', 0.0);
         }
 
         // Handle line breaks
-        if ($frame->get_node()->nodeName === "br") {
+        if ($frame->get_node()->nodeName === 'br') {
             if ($block) {
                 $line = $block->get_current_line_box();
                 $frame->set_containing_line($line);

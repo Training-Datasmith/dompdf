@@ -1,16 +1,18 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Dompdf\Tests;
 
 use Dompdf\Helpers;
-use Dompdf\Tests\TestCase;
 
 class HelpersTest extends TestCase
 {
     public static function uriEncodingProvider(): array
     {
         return [
-            ["https://example.com/test.html", "https://example.com/test.html"],
-            ["https://example.com?a[]=1&b%5B%5D=1&c=d+e&f=g h&i=j%2Bk%26l", "https://example.com?a%5B%5D=1&b%5B%5D=1&c=d+e&f=g%20h&i=j%2Bk%26l"],
+            ['https://example.com/test.html', 'https://example.com/test.html'],
+            ['https://example.com?a[]=1&b%5B%5D=1&c=d+e&f=g h&i=j%2Bk%26l', 'https://example.com?a%5B%5D=1&b%5B%5D=1&c=d+e&f=g%20h&i=j%2Bk%26l'],
         ];
     }
 
@@ -30,7 +32,7 @@ class HelpersTest extends TestCase
             'mime' => 'data:image/png;base64,',
             'data' => 'iVBORw0KGgoAAAANSUhEUgAAAAUA
 AAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO
-9TXL0Y4OHwAAAABJRU5ErkJggg=='
+9TXL0Y4OHwAAAABJRU5ErkJggg==',
         ];
         $result = Helpers::parse_data_uri(implode('', $imageParts));
         $this->assertEquals(
@@ -42,13 +44,13 @@ AAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO
     public static function dec2RomanProvider(): array
     {
         return [
-            [-5, "-5"],
-            [0, "0"],
-            [1, "i"],
-            [5, "v"],
-            [3999, "mmmcmxcix"],
-            [4000, "4000"],
-            [50000, "50000"],
+            [-5, '-5'],
+            [0, '0'],
+            [1, 'i'],
+            [5, 'v'],
+            [3999, 'mmmcmxcix'],
+            [4000, '4000'],
+            [50000, '50000'],
         ];
     }
 
@@ -122,10 +124,9 @@ AAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO
         $this->assertSame($expected, Helpers::lengthEqual(-$b, -$a));
     }
 
-
     public function testCustomProtocolParsing(): void
     {
-        $uri = "mock://path/to/resource";
-        $this->assertSame($uri, Helpers::build_url("", "", "", $uri));
+        $uri = 'mock://path/to/resource';
+        $this->assertSame($uri, Helpers::build_url('', '', '', $uri));
     }
 }

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Dompdf\Tests\Css;
 
 use Dompdf\Dompdf;
@@ -11,7 +14,7 @@ final class AttributeTranslatorTest extends TestCase
     {
         return [
             // TODO: Heredocs can be nicely indented starting with PHP 7.3
-            "list type ol" => [
+            'list type ol' => [
                 <<<HTML
 <ol type="1"></ol>
 <ol type="a"></ol>
@@ -21,16 +24,16 @@ final class AttributeTranslatorTest extends TestCase
 HTML
 ,
                 [
-                    "ol" => [
-                        ["list-style-type" => "decimal"],
-                        ["list-style-type" => "lower-alpha"],
-                        ["list-style-type" => "upper-alpha"],
-                        ["list-style-type" => "lower-roman"],
-                        ["list-style-type" => "upper-roman"]
-                    ]
-                ]
+                    'ol' => [
+                        ['list-style-type' => 'decimal'],
+                        ['list-style-type' => 'lower-alpha'],
+                        ['list-style-type' => 'upper-alpha'],
+                        ['list-style-type' => 'lower-roman'],
+                        ['list-style-type' => 'upper-roman'],
+                    ],
+                ],
             ],
-            "list type ul" => [
+            'list type ul' => [
                 <<<HTML
 <ul type="1"></ul>
 <ul type="a"></ul>
@@ -40,16 +43,16 @@ HTML
 HTML
 ,
                 [
-                    "ul" => [
-                        ["list-style-type" => "decimal"],
-                        ["list-style-type" => "lower-alpha"],
-                        ["list-style-type" => "upper-alpha"],
-                        ["list-style-type" => "lower-roman"],
-                        ["list-style-type" => "upper-roman"]
-                    ]
-                ]
+                    'ul' => [
+                        ['list-style-type' => 'decimal'],
+                        ['list-style-type' => 'lower-alpha'],
+                        ['list-style-type' => 'upper-alpha'],
+                        ['list-style-type' => 'lower-roman'],
+                        ['list-style-type' => 'upper-roman'],
+                    ],
+                ],
             ],
-            "list type li" => [
+            'list type li' => [
                 <<<HTML
 <ol>
     <li type="1"></li>
@@ -61,15 +64,15 @@ HTML
 HTML
 ,
                 [
-                    "li" => [
-                        ["list-style-type" => "decimal"],
-                        ["list-style-type" => "lower-alpha"],
-                        ["list-style-type" => "upper-alpha"],
-                        ["list-style-type" => "lower-roman"],
-                        ["list-style-type" => "upper-roman"]
-                    ]
-                ]
-            ]
+                    'li' => [
+                        ['list-style-type' => 'decimal'],
+                        ['list-style-type' => 'lower-alpha'],
+                        ['list-style-type' => 'upper-alpha'],
+                        ['list-style-type' => 'lower-roman'],
+                        ['list-style-type' => 'upper-roman'],
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -91,14 +94,14 @@ HTML
         $dompdf = new Dompdf();
         $dompdf->setCallbacks([
             [
-                "event" => "begin_frame",
-                "f" => function (AbstractFrameDecorator $frame) use ($expectedStyles, &$styles) {
+                'event' => 'begin_frame',
+                'f' => function (AbstractFrameDecorator $frame) use ($expectedStyles, &$styles) {
                     $node = $frame->get_node();
                     $name = $node->nodeName;
 
                     if (isset($expectedStyles[$name])) {
                         $translateProp = function ($prop) {
-                            return str_replace("-", "_", $prop);
+                            return str_replace('-', '_', $prop);
                         };
 
                         $style = $frame->get_style();
@@ -111,8 +114,8 @@ HTML
 
                         $styles[$name][] = array_combine($keys, $values);
                     }
-                }
-            ]
+                },
+            ],
         ]);
 
         $dompdf->loadHtml("<html><body>$body</body></html>");

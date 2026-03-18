@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Dompdf\Tests\LayoutTest;
 
 use Dompdf\Dompdf;
@@ -11,46 +14,46 @@ class ImageTest extends TestCase
 {
     public static function imageDimensionsProvider(): array
     {
-        $filepath = "../_files/jamaica.jpg";
+        $filepath = '../_files/jamaica.jpg';
         $dpiFactor = 72 / 96;
         $intrinsicWidth = 2048 * $dpiFactor;
         $intrinsicHeight = 1536 * $dpiFactor;
 
         return [
             // TODO: Heredocs can be nicely indented starting with PHP 7.3
-            "zero" => [
+            'zero' => [
                 <<<HTML
 <img src="$filepath" style="width: 0; height: 0;">
 HTML
 ,
                 0.0,
-                0.0
+                0.0,
             ],
-            "auto" => [
+            'auto' => [
                 <<<HTML
 <img src="$filepath">
 HTML
 ,
                 $intrinsicWidth,
-                $intrinsicHeight
+                $intrinsicHeight,
             ],
-            "fixed px" => [
+            'fixed px' => [
                 <<<HTML
 <img src="$filepath" width="100" height="200">
 HTML
 ,
                 100 * $dpiFactor,
-                200 * $dpiFactor
+                200 * $dpiFactor,
             ],
-            "fixed pt" => [
+            'fixed pt' => [
                 <<<HTML
 <img src="$filepath" style="width: 100pt; height: 200pt;">
 HTML
 ,
                 100.0,
-                200.0
+                200.0,
             ],
-            "min-max 1" => [
+            'min-max 1' => [
                 <<<HTML
 <img src="$filepath" style="
     width: 100px;
@@ -63,9 +66,9 @@ HTML
 HTML
 ,
                 400 * $dpiFactor,
-                500 * $dpiFactor
+                500 * $dpiFactor,
             ],
-            "min-max 2" => [
+            'min-max 2' => [
                 <<<HTML
 <img src="$filepath" style="
     width: auto;
@@ -76,9 +79,9 @@ HTML
 HTML
 ,
                 200 * $dpiFactor,
-                200 * $dpiFactor
+                200 * $dpiFactor,
             ],
-            "min-max 3" => [
+            'min-max 3' => [
                 <<<HTML
 <img src="$filepath" style="
     width: 100px;
@@ -89,9 +92,9 @@ HTML
 HTML
 ,
                 200 * $dpiFactor,
-                150 * $dpiFactor
+                150 * $dpiFactor,
             ],
-            "min-max 4" => [
+            'min-max 4' => [
                 <<<HTML
 <img src="$filepath" style="
     width: auto;
@@ -102,9 +105,9 @@ HTML
 HTML
 ,
                 100 * $dpiFactor,
-                75 * $dpiFactor
+                75 * $dpiFactor,
             ],
-            "min-max 5" => [
+            'min-max 5' => [
                 <<<HTML
 <img src="$filepath" style="
     width: auto;
@@ -115,17 +118,17 @@ HTML
 HTML
 ,
                 50 * (4 / 3) * $dpiFactor,
-                50 * $dpiFactor
+                50 * $dpiFactor,
             ],
-            "page size" => [
+            'page size' => [
                 <<<HTML
 <img src="$filepath" style="width: 100%; height: 100%;">
 HTML
 ,
                 400.0,
-                300.0
+                300.0,
             ],
-            "percentage chain" => [
+            'percentage chain' => [
                 <<<HTML
 <div style="width: 400px; height: 800px;">
     <div style="width: 50%; height: 75%;">
@@ -135,9 +138,9 @@ HTML
 HTML
 ,
                 100 * $dpiFactor,
-                450 * $dpiFactor
+                450 * $dpiFactor,
             ],
-            "in table" => [
+            'in table' => [
                 <<<HTML
 <table style="width: 20%; border-collapse: collapse;">
     <tr>
@@ -149,9 +152,9 @@ HTML
 HTML
 ,
                 $intrinsicWidth,
-                $intrinsicHeight
+                $intrinsicHeight,
             ],
-            "in table max-width" => [
+            'in table max-width' => [
                 <<<HTML
 <table style="width: 20%; border-collapse: collapse;">
     <tr>
@@ -163,8 +166,8 @@ HTML
 HTML
 ,
                 80.0,
-                60.0
-            ]
+                60.0,
+            ],
         ];
     }
 
@@ -187,16 +190,17 @@ HTML
         $dompdf->setBasePath(__DIR__);
         $dompdf->setCallbacks([
             [
-                "event" => "begin_frame",
-                "f" => function (AbstractFrameDecorator $frame) use (&$width, &$height) {
-                    if ($frame->get_node()->nodeName === "img") {
+                'event' => 'begin_frame',
+                'f' => function (AbstractFrameDecorator $frame) use (&$width, &$height) {
+                    if ($frame->get_node()->nodeName === 'img') {
                         [, , $width, $height] = $frame->get_content_box();
                     }
-                }
-            ]
+                },
+            ],
         ]);
 
-        $dompdf->loadHtml(<<<HTML
+        $dompdf->loadHtml(
+            <<<HTML
     <!DOCTYPE html>
     <head>
     <meta charset="UTF-8">

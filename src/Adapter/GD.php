@@ -1,9 +1,12 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf\Adapter;
 
 use Dompdf\Canvas;
@@ -125,7 +128,7 @@ class GD implements Canvas
      *
      * @var float
      */
-    const FONT_SCALE = 0.75;
+    public const FONT_SCALE = 0.75;
 
     /**
      * @param string|float[] $paper       The paper size to use as either a standard paper size (see {@link CPDF::$PAPER_SIZES}) or
@@ -135,16 +138,16 @@ class GD implements Canvas
      * @param float          $aa_factor   Anti-aliasing factor, 1 for no AA
      * @param array          $bg_color    Image background color: array(r,g,b,a), 0 <= r,g,b,a <= 1
      */
-    public function __construct($paper = "letter", string $orientation = "portrait", ?Dompdf $dompdf = null, float $aa_factor = 1.0, array $bg_color = [1, 1, 1, 0])
+    public function __construct($paper = 'letter', string $orientation = 'portrait', ?Dompdf $dompdf = null, float $aa_factor = 1.0, array $bg_color = [1, 1, 1, 0])
     {
         if (is_array($paper)) {
-            $size = array_map("floatval", $paper);
+            $size = array_map('floatval', $paper);
         } else {
             $paper = strtolower($paper);
-            $size = CPDF::$PAPER_SIZES[$paper] ?? CPDF::$PAPER_SIZES["letter"];
+            $size = CPDF::$PAPER_SIZES[$paper] ?? CPDF::$PAPER_SIZES['letter'];
         }
 
-        if (strtolower($orientation) === "landscape") {
+        if (strtolower($orientation) === 'landscape') {
             [$size[2], $size[3]] = [$size[3], $size[2]];
         }
 
@@ -239,7 +242,7 @@ class GD implements Canvas
         $this->_page_count = $count;
     }
 
-    public function set_opacity(float $opacity, string $mode = "Normal"): void
+    public function set_opacity(float $opacity, string $mode = 'Normal'): void
     {
         // FIXME
     }
@@ -253,9 +256,9 @@ class GD implements Canvas
      */
     protected function _allocate_color($color)
     {
-        $a = $color["alpha"] ?? 1;
+        $a = $color['alpha'] ?? 1;
 
-        if (isset($color["c"])) {
+        if (isset($color['c'])) {
             $color = Helpers::cmyk_to_rgb($color);
         }
 
@@ -277,7 +280,7 @@ class GD implements Canvas
         $b = $b < 0 ? 0 : $b;
         $a = $a < 0 ? 0 : $a;
 
-        $key = sprintf("#%02X%02X%02X%02X", $r, $g, $b, $a);
+        $key = sprintf('#%02X%02X%02X%02X', $r, $g, $b, $a);
 
         if (isset($this->_colors[$key])) {
             return $this->_colors[$key];
@@ -335,11 +338,11 @@ class GD implements Canvas
         return $gdStyle;
     }
 
-    public function line($x1, $y1, $x2, $y2, $color, $width, $style = [], $cap = "butt"): void
+    public function line($x1, $y1, $x2, $y2, $color, $width, $style = [], $cap = 'butt'): void
     {
         // Account for the fact that round and square caps are expected to
         // extend outwards
-        if ($cap === "round" || $cap === "square") {
+        if ($cap === 'round' || $cap === 'square') {
             // Shift line by half width
             $w = $width / 2;
             $a = $x2 - $x1;
@@ -385,11 +388,11 @@ class GD implements Canvas
         imageline($this->get_image(), $x1, $y1, $x2, $y2, $c);
     }
 
-    public function arc($x, $y, $r1, $r2, $astart, $aend, $color, $width, $style = [], $cap = "butt"): void
+    public function arc($x, $y, $r1, $r2, $astart, $aend, $color, $width, $style = [], $cap = 'butt'): void
     {
         // Account for the fact that round and square caps are expected to
         // extend outwards
-        if ($cap === "round" || $cap === "square") {
+        if ($cap === 'round' || $cap === 'square') {
             // Adapt dash pattern
             if (is_array($style)) {
                 foreach ($style as $index => &$s) {
@@ -426,11 +429,11 @@ class GD implements Canvas
         imagearc($this->get_image(), $x, $y, $w, $h, $start, $end, $c);
     }
 
-    public function rectangle($x1, $y1, $w, $h, $color, $width, $style = [], $cap = "butt"): void
+    public function rectangle($x1, $y1, $w, $h, $color, $width, $style = [], $cap = 'butt'): void
     {
         // Account for the fact that round and square caps are expected to
         // extend outwards
-        if ($cap === "round" || $cap === "square") {
+        if ($cap === 'round' || $cap === 'square') {
             // Adapt dash pattern
             if (is_array($style)) {
                 foreach ($style as $index => &$s) {
@@ -465,10 +468,10 @@ class GD implements Canvas
                 $x1, $y1,
                 $x1 + $w, $y1,
                 $x1 + $w, $y1 + $h,
-                $x1, $y1 + $h
+                $x1, $y1 + $h,
             ];
-            if (version_compare(PHP_VERSION, "8.1.0", "<")) {
-                imagepolygon($this->get_image(), $points, count($points)/2, $c);
+            if (version_compare(PHP_VERSION, '8.1.0', '<')) {
+                imagepolygon($this->get_image(), $points, count($points) / 2, $c);
             } else {
                 imagepolygon($this->get_image(), $points, $c);
             }
@@ -569,14 +572,14 @@ class GD implements Canvas
         imagesetthickness($this->get_image(), $width ?? 0);
 
         if ($fill) {
-            if (version_compare(PHP_VERSION, "8.1.0", "<")) {
-                imagefilledpolygon($this->get_image(), $points, count($points)/2, $c);
+            if (version_compare(PHP_VERSION, '8.1.0', '<')) {
+                imagefilledpolygon($this->get_image(), $points, count($points) / 2, $c);
             } else {
                 imagefilledpolygon($this->get_image(), $points, $c);
             }
         } else {
-            if (version_compare(PHP_VERSION, "8.1.0", "<")) {
-                imagepolygon($this->get_image(), $points, count($points)/2, $c);
+            if (version_compare(PHP_VERSION, '8.1.0', '<')) {
+                imagepolygon($this->get_image(), $points, count($points) / 2, $c);
             } else {
                 imagepolygon($this->get_image(), $points, $c);
             }
@@ -615,7 +618,7 @@ class GD implements Canvas
     /**
      * @throws \Exception
      */
-    public function image($img, $x, $y, $w, $h, $resolution = "normal"): void
+    public function image($img, $x, $y, $w, $h, $resolution = 'normal'): void
     {
         $img_type = Cache::detect_type($img, $this->get_dompdf()->getHttpContext());
 
@@ -763,7 +766,7 @@ class GD implements Canvas
                         }
                         break;
 
-                    // U 827 ; WX 0 ; N squaresubnosp ; G 675 ;
+                        // U 827 ; WX 0 ; N squaresubnosp ; G 675 ;
                     case 'U': // Found in UFM files
                         $bits = explode(';', trim($row));
                         $dtmp = ['G' => null, 'N' => null, 'U' => null, 'WX' => null];
@@ -807,13 +810,13 @@ class GD implements Canvas
 
     public function font_supports_char(string $font, string $char): bool
     {
-        if ($char === "") {
+        if ($char === '') {
             return true;
         }
 
         $font = $this->get_ttf_file($font);
         $charMap = $this->getCharMap($font);
-        $charCode = Helpers::uniord($char, "UTF-8");
+        $charCode = Helpers::uniord($char, 'UTF-8');
 
         return \array_key_exists($charCode, $charMap);
     }
@@ -844,25 +847,25 @@ class GD implements Canvas
     public function get_ttf_file($font): string
     {
         if ($font === null) {
-            $font = "";
+            $font = '';
         }
 
-        if ( stripos($font, ".ttf") === false ) {
-            $font .= ".ttf";
+        if (stripos($font, '.ttf') === false) {
+            $font .= '.ttf';
         }
 
         if (!file_exists($font)) {
             $font_metrics = $this->_dompdf->getFontMetrics();
-            $font = $font_metrics->getFont($this->_dompdf->getOptions()->getDefaultFont()) . ".ttf";
+            $font = $font_metrics->getFont($this->_dompdf->getOptions()->getDefaultFont()) . '.ttf';
             if (!file_exists($font)) {
-                if (strpos($font, "mono")) {
-                    $font = $font_metrics->getFont("DejaVu Mono") . ".ttf";
-                } elseif (strpos($font, "sans") !== false) {
-                    $font = $font_metrics->getFont("DejaVu Sans") . ".ttf";
-                } elseif (strpos($font, "serif")) {
-                    $font = $font_metrics->getFont("DejaVu Serif") . ".ttf";
+                if (strpos($font, 'mono')) {
+                    $font = $font_metrics->getFont('DejaVu Mono') . '.ttf';
+                } elseif (strpos($font, 'sans') !== false) {
+                    $font = $font_metrics->getFont('DejaVu Sans') . '.ttf';
+                } elseif (strpos($font, 'serif')) {
+                    $font = $font_metrics->getFont('DejaVu Serif') . '.ttf';
                 } else {
-                    $font = $font_metrics->getFont("DejaVu Sans") . ".ttf";
+                    $font = $font_metrics->getFont('DejaVu Sans') . '.ttf';
                 }
             }
         }
@@ -891,7 +894,7 @@ class GD implements Canvas
         $ratio = $this->_dompdf->getOptions()->getFontHeightRatio();
 
         // FIXME: word spacing
-        list(, $y2, , , , $y1) = imagettfbbox($size, 0, $font, "MXjpqytfhl"); // Test string with ascenders, descenders and caps
+        list(, $y2, , , , $y1) = imagettfbbox($size, 0, $font, 'MXjpqytfhl'); // Test string with ascenders, descenders and caps
         return ($y2 - $y1) * $ratio;
     }
 
@@ -956,30 +959,34 @@ class GD implements Canvas
     public function stream($filename, $options = []): void
     {
         if (headers_sent()) {
-            die("Unable to stream image: headers already sent");
+            die('Unable to stream image: headers already sent');
         }
 
-        if (!isset($options["type"])) $options["type"] = "png";
-        if (!isset($options["Attachment"])) $options["Attachment"] = true;
-        $type = strtolower($options["type"]);
+        if (!isset($options['type'])) {
+            $options['type'] = 'png';
+        }
+        if (!isset($options['Attachment'])) {
+            $options['Attachment'] = true;
+        }
+        $type = strtolower($options['type']);
 
         switch ($type) {
-            case "jpg":
-            case "jpeg":
-                $contentType = "image/jpeg";
-                $extension = ".jpg";
+            case 'jpg':
+            case 'jpeg':
+                $contentType = 'image/jpeg';
+                $extension = '.jpg';
                 break;
-            case "png":
+            case 'png':
             default:
-                $contentType = "image/png";
-                $extension = ".png";
+                $contentType = 'image/png';
+                $extension = '.png';
                 break;
         }
 
         header("Content-Type: $contentType");
 
-        $filename = str_replace(["\n", "'"], "", basename($filename, ".$type")) . $extension;
-        $attachment = $options["Attachment"] ? "attachment" : "inline";
+        $filename = str_replace(["\n", "'"], '', basename($filename, ".$type")) . $extension;
+        $attachment = $options['Attachment'] ? 'attachment' : 'inline';
         header(Helpers::buildContentDispositionHeader($attachment, $filename));
 
         $this->_output($options);
@@ -1010,12 +1017,16 @@ class GD implements Canvas
      */
     protected function _output(array $options = [])
     {
-        if (!isset($options["type"])) $options["type"] = "png";
-        if (!isset($options["page"])) $options["page"] = 1;
-        $type = strtolower($options["type"]);
+        if (!isset($options['type'])) {
+            $options['type'] = 'png';
+        }
+        if (!isset($options['page'])) {
+            $options['page'] = 1;
+        }
+        $type = strtolower($options['type']);
 
-        if (isset($this->_imgs[$options["page"] - 1])) {
-            $img = $this->_imgs[$options["page"] - 1];
+        if (isset($this->_imgs[$options['page'] - 1])) {
+            $img = $this->_imgs[$options['page'] - 1];
         } else {
             $img = $this->_imgs[0];
         }
@@ -1025,23 +1036,32 @@ class GD implements Canvas
             $dst_w = round($this->_actual_width / $this->_aa_factor);
             $dst_h = round($this->_actual_height / $this->_aa_factor);
             $dst = imagecreatetruecolor($dst_w, $dst_h);
-            imagecopyresampled($dst, $img, 0, 0, 0, 0,
-                $dst_w, $dst_h,
-                $this->_actual_width, $this->_actual_height);
+            imagecopyresampled(
+                $dst,
+                $img,
+                0,
+                0,
+                0,
+                0,
+                $dst_w,
+                $dst_h,
+                $this->_actual_width,
+                $this->_actual_height
+            );
         } else {
             $dst = $img;
         }
 
         switch ($type) {
-            case "jpg":
-            case "jpeg":
-                if (!isset($options["quality"])) {
-                    $options["quality"] = 75;
+            case 'jpg':
+            case 'jpeg':
+                if (!isset($options['quality'])) {
+                    $options['quality'] = 75;
                 }
 
-                imagejpeg($dst, null, $options["quality"]);
+                imagejpeg($dst, null, $options['quality']);
                 break;
-            case "png":
+            case 'png':
             default:
                 imagepng($dst);
                 break;

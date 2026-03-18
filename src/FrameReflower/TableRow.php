@@ -1,15 +1,18 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf\FrameReflower;
 
+use Dompdf\Exception;
 use Dompdf\FrameDecorator\Block as BlockFrameDecorator;
 use Dompdf\FrameDecorator\Table as TableFrameDecorator;
 use Dompdf\FrameDecorator\TableRow as TableRowFrameDecorator;
-use Dompdf\Exception;
 
 /**
  * Reflows table rows
@@ -21,12 +24,12 @@ class TableRow extends AbstractFrameReflower
     /**
      * TableRow constructor.
      */
-    function __construct(TableRowFrameDecorator $frame)
+    public function __construct(TableRowFrameDecorator $frame)
     {
         parent::__construct($frame);
     }
 
-    function reflow(?BlockFrameDecorator $block = null): void
+    public function reflow(?BlockFrameDecorator $block = null): void
     {
         /** @var TableRowFrameDecorator */
         $frame = $this->_frame;
@@ -62,12 +65,12 @@ class TableRow extends AbstractFrameReflower
 
         $table = TableFrameDecorator::find_parent_table($frame);
         if ($table === null) {
-            throw new Exception("Parent table not found for table row");
+            throw new Exception('Parent table not found for table row');
         }
         $cellmap = $table->get_cellmap();
 
-        $style->set_used("width", $cellmap->get_frame_width($frame));
-        $style->set_used("height", $cellmap->get_frame_height($frame));
+        $style->set_used('width', $cellmap->get_frame_width($frame));
+        $style->set_used('height', $cellmap->get_frame_height($frame));
 
         $frame->set_position($cellmap->get_frame_position($frame));
     }
@@ -77,6 +80,6 @@ class TableRow extends AbstractFrameReflower
      */
     public function get_min_max_width(): array
     {
-        throw new Exception("Min/max width is undefined for table rows");
+        throw new Exception('Min/max width is undefined for table rows');
     }
 }

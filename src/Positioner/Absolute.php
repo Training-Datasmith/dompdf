@@ -1,9 +1,12 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf\Positioner;
 
 use Dompdf\FrameDecorator\AbstractFrameDecorator;
@@ -14,8 +17,7 @@ use Dompdf\FrameReflower\Block;
  */
 class Absolute extends AbstractPositioner
 {
-
-    function position(AbstractFrameDecorator $frame): void
+    public function position(AbstractFrameDecorator $frame): void
     {
         if ($frame->get_reflower() instanceof Block) {
             $style = $frame->get_style();
@@ -34,9 +36,9 @@ class Absolute extends AbstractPositioner
             $style = $frame->get_style();
             $block_parent = $frame->find_block_parent();
             $current_line = $block_parent->get_current_line_box();
-    
+
             [$x, $y, $w, $h] = $frame->get_containing_block();
-            $inflow_x = $block_parent->get_content_box()["x"] + $current_line->left + $current_line->w;
+            $inflow_x = $block_parent->get_content_box()['x'] + $current_line->left + $current_line->w;
             $inflow_y = $current_line->y;
 
             $top = $style->length_in_pt($style->top, $h);
@@ -46,8 +48,8 @@ class Absolute extends AbstractPositioner
 
             [$width, $height] = [$frame->get_margin_width(), $frame->get_margin_height()];
 
-            $orig_width = $style->get_specified("width");
-            $orig_height = $style->get_specified("height");
+            $orig_width = $style->get_specified('width');
+            $orig_height = $style->get_specified('height');
 
             /****************************
              *
@@ -62,12 +64,12 @@ class Absolute extends AbstractPositioner
              * right=fixed |     G     |     H      |
              *****************************/
 
-            if ($left === "auto") {
-                if ($right === "auto") {
+            if ($left === 'auto') {
+                if ($right === 'auto') {
                     // A or E - Keep the frame at the same position
                     $x = $inflow_x;
                 } else {
-                    if ($orig_width === "auto") {
+                    if ($orig_width === 'auto') {
                         // C
                         $x += $w - $width - $right;
                     } else {
@@ -76,11 +78,11 @@ class Absolute extends AbstractPositioner
                     }
                 }
             } else {
-                if ($right === "auto") {
+                if ($right === 'auto') {
                     // B or F
                     $x += (float)$left;
                 } else {
-                    if ($orig_width === "auto") {
+                    if ($orig_width === 'auto') {
                         // D - TODO change width
                         $x += (float)$left;
                     } else {
@@ -91,12 +93,12 @@ class Absolute extends AbstractPositioner
             }
 
             // The same vertically
-            if ($top === "auto") {
-                if ($bottom === "auto") {
+            if ($top === 'auto') {
+                if ($bottom === 'auto') {
                     // A or E - Keep the frame at the same position
                     $y = $inflow_y;
                 } else {
-                    if ($orig_height === "auto") {
+                    if ($orig_height === 'auto') {
                         // C
                         $y += (float)$h - $height - (float)$bottom;
                     } else {
@@ -105,11 +107,11 @@ class Absolute extends AbstractPositioner
                     }
                 }
             } else {
-                if ($bottom === "auto") {
+                if ($bottom === 'auto') {
                     // B or F
                     $y += (float)$top;
                 } else {
-                    if ($orig_height === "auto") {
+                    if ($orig_height === 'auto') {
                         // D - TODO change height
                         $y += (float)$top;
                     } else {
