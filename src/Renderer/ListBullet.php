@@ -69,13 +69,6 @@ class ListBullet extends AbstractRenderer
         return $cache[$type] = "$text.";
     }
 
-    /**
-     * @param int      $n
-     * @param string   $type
-     * @param int|null $pad
-     *
-     * @return string
-     */
     private function make_counter(int $n, string $type, ?int $pad = null): string
     {
         $text = "";
@@ -120,7 +113,7 @@ class ListBullet extends AbstractRenderer
     /**
      * @param ListBulletFrameDecorator $frame
      */
-    function render(Frame $frame)
+    function render(Frame $frame): void
     {
         $li = $frame->get_parent();
         $style = $frame->get_style();

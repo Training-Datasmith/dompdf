@@ -60,7 +60,7 @@ class Cache
      * @return array            An array with three elements: The local path to the image, the image
      *                          extension, and an error message if the image could not be cached
      */
-    static function resolve_url($url, $protocol, $host, $base_path, Options $options)
+    static function resolve_url($url, $protocol, $host, $base_path, Options $options): array
     {
         $full_url = null;
         $tempfile = null;
@@ -107,7 +107,7 @@ class Cache
                         $image = $parsed_data_uri["data"];
                     }
                 } else {
-                    list($image, $http_response_header) = Helpers::getFileContent($full_url, $options->getHttpContext());
+                    [$image, $http_response_header] = Helpers::getFileContent($full_url, $options->getHttpContext());
                 }
 
                 // Image not found or invalid
@@ -128,7 +128,7 @@ class Cache
                 throw new ImageException("Image not readable or empty", E_WARNING);
             }
 
-            list($width, $height, $type) = Helpers::dompdf_getimagesize($resolved_url, $options->getHttpContext());
+            [$width, $height, $type] = Helpers::dompdf_getimagesize($resolved_url, $options->getHttpContext());
 
             if (($width && $height && in_array($type, ["gif", "png", "jpeg", "bmp", "svg","webp"], true)) === false) {
                 throw new ImageException("Image type unknown", E_WARNING);
@@ -139,7 +139,7 @@ class Cache
                 xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, false);
                 xml_set_element_handler(
                     $parser,
-                    function ($parser, $name, $attributes) use ($options, $parsed_url, $full_url) {
+                    function ($parser, $name, $attributes) use ($options, $parsed_url, $full_url): void {
                         if (strtolower($name) === "image") {
                             if (!\array_key_exists($full_url, self::$svgRefs)) {
                                 self::$svgRefs[$full_url] = [];
@@ -186,7 +186,7 @@ class Cache
                 unlink($tempfile);
             }
             $resolved_url = self::$broken_image;
-            list($width, $height, $type) = Helpers::dompdf_getimagesize($resolved_url, $options->getHttpContext());
+            [$width, $height, $type] = Helpers::dompdf_getimagesize($resolved_url, $options->getHttpContext());
             $message = self::$error_message;
             Helpers::record_warnings($e->getCode(), $e->getMessage() . " \n $url", $e->getFile(), $e->getLine());
             if ($full_url !== null) {
@@ -197,7 +197,7 @@ class Cache
         return [$resolved_url, $type, $message];
     }
 
-    static function detectCircularRef(string $src, string $target)
+    static function detectCircularRef(string $src, string $target): void
     {
         if (!\array_key_exists($target, self::$svgRefs)) {
             return;
@@ -241,7 +241,7 @@ class Cache
      * Unlink all cached images (i.e. temporary images either downloaded
      * or converted) except for the bundled "broken image"
      */
-    static function clear(bool $debugPng = false)
+    static function clear(bool $debugPng = false): void
     {
         foreach (self::$_cache as $file) {
             if ($file === self::$broken_image) {
@@ -281,7 +281,7 @@ class Cache
         return $type;
     }
 
-    static function is_broken($url)
+    static function is_broken($url): bool
     {
         return $url === self::$broken_image;
     }

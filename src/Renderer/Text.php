@@ -40,7 +40,7 @@ class Text extends AbstractRenderer
     /**
      * @param \Dompdf\FrameDecorator\Text $frame
      */
-    function render(Frame $frame)
+    function render(Frame $frame): void
     {
         $style = $frame->get_style();
         $text = $frame->get_text();

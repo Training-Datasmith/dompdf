@@ -116,14 +116,13 @@ class FrameTree implements IteratorAggregate
      */
     public function get_frame($id)
     {
-        return isset($this->_registry[$id]) ? $this->_registry[$id] : null;
+        return $this->_registry[$id] ?? null;
     }
 
     /**
      * Returns a post-order iterator for all frames in the tree
      *
      * @deprecated Iterate the tree directly instead
-     * @return FrameTreeIterator
      */
     public function get_frames(): FrameTreeIterator
     {
@@ -132,8 +131,6 @@ class FrameTree implements IteratorAggregate
 
     /**
      * Returns a post-order iterator for all frames in the tree
-     *
-     * @return FrameTreeIterator
      */
     public function getIterator(): FrameTreeIterator
     {
@@ -143,7 +140,7 @@ class FrameTree implements IteratorAggregate
     /**
      * Builds the tree
      */
-    public function build_tree()
+    public function build_tree(): void
     {
         $html = $this->_dom->getElementsByTagName("html")->item(0);
         if (is_null($html)) {
@@ -234,10 +231,8 @@ class FrameTree implements IteratorAggregate
      * and images may be created).
      *
      * @param DOMNode $node the current DOMNode being considered
-     *
-     * @return Frame
      */
-    protected function _build_tree_r(DOMNode $node)
+    protected function _build_tree_r(DOMNode $node): \Dompdf\Frame
     {
         $frame = new Frame($node);
         $id = $frame->get_id();
@@ -289,8 +284,6 @@ class FrameTree implements IteratorAggregate
     }
 
     /**
-     * @param DOMElement $node
-     * @param DOMElement $new_node
      * @param string $pos
      *
      * @return mixed

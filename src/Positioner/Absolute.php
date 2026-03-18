@@ -15,9 +15,6 @@ use Dompdf\FrameReflower\Block;
 class Absolute extends AbstractPositioner
 {
 
-    /**
-     * @param AbstractFrameDecorator $frame
-     */
     function position(AbstractFrameDecorator $frame): void
     {
         if ($frame->get_reflower() instanceof Block) {
@@ -38,7 +35,7 @@ class Absolute extends AbstractPositioner
             $block_parent = $frame->find_block_parent();
             $current_line = $block_parent->get_current_line_box();
     
-            list($x, $y, $w, $h) = $frame->get_containing_block();
+            [$x, $y, $w, $h] = $frame->get_containing_block();
             $inflow_x = $block_parent->get_content_box()["x"] + $current_line->left + $current_line->w;
             $inflow_y = $current_line->y;
 
@@ -47,7 +44,7 @@ class Absolute extends AbstractPositioner
             $bottom = $style->length_in_pt($style->bottom, $h);
             $left = $style->length_in_pt($style->left, $w);
 
-            list($width, $height) = [$frame->get_margin_width(), $frame->get_margin_height()];
+            [$width, $height] = [$frame->get_margin_width(), $frame->get_margin_height()];
 
             $orig_width = $style->get_specified("width");
             $orig_height = $style->get_specified("height");

@@ -72,7 +72,7 @@ class LineBox
     /**
      * @var AbstractFrameDecorator
      */
-    public $tallest_frame = null;
+    public $tallest_frame;
 
     /**
      * @var bool[]
@@ -105,7 +105,6 @@ class LineBox
 
     /**
      * @param Block $frame the Block containing this line
-     * @param float $y
      */
     public function __construct(Block $frame, float $y = 0.0)
     {
@@ -119,7 +118,6 @@ class LineBox
     /**
      * Returns the floating elements inside the first floating parent
      *
-     * @param Page $root
      *
      * @return Frame[]
      */
@@ -254,17 +252,11 @@ class LineBox
         }
     }
 
-    /**
-     * @return float
-     */
     public function get_width(): float
     {
         return $this->left + $this->w + $this->right;
     }
 
-    /**
-     * @return Block
-     */
     public function get_block_frame(): Block
     {
         return $this->_block_frame;
@@ -278,9 +270,6 @@ class LineBox
         return $this->_frames;
     }
 
-    /**
-     * @return bool
-     */
     public function is_empty(): bool
     {
         return $this->_frames === [];
@@ -301,8 +290,6 @@ class LineBox
     /**
      * Remove the frame at the given index and all following frames from the
      * line.
-     *
-     * @param int $index
      */
     public function remove_frames(int $index): void
     {
@@ -397,8 +384,6 @@ class LineBox
 
     /**
      * Recalculate LineBox width based on the contained frames total width.
-     *
-     * @return float
      */
     public function recalculate_width(): float
     {
@@ -418,8 +403,7 @@ class LineBox
         foreach ($props as $prop) {
             $s .= "$prop: " . $this->$prop . "\n";
         }
-        $s .= count($this->_frames) . " frames\n";
 
-        return $s;
+        return $s . (count($this->_frames) . " frames\n");
     }
 }

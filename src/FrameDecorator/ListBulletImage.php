@@ -41,8 +41,6 @@ class ListBulletImage extends ListBullet
 
     /**
      * ListBulletImage constructor.
-     * @param Frame $frame
-     * @param Dompdf $dompdf
      */
     function __construct(Frame $frame, Dompdf $dompdf)
     {

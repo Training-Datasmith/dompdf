@@ -24,14 +24,11 @@ class CanvasFactory
     }
 
     /**
-     * @param Dompdf         $dompdf
      * @param string|float[] $paper
-     * @param string         $orientation
-     * @param string|null    $class
      *
      * @return Canvas
      */
-    static function get_instance(Dompdf $dompdf, $paper, string $orientation, ?string $class = null)
+    static function get_instance(Dompdf $dompdf, $paper, string $orientation, ?string $class = null): object
     {
         $backend = strtolower($dompdf->getOptions()->getPdfBackend());
 
@@ -41,16 +38,16 @@ class CanvasFactory
             if (($backend === "auto" || $backend === "pdflib") &&
                 class_exists("PDFLib", false)
             ) {
-                $class = "Dompdf\\Adapter\\PDFLib";
+                $class = \Dompdf\Adapter\PDFLib::class;
             }
 
             else {
                 if (class_exists($backend, false)) {
                     $class = $backend;
                 } elseif ($backend === "gd" && extension_loaded('gd')) {
-                    $class = "Dompdf\\Adapter\\GD";
+                    $class = \Dompdf\Adapter\GD::class;
                 } else {
-                    $class = "Dompdf\\Adapter\\CPDF";
+                    $class = \Dompdf\Adapter\CPDF::class;
                 }
             }
         }
@@ -58,8 +55,8 @@ class CanvasFactory
         $instance = new $class($paper, $orientation, $dompdf);
 
         $class_interfaces = class_implements($class, false);
-        if (!$class_interfaces || !in_array("Dompdf\\Canvas", $class_interfaces)) {
-            $class = "Dompdf\\Adapter\\CPDF";
+        if (!$class_interfaces || !in_array(\Dompdf\Canvas::class, $class_interfaces)) {
+            $class = \Dompdf\Adapter\CPDF::class;
             $instance = new $class($paper, $orientation, $dompdf);
         }
 

@@ -24,8 +24,6 @@ class TableCell extends BlockFrameDecorator
 
     /**
      * TableCell constructor.
-     * @param Frame $frame
-     * @param Dompdf $dompdf
      */
     function __construct(Frame $frame, Dompdf $dompdf)
     {
@@ -33,31 +31,22 @@ class TableCell extends BlockFrameDecorator
         $this->content_height = 0.0;
     }
 
-    function reset()
+    function reset(): void
     {
         parent::reset();
         $this->content_height = 0.0;
     }
 
-    /**
-     * @return float
-     */
     public function get_content_height(): float
     {
         return $this->content_height;
     }
 
-    /**
-     * @param float $height
-     */
     public function set_content_height(float $height): void
     {
         $this->content_height = $height;
     }
 
-    /**
-     * @param float $height
-     */
     public function set_cell_height(float $height): void
     {
         $style = $this->get_style();

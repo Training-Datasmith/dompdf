@@ -34,7 +34,6 @@ class Page extends AbstractFrameReflower
 
     /**
      * Page constructor.
-     * @param PageFrameDecorator $frame
      */
     function __construct(PageFrameDecorator $frame)
     {
@@ -45,7 +44,7 @@ class Page extends AbstractFrameReflower
      * @param PageFrameDecorator $frame
      * @param int $page_number
      */
-    function apply_page_style(Frame $frame, $page_number)
+    function apply_page_style(Frame $frame, $page_number): void
     {
         $style = $frame->get_style();
         $page_styles = $style->get_stylesheet()->get_page_styles();
@@ -88,10 +87,8 @@ class Page extends AbstractFrameReflower
     /**
      * Paged layout:
      * http://www.w3.org/TR/CSS21/page.html
-     *
-     * @param BlockFrameDecorator|null $block
      */
-    function reflow(?BlockFrameDecorator $block = null)
+    function reflow(?BlockFrameDecorator $block = null): void
     {
         /** @var PageFrameDecorator $frame */
         $frame = $this->_frame;

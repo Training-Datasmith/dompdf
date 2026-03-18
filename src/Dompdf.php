@@ -123,13 +123,6 @@ class Dompdf
     private $callbacks = [];
 
     /**
-     * Experimental caching capability
-     *
-     * @var string
-     */
-    private $cacheId;
-
-    /**
      * Base hostname
      *
      * Used for relative paths/urls
@@ -157,21 +150,21 @@ class Dompdf
      *
      * @var string
      */
-    private $systemLocale = null;
+    private $systemLocale;
 
     /**
      * The system's mbstring internal encoding
      *
      * @var string
      */
-    private $mbstringEncoding = null;
+    private $mbstringEncoding;
 
     /**
      * The system's PCRE JIT configuration
      *
      * @var string
      */
-    private $pcreJit = null;
+    private $pcreJit;
 
     /**
      * The default view of the PDF in the viewer
@@ -202,11 +195,6 @@ class Dompdf
     * @var array
     */
     private $allowedLocalFileExtensions = ["htm", "html"];
-
-    /**
-     * @var array
-     */
-    private $messages = [];
 
     /**
      * @var Options
@@ -282,7 +270,7 @@ class Dompdf
      * Save the system's existing locale, PCRE JIT, and MBString encoding
      * configuration and configure the system for Dompdf processing
      */
-    private function setPhpConfig()
+    private function setPhpConfig(): void
     {
         if (sprintf('%.1f', 1.0) !== '1.0') {
             $this->systemLocale = setlocale(LC_NUMERIC, "0");
@@ -301,7 +289,7 @@ class Dompdf
     /**
      * Restore the system's locale configuration
      */
-    private function restorePhpConfig()
+    private function restorePhpConfig(): void
     {
         if ($this->systemLocale !== null) {
             setlocale(LC_NUMERIC, $this->systemLocale);
@@ -325,7 +313,7 @@ class Dompdf
      * @param $file
      * @deprecated
      */
-    public function load_html_file($file)
+    public function load_html_file($file): void
     {
         $this->loadHtmlFile($file);
     }
@@ -342,7 +330,7 @@ class Dompdf
      * @param string      $file     A filename or URL to load.
      * @param string|null $encoding Encoding of the file.
      */
-    public function loadHtmlFile($file, $encoding = null)
+    public function loadHtmlFile($file, $encoding = null): void
     {
         $this->setPhpConfig();
 
@@ -396,7 +384,7 @@ class Dompdf
      * @param string $encoding
      * @deprecated
      */
-    public function load_html($str, $encoding = null)
+    public function load_html($str, $encoding = null): void
     {
         $this->loadHtml($str, $encoding);
     }
@@ -405,7 +393,7 @@ class Dompdf
      * @param DOMDocument $doc
      * @param bool        $quirksmode
      */
-    public function loadDOM($doc, $quirksmode = false)
+    public function loadDOM($doc, $quirksmode = false): void
     {
         // Remove #text children nodes in nodes that shouldn't have
         $tag_names = ["html", "head", "table", "tbody", "thead", "tfoot", "tr"];
@@ -433,7 +421,7 @@ class Dompdf
      * @param string      $str      The HTML to load.
      * @param string|null $encoding Encoding of the string.
      */
-    public function loadHtml($str, $encoding = null)
+    public function loadHtml($str, $encoding = null): void
     {
         $this->setPhpConfig();
 
@@ -531,18 +519,14 @@ class Dompdf
     }
 
     /**
-     * @param DOMNode $node
      * @deprecated
      */
-    public static function remove_text_nodes(DOMNode $node)
+    public static function remove_text_nodes(DOMNode $node): void
     {
         self::removeTextNodes($node);
     }
 
-    /**
-     * @param DOMNode $node
-     */
-    public static function removeTextNodes(DOMNode $node)
+    public static function removeTextNodes(DOMNode $node): void
     {
         $children = [];
         for ($i = 0; $i < $node->childNodes->length; $i++) {
@@ -561,7 +545,7 @@ class Dompdf
      * Builds the {@link FrameTree}, loads any CSS and applies the styles to
      * the {@link FrameTree}
      */
-    private function processHtml()
+    private function processHtml(): void
     {
         $this->tree->build_tree();
 
@@ -669,7 +653,7 @@ class Dompdf
      * @param string $cacheId
      * @deprecated
      */
-    public function enable_caching($cacheId)
+    public function enable_caching($cacheId): void
     {
         $this->enableCaching($cacheId);
     }
@@ -681,7 +665,6 @@ class Dompdf
      */
     public function enableCaching($cacheId)
     {
-        $this->cacheId = $cacheId;
     }
 
     /**
@@ -696,9 +679,8 @@ class Dompdf
 
     /**
      * @param string $value
-     * @return bool
      */
-    public function parseDefaultView($value)
+    public function parseDefaultView($value): bool
     {
         $valid = ["XYZ", "Fit", "FitH", "FitV", "FitR", "FitB", "FitBH", "FitBV"];
 
@@ -716,7 +698,7 @@ class Dompdf
     /**
      * Renders the HTML to PDF
      */
-    public function render()
+    public function render(): void
     {
         $this->setPhpConfig();
 
@@ -853,9 +835,6 @@ class Dompdf
 
     /**
      * Writes the output buffer in the log file
-     *
-     * @param string $logOutputFile
-     * @param float $startTime
      */
     private function writeLog(string $logOutputFile, float $startTime): void
     {
@@ -882,7 +861,7 @@ class Dompdf
      *
      * @deprecated
      */
-    public function add_info($label, $value)
+    public function add_info(string $label, string $value): void
     {
         $this->addInfo($label, $value);
     }
@@ -914,7 +893,7 @@ class Dompdf
      * @param string $filename the name of the streamed file
      * @param array $options header options (see above)
      */
-    public function stream($filename = "document.pdf", $options = [])
+    public function stream($filename = "document.pdf", $options = []): void
     {
         $this->setPhpConfig();
 
@@ -983,7 +962,7 @@ class Dompdf
      * @return $this
      * @deprecated
      */
-    public function set_option($key, $value)
+    public function set_option($key, $value): self
     {
         $new_options = clone $this->options;
         $new_options->set($key, $value);
@@ -992,11 +971,10 @@ class Dompdf
     }
 
     /**
-     * @param array $options
      * @return $this
      * @deprecated
      */
-    public function set_options(array $options)
+    public function set_options(array $options): self
     {
         $new_options = clone $this->options;
         $new_options->set($options);
@@ -1006,10 +984,9 @@ class Dompdf
 
     /**
      * @param string $size
-     * @param string $orientation
      * @deprecated
      */
-    public function set_paper($size, $orientation = "portrait")
+    public function set_paper($size, string $orientation = "portrait"): void
     {
         $this->setPaper($size, $orientation);
     }
@@ -1071,10 +1048,9 @@ class Dompdf
     }
 
     /**
-     * @param FrameTree $tree
      * @return $this
      */
-    public function setTree(FrameTree $tree)
+    public function setTree(FrameTree $tree): self
     {
         $this->tree = $tree;
         return $this;
@@ -1100,11 +1076,10 @@ class Dompdf
     }
 
     /**
-     * @param string $protocol
      * @return $this
      * @deprecated
      */
-    public function set_protocol($protocol)
+    public function set_protocol(string $protocol)
     {
         return $this->setProtocol($protocol);
     }
@@ -1113,10 +1088,9 @@ class Dompdf
      * Sets the protocol to use
      * FIXME validate these
      *
-     * @param string $protocol
      * @return $this
      */
-    public function setProtocol(string $protocol)
+    public function setProtocol(string $protocol): self
     {
         $this->protocol = $protocol;
         return $this;
@@ -1142,10 +1116,9 @@ class Dompdf
     }
 
     /**
-     * @param string $host
      * @deprecated
      */
-    public function set_host($host)
+    public function set_host(string $host): void
     {
         $this->setBaseHost($host);
     }
@@ -1153,10 +1126,9 @@ class Dompdf
     /**
      * Sets the base hostname
      *
-     * @param string $baseHost
      * @return $this
      */
-    public function setBaseHost(string $baseHost)
+    public function setBaseHost(string $baseHost): self
     {
         $this->baseHost = $baseHost;
         return $this;
@@ -1184,10 +1156,9 @@ class Dompdf
     /**
      * Sets the base path
      *
-     * @param string $path
      * @deprecated
      */
-    public function set_base_path($path)
+    public function set_base_path(string $path): void
     {
         $this->setBasePath($path);
     }
@@ -1195,10 +1166,9 @@ class Dompdf
     /**
      * Sets the base path
      *
-     * @param string $basePath
      * @return $this
      */
-    public function setBasePath(string $basePath)
+    public function setBasePath(string $basePath): self
     {
         $this->basePath = $basePath;
         return $this;
@@ -1241,7 +1211,7 @@ class Dompdf
      * @param array $options The view's options
      * @return $this
      */
-    public function setDefaultView($defaultView, $options)
+    public function setDefaultView($defaultView, $options): self
     {
         $this->defaultView = $defaultView;
         $this->defaultViewOptions = $options;
@@ -1264,7 +1234,7 @@ class Dompdf
      * @param resource|array $httpContext
      * @return $this
      */
-    public function setHttpContext($httpContext)
+    public function setHttpContext($httpContext): self
     {
         $this->options->setHttpContext($httpContext);
         return $this;
@@ -1295,10 +1265,9 @@ class Dompdf
      * Be aware that the instance will be replaced on render if the document
      * defines a paper size different from the canvas.
      *
-     * @param Canvas $canvas
      * @return $this
      */
-    public function setCanvas(Canvas $canvas)
+    public function setCanvas(Canvas $canvas): self
     {
         $this->canvas = $canvas;
         $canvasWidth = $this->canvas->get_width();
@@ -1328,10 +1297,9 @@ class Dompdf
     }
 
     /**
-     * @param Stylesheet $css
      * @return $this
      */
-    public function setCss(Stylesheet $css)
+    public function setCss(Stylesheet $css): self
     {
         $this->css = $css;
         return $this;
@@ -1357,10 +1325,9 @@ class Dompdf
     }
 
     /**
-     * @param DOMDocument $dom
      * @return $this
      */
-    public function setDom(DOMDocument $dom)
+    public function setDom(DOMDocument $dom): self
     {
         $this->dom = $dom;
         return $this;
@@ -1384,10 +1351,9 @@ class Dompdf
     }
 
     /**
-     * @param Options $options
      * @return $this
      */
-    public function setOptions(Options $options)
+    public function setOptions(Options $options): self
     {
         // For backwards compatibility
         if ($this->options && $this->options->getHttpContext() && !$options->getHttpContext()) {
@@ -1440,10 +1406,9 @@ class Dompdf
 
     /**
      * @param array $callbacks the set of callbacks to set
-     * @return $this
      * @deprecated
      */
-    public function set_callbacks($callbacks)
+    public function set_callbacks(array $callbacks): \Dompdf\Dompdf
     {
         return $this->setCallbacks($callbacks);
     }
@@ -1507,10 +1472,9 @@ class Dompdf
     }
 
     /**
-     * @param FontMetrics $fontMetrics
      * @return $this
      */
-    public function setFontMetrics(FontMetrics $fontMetrics)
+    public function setFontMetrics(FontMetrics $fontMetrics): self
     {
         $this->fontMetrics = $fontMetrics;
         return $this;
@@ -1530,12 +1494,11 @@ class Dompdf
      * properties directly.  Typically __get() is not called directly outside
      * of this class.
      *
-     * @param string $prop
      *
      * @throws Exception
      * @return mixed
      */
-    function __get($prop)
+    function __get(string $prop)
     {
         switch ($prop) {
             case 'version':

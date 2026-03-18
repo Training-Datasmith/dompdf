@@ -209,10 +209,7 @@ class Frame
         }
     }
 
-    /**
-     * @return bool
-     */
-    protected function ws_keep()
+    protected function ws_keep(): bool
     {
         $whitespace = $this->get_style()->white_space;
 
@@ -246,7 +243,7 @@ class Frame
      *
      * @param bool $recursive if true, call dispose on all children
      */
-    public function dispose($recursive = false)
+    public function dispose($recursive = false): void
     {
         if ($recursive) {
             while ($child = $this->_first_child) {
@@ -282,7 +279,7 @@ class Frame
     /**
      * Re-initialize the frame
      */
-    public function reset()
+    public function reset(): void
     {
         $this->_position["x"] = null;
         $this->_position["y"] = null;
@@ -376,9 +373,6 @@ class Frame
         return $this->_next_sibling;
     }
 
-    /**
-     * @return FrameListIterator
-     */
     public function get_children(): FrameListIterator
     {
         return new FrameListIterator($this);
@@ -419,12 +413,9 @@ class Frame
     }
 
     //........................................................................
-
     /**
      * Return the width of the margin box of the frame, in pt.  Meaningless
      * unless the width has been calculated properly.
-     *
-     * @return float
      */
     public function get_margin_width(): float
     {
@@ -444,8 +435,6 @@ class Frame
     /**
      * Return the height of the margin box of the frame, in pt.  Meaningless
      * unless the height has been calculated properly.
-     *
-     * @return float
      */
     public function get_margin_height(): float
     {
@@ -611,11 +600,6 @@ class Frame
             3 => $h, "h" => $h];
     }
 
-    /**
-     * @param float|null $opacity
-     *
-     * @return float
-     */
     public function get_opacity(?float $opacity = null): float
     {
         if ($opacity !== null) {
@@ -639,7 +623,7 @@ class Frame
     /**
      * @param int $id
      */
-    public function set_id($id)
+    public function set_id($id): void
     {
         $this->_id = $id;
 
@@ -651,19 +635,13 @@ class Frame
         }
     }
 
-    /**
-     * @param Style $style
-     */
     public function set_style(Style $style): void
     {
         // $style->set_frame($this);
         $this->_style = $style;
     }
 
-    /**
-     * @param FrameDecorator\AbstractFrameDecorator $decorator
-     */
-    public function set_decorator(FrameDecorator\AbstractFrameDecorator $decorator)
+    public function set_decorator(FrameDecorator\AbstractFrameDecorator $decorator): void
     {
         $this->_decorator = $decorator;
     }
@@ -674,10 +652,10 @@ class Frame
      * @param float|null $w
      * @param float|null $h
      */
-    public function set_containing_block($x = null, $y = null, $w = null, $h = null)
+    public function set_containing_block($x = null, $y = null, $w = null, $h = null): void
     {
         if (is_array($x)) {
-            list($x, $y, $w, $h) = [
+            [$x, $y, $w, $h] = [
                 $x["x"] ?? null,
                 $x["y"] ?? null,
                 $x["w"] ?? null,
@@ -706,10 +684,10 @@ class Frame
      * @param float|float[]|null $x
      * @param float|null $y
      */
-    public function set_position($x = null, $y = null)
+    public function set_position($x = null, $y = null): void
     {
         if (is_array($x)) {
-            list($x, $y) = [$x["x"], $x["y"]];
+            [$x, $y] = [$x["x"], $x["y"]];
         }
 
         if (is_numeric($x)) {
@@ -721,9 +699,6 @@ class Frame
         }
     }
 
-    /**
-     * @param float $opacity
-     */
     public function set_opacity(float $opacity): void
     {
         $parent = $this->get_parent();
@@ -731,20 +706,15 @@ class Frame
         $this->_opacity = $base_opacity * $opacity;
     }
 
-    /**
-     * @param LineBox $line
-     */
-    public function set_containing_line(LineBox $line)
+    public function set_containing_line(LineBox $line): void
     {
         $this->_containing_line = $line;
     }
 
     /**
      * Indicates if the margin height is auto sized
-     *
-     * @return bool
      */
-    public function is_auto_height()
+    public function is_auto_height(): bool
     {
         $style = $this->_style;
 
@@ -766,10 +736,8 @@ class Frame
 
     /**
      * Indicates if the margin width is auto sized
-     *
-     * @return bool
      */
-    public function is_auto_width()
+    public function is_auto_width(): bool
     {
         $style = $this->_style;
 
@@ -791,21 +759,12 @@ class Frame
 
     /**
      * Tells if the frame is a text node
-     *
-     * @return bool
      */
     public function is_text_node(): bool
     {
-        if (isset($this->_is_cache["text_node"])) {
-            return $this->_is_cache["text_node"];
-        }
-
-        return $this->_is_cache["text_node"] = ($this->get_node()->nodeName === "#text");
+        return $this->_is_cache["text_node"] ?? $this->_is_cache["text_node"] = ($this->get_node()->nodeName === "#text");
     }
 
-    /**
-     * @return bool
-     */
     public function is_positioned(): bool
     {
         if (isset($this->_is_cache["positioned"])) {
@@ -817,36 +776,21 @@ class Frame
         return $this->_is_cache["positioned"] = in_array($position, Style::POSITIONED_TYPES, true);
     }
 
-    /**
-     * @return bool
-     */
     public function is_absolute(): bool
     {
-        if (isset($this->_is_cache["absolute"])) {
-            return $this->_is_cache["absolute"];
-        }
-
-        return $this->_is_cache["absolute"] = $this->get_style()->is_absolute();
+        return $this->_is_cache["absolute"] ?? $this->_is_cache["absolute"] = $this->get_style()->is_absolute();
     }
 
     /**
      * Whether the frame is a block container.
-     *
-     * @return bool
      */
     public function is_block(): bool
     {
-        if (isset($this->_is_cache["block"])) {
-            return $this->_is_cache["block"];
-        }
-
-        return $this->_is_cache["block"] = in_array($this->get_style()->display, Style::BLOCK_TYPES, true);
+        return $this->_is_cache["block"] ?? $this->_is_cache["block"] = in_array($this->get_style()->display, Style::BLOCK_TYPES, true);
     }
 
     /**
      * Whether the frame has a block-level display type.
-     *
-     * @return bool
      */
     public function is_block_level(): bool
     {
@@ -861,8 +805,6 @@ class Frame
 
     /**
      * Whether the frame has an inline-level display type.
-     *
-     * @return bool
      */
     public function is_inline_level(): bool
     {
@@ -875,21 +817,11 @@ class Frame
         return $this->_is_cache["inline_level"] = in_array($display, Style::INLINE_LEVEL_TYPES, true);
     }
 
-    /**
-     * @return bool
-     */
     public function is_in_flow(): bool
     {
-        if (isset($this->_is_cache["in_flow"])) {
-            return $this->_is_cache["in_flow"];
-        }
-
-        return $this->_is_cache["in_flow"] = $this->get_style()->is_in_flow();
+        return $this->_is_cache["in_flow"] ?? $this->_is_cache["in_flow"] = $this->get_style()->is_in_flow();
     }
 
-    /**
-     * @return bool
-     */
     public function is_pre(): bool
     {
         if (isset($this->_is_cache["pre"])) {
@@ -901,9 +833,6 @@ class Frame
         return $this->_is_cache["pre"] = in_array($white_space, ["pre", "pre-wrap"], true);
     }
 
-    /**
-     * @return bool
-     */
     public function is_table(): bool
     {
         if (isset($this->_is_cache["table"])) {
@@ -922,7 +851,7 @@ class Frame
      * @param Frame $child       The new Frame to insert
      * @param bool  $update_node Whether or not to update the DOM
      */
-    public function prepend_child(Frame $child, $update_node = true)
+    public function prepend_child(Frame $child, $update_node = true): void
     {
         if ($update_node) {
             $this->_node->insertBefore($child->_node, $this->_first_child ? $this->_first_child->_node : null);
@@ -959,7 +888,7 @@ class Frame
      * @param Frame $child       The new Frame to insert
      * @param bool  $update_node Whether or not to update the DOM
      */
-    public function append_child(Frame $child, $update_node = true)
+    public function append_child(Frame $child, $update_node = true): void
     {
         if ($update_node) {
             $this->_node->appendChild($child->_node);
@@ -999,7 +928,7 @@ class Frame
      *
      * @throws Exception
      */
-    public function insert_child_before(Frame $new_child, Frame $ref, $update_node = true)
+    public function insert_child_before(Frame $new_child, Frame $ref, $update_node = true): void
     {
         if ($ref === $this->_first_child) {
             $this->prepend_child($new_child, $update_node);
@@ -1052,7 +981,7 @@ class Frame
      *
      * @throws Exception
      */
-    public function insert_child_after(Frame $new_child, Frame $ref, $update_node = true)
+    public function insert_child_after(Frame $new_child, Frame $ref, $update_node = true): void
     {
         if ($ref === $this->_last_child) {
             $this->append_child($new_child, $update_node);
@@ -1104,13 +1033,12 @@ class Frame
     /**
      * Remove a child frame
      *
-     * @param Frame $child
      * @param bool  $update_node Whether or not to remove the DOM node
      *
      * @throws Exception
      * @return Frame The removed child frame
      */
-    public function remove_child(Frame $child, $update_node = true)
+    public function remove_child(Frame $child, $update_node = true): Frame
     {
         if ($child->_parent !== $this) {
             throw new Exception("Child not found in this frame");
@@ -1150,12 +1078,8 @@ class Frame
     }
 
     //........................................................................
-
     // Debugging function:
-    /**
-     * @return string
-     */
-    public function __toString()
+    public function __toString(): string
     {
         // Skip empty text frames
 //     if ( $this->is_text_node() &&
@@ -1231,7 +1155,7 @@ class Frame
 
         $str .= "\n";
         if (php_sapi_name() === "cli") {
-            $str = strip_tags(str_replace(["<br/>", "<b>", "</b>"],
+            return strip_tags(str_replace(["<br/>", "<b>", "</b>"],
                 ["\n", "", ""],
                 $str));
         }

@@ -16,10 +16,7 @@ use Dompdf\FrameDecorator\Block as BlockFrameDecorator;
  */
 class Block extends AbstractRenderer
 {
-    /**
-     * @param Frame $frame
-     */
-    function render(Frame $frame)
+    function render(Frame $frame): void
     {
         $style = $frame->get_style();
         $node = $frame->get_node();
@@ -48,9 +45,7 @@ class Block extends AbstractRenderer
     }
 
     /**
-     * @param Frame        $frame
      * @param array|string $color
-     * @param bool         $lines
      */
     protected function debugBlockLayout(Frame $frame, $color, bool $lines = false): void
     {

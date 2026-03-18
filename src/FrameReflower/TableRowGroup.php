@@ -21,17 +21,13 @@ class TableRowGroup extends AbstractFrameReflower
 
     /**
      * TableRowGroup constructor.
-     * @param TableRowGroupFrameDecorator $frame
      */
     function __construct(TableRowGroupFrameDecorator $frame)
     {
         parent::__construct($frame);
     }
 
-    /**
-     * @param BlockFrameDecorator|null $block
-     */
-    function reflow(?BlockFrameDecorator $block = null)
+    function reflow(?BlockFrameDecorator $block = null): void
     {
         /** @var TableRowGroupFrameDecorator */
         $frame = $this->_frame;

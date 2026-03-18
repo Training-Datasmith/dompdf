@@ -58,7 +58,6 @@ class Table extends AbstractFrameDecorator
      * Class constructor
      *
      * @param Frame $frame the frame to decorate
-     * @param Dompdf $dompdf
      */
     public function __construct(Frame $frame, Dompdf $dompdf)
     {
@@ -74,7 +73,7 @@ class Table extends AbstractFrameDecorator
         $this->_footers = [];
     }
 
-    public function reset()
+    public function reset(): void
     {
         parent::reset();
         $this->_cellmap->reset();
@@ -151,7 +150,6 @@ class Table extends AbstractFrameDecorator
     /**
      * Static function to locate the parent table of a frame
      *
-     * @param Frame $frame
      *
      * @return Table the table that is an ancestor of $frame
      */
@@ -177,21 +175,18 @@ class Table extends AbstractFrameDecorator
     }
 
     //........................................................................
-
     /**
      * Check for text nodes between valid table children that only contain white
      * space, except if white space is to be preserved.
      *
-     * @param AbstractFrameDecorator $frame
      *
-     * @return bool
      */
     private function isEmptyTextNode(AbstractFrameDecorator $frame): bool
     {
         // This is based on the white-space pattern in `FrameReflower\Text`,
         // i.e. only match on collapsible white space
         $wsPattern = '/^[^\S\xA0\x{202F}\x{2007}]*$/u';
-        $validChildOrNull = function ($frame) {
+        $validChildOrNull = function ($frame): bool {
             return $frame === null
                 || in_array($frame->get_style()->display, self::VALID_CHILDREN, true);
         };

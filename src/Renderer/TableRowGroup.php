@@ -13,10 +13,7 @@ use Dompdf\Frame;
  */
 class TableRowGroup extends Block
 {
-    /**
-     * @param Frame $frame
-     */
-    function render(Frame $frame)
+    function render(Frame $frame): void
     {
         $style = $frame->get_style();
         $node = $frame->get_node();

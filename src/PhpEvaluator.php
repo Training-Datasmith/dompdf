@@ -21,7 +21,6 @@ class PhpEvaluator
 
     /**
      * PhpEvaluator constructor.
-     * @param Canvas $canvas
      */
     public function __construct(Canvas $canvas)
     {
@@ -32,7 +31,7 @@ class PhpEvaluator
      * @param $code
      * @param array $vars
      */
-    public function evaluate($code, $vars = [])
+    public function evaluate($code, $vars = []): void
     {
         if (!$this->_canvas->get_dompdf()->getOptions()->getIsPhpEnabled()) {
             return;
@@ -46,16 +45,13 @@ class PhpEvaluator
 
         // Override those variables if passed in
         foreach ($vars as $k => $v) {
-            $$k = $v;
+            ${$k} = $v;
         }
 
         eval($code);
     }
 
-    /**
-     * @param Frame $frame
-     */
-    public function render(Frame $frame)
+    public function render(Frame $frame): void
     {
         $this->evaluate($frame->get_node()->nodeValue);
     }

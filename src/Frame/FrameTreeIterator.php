@@ -33,9 +33,6 @@ class FrameTreeIterator implements Iterator
      */
     protected $_num;
 
-    /**
-     * @param Frame $root
-     */
     public function __construct(Frame $root)
     {
         $this->_stack[] = $this->_root = $root;
@@ -48,25 +45,16 @@ class FrameTreeIterator implements Iterator
         $this->_num = 0;
     }
 
-    /**
-     * @return bool
-     */
     public function valid(): bool
     {
         return count($this->_stack) > 0;
     }
 
-    /**
-     * @return int
-     */
     public function key(): int
     {
         return $this->_num;
     }
 
-    /**
-     * @return Frame
-     */
     public function current(): Frame
     {
         return end($this->_stack);

@@ -89,7 +89,7 @@ class Options
     *
     * @var callable
     */
-    private $artifactPathValidation = null;
+    private $artifactPathValidation;
 
     /**
      * @var string
@@ -218,7 +218,7 @@ class Options
      *
      * @var array|null
      */
-    private $allowedRemoteHosts = null;
+    private $allowedRemoteHosts;
 
     /**
      * Enable PDF/A-3 compliance mode
@@ -348,7 +348,7 @@ class Options
     public function __construct(?array $attributes = null)
     {
         $rootDir = realpath(__DIR__ . "/../");
-        $this->setChroot(array($rootDir));
+        $this->setChroot([$rootDir]);
         $this->setRootDir($rootDir);
         $this->setTempDir(sys_get_temp_dir());
         $this->setFontDir($rootDir . "/lib/fonts");
@@ -383,7 +383,7 @@ class Options
      * @param null|mixed $value
      * @return $this
      */
-    public function set($attributes, $value = null)
+    public function set($attributes, $value = null): self
     {
         if (!is_array($attributes)) {
             $attributes = [$attributes => $value];
@@ -449,7 +449,7 @@ class Options
      * @param string $pdfBackend
      * @return $this
      */
-    public function setPdfBackend($pdfBackend)
+    public function setPdfBackend($pdfBackend): self
     {
         $this->pdfBackend = $pdfBackend;
         return $this;
@@ -467,7 +467,7 @@ class Options
      * @param string $pdflibLicense
      * @return $this
      */
-    public function setPdflibLicense($pdflibLicense)
+    public function setPdflibLicense($pdflibLicense): self
     {
         $this->pdflibLicense = $pdflibLicense;
         return $this;
@@ -485,7 +485,7 @@ class Options
      * @param array|string $chroot
      * @return $this
      */
-    public function setChroot($chroot, $delimiter = ',')
+    public function setChroot($chroot, $delimiter = ','): self
     {
         if (is_string($chroot)) {
             $this->chroot = explode($delimiter, $chroot);
@@ -510,7 +510,7 @@ class Options
      *
      * @return $this
      */
-    public function setAllowedProtocols(array $allowedProtocols)
+    public function setAllowedProtocols(array $allowedProtocols): self
     {
         $protocols = [];
         foreach ($allowedProtocols as $protocol => $config) {
@@ -537,7 +537,7 @@ class Options
      * @param callable $rule A callable that validates the protocol
      * @return $this
      */
-    public function addAllowedProtocol(string $protocol, callable ...$rules)
+    public function addAllowedProtocol(string $protocol, callable ...$rules): self
     {
         $protocol = strtolower($protocol);
         if (empty($rules)) {
@@ -573,29 +573,25 @@ class Options
      * @param callable $validator
      * @return $this
      */
-    public function setArtifactPathValidation($validator)
+    public function setArtifactPathValidation($validator): self
     {
         $this->artifactPathValidation = $validator;
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getChroot()
+    public function getChroot(): array
     {
-        $chroot = [];
         if (is_array($this->chroot)) {
-            $chroot = $this->chroot;
+            return $this->chroot;
         }
-        return $chroot;
+        return [];
     }
 
     /**
      * @param boolean $debugCss
      * @return $this
      */
-    public function setDebugCss($debugCss)
+    public function setDebugCss($debugCss): self
     {
         $this->debugCss = $debugCss;
         return $this;
@@ -613,7 +609,7 @@ class Options
      * @param boolean $debugKeepTemp
      * @return $this
      */
-    public function setDebugKeepTemp($debugKeepTemp)
+    public function setDebugKeepTemp($debugKeepTemp): self
     {
         $this->debugKeepTemp = $debugKeepTemp;
         return $this;
@@ -631,7 +627,7 @@ class Options
      * @param boolean $debugLayout
      * @return $this
      */
-    public function setDebugLayout($debugLayout)
+    public function setDebugLayout($debugLayout): self
     {
         $this->debugLayout = $debugLayout;
         return $this;
@@ -649,7 +645,7 @@ class Options
      * @param boolean $debugLayoutBlocks
      * @return $this
      */
-    public function setDebugLayoutBlocks($debugLayoutBlocks)
+    public function setDebugLayoutBlocks($debugLayoutBlocks): self
     {
         $this->debugLayoutBlocks = $debugLayoutBlocks;
         return $this;
@@ -667,7 +663,7 @@ class Options
      * @param boolean $debugLayoutInline
      * @return $this
      */
-    public function setDebugLayoutInline($debugLayoutInline)
+    public function setDebugLayoutInline($debugLayoutInline): self
     {
         $this->debugLayoutInline = $debugLayoutInline;
         return $this;
@@ -685,7 +681,7 @@ class Options
      * @param boolean $debugLayoutLines
      * @return $this
      */
-    public function setDebugLayoutLines($debugLayoutLines)
+    public function setDebugLayoutLines($debugLayoutLines): self
     {
         $this->debugLayoutLines = $debugLayoutLines;
         return $this;
@@ -703,7 +699,7 @@ class Options
      * @param boolean $debugLayoutPaddingBox
      * @return $this
      */
-    public function setDebugLayoutPaddingBox($debugLayoutPaddingBox)
+    public function setDebugLayoutPaddingBox($debugLayoutPaddingBox): self
     {
         $this->debugLayoutPaddingBox = $debugLayoutPaddingBox;
         return $this;
@@ -721,7 +717,7 @@ class Options
      * @param boolean $debugPng
      * @return $this
      */
-    public function setDebugPng($debugPng)
+    public function setDebugPng($debugPng): self
     {
         $this->debugPng = $debugPng;
         return $this;
@@ -739,7 +735,7 @@ class Options
      * @param string $defaultFont
      * @return $this
      */
-    public function setDefaultFont($defaultFont)
+    public function setDefaultFont($defaultFont): self
     {
         if (!($defaultFont === null || trim($defaultFont) === "")) {
             $this->defaultFont = $defaultFont;
@@ -761,7 +757,7 @@ class Options
      * @param string $defaultMediaType
      * @return $this
      */
-    public function setDefaultMediaType($defaultMediaType)
+    public function setDefaultMediaType($defaultMediaType): self
     {
         $this->defaultMediaType = $defaultMediaType;
         return $this;
@@ -786,7 +782,6 @@ class Options
     }
 
     /**
-     * @param string $defaultPaperOrientation
      * @return $this
      */
     public function setDefaultPaperOrientation(string $defaultPaperOrientation): self
@@ -803,9 +798,6 @@ class Options
         return $this->defaultPaperSize;
     }
 
-    /**
-     * @return string
-     */
     public function getDefaultPaperOrientation(): string
     {
         return $this->defaultPaperOrientation;
@@ -815,7 +807,7 @@ class Options
      * @param int $dpi
      * @return $this
      */
-    public function setDpi($dpi)
+    public function setDpi($dpi): self
     {
         $this->dpi = $dpi;
         return $this;
@@ -833,7 +825,7 @@ class Options
      * @param string $fontCache
      * @return $this
      */
-    public function setFontCache($fontCache)
+    public function setFontCache($fontCache): self
     {
         if (!is_callable($this->artifactPathValidation) || ($this->artifactPathValidation)($fontCache, "fontCache") === true) {
             $this->fontCache = $fontCache;
@@ -853,7 +845,7 @@ class Options
      * @param string $fontDir
      * @return $this
      */
-    public function setFontDir($fontDir)
+    public function setFontDir($fontDir): self
     {
         if (!is_callable($this->artifactPathValidation) || ($this->artifactPathValidation)($fontDir, "fontDir") === true) {
             $this->fontDir = $fontDir;
@@ -873,7 +865,7 @@ class Options
      * @param float $fontHeightRatio
      * @return $this
      */
-    public function setFontHeightRatio($fontHeightRatio)
+    public function setFontHeightRatio($fontHeightRatio): self
     {
         $this->fontHeightRatio = $fontHeightRatio;
         return $this;
@@ -891,7 +883,7 @@ class Options
      * @param boolean $isFontSubsettingEnabled
      * @return $this
      */
-    public function setIsFontSubsettingEnabled($isFontSubsettingEnabled)
+    public function setIsFontSubsettingEnabled($isFontSubsettingEnabled): self
     {
         $this->isFontSubsettingEnabled = $isFontSubsettingEnabled;
         return $this;
@@ -918,7 +910,7 @@ class Options
      * @param boolean $isHtml5ParserEnabled
      * @return $this
      */
-    public function setIsHtml5ParserEnabled($isHtml5ParserEnabled)
+    public function setIsHtml5ParserEnabled($isHtml5ParserEnabled): self
     {
         $this->isHtml5ParserEnabled = $isHtml5ParserEnabled;
         return $this;
@@ -946,7 +938,7 @@ class Options
      * @param boolean $isJavascriptEnabled
      * @return $this
      */
-    public function setIsJavascriptEnabled($isJavascriptEnabled)
+    public function setIsJavascriptEnabled($isJavascriptEnabled): self
     {
         $this->isJavascriptEnabled = $isJavascriptEnabled;
         return $this;
@@ -972,7 +964,7 @@ class Options
      * @param boolean $isPhpEnabled
      * @return $this
      */
-    public function setIsPhpEnabled($isPhpEnabled)
+    public function setIsPhpEnabled($isPhpEnabled): self
     {
         $this->isPhpEnabled = $isPhpEnabled;
         return $this;
@@ -998,7 +990,7 @@ class Options
      * @param boolean $isRemoteEnabled
      * @return $this
      */
-    public function setIsRemoteEnabled($isRemoteEnabled)
+    public function setIsRemoteEnabled($isRemoteEnabled): self
     {
         $this->isRemoteEnabled = $isRemoteEnabled;
         return $this;
@@ -1024,7 +1016,7 @@ class Options
      * @param array|null $allowedRemoteHosts
      * @return $this
      */
-    public function setAllowedRemoteHosts($allowedRemoteHosts)
+    public function setAllowedRemoteHosts($allowedRemoteHosts): self
     {
         if (is_array($allowedRemoteHosts)) {
             // Set hosts to lowercase
@@ -1051,7 +1043,7 @@ class Options
      * @param boolean $isRemoteEnabled
      * @return $this
      */
-    public function setIsPdfAEnabled($isPdfAEnabled)
+    public function setIsPdfAEnabled($isPdfAEnabled): self
     {
         $this->isPdfAEnabled = $isPdfAEnabled;
         return $this;
@@ -1077,7 +1069,7 @@ class Options
      * @param string $logOutputFile
      * @return $this
      */
-    public function setLogOutputFile($logOutputFile)
+    public function setLogOutputFile($logOutputFile): self
     {
         if (!is_callable($this->artifactPathValidation) || ($this->artifactPathValidation)($logOutputFile, "logOutputFile") === true) {
             $this->logOutputFile = $logOutputFile;
@@ -1097,7 +1089,7 @@ class Options
      * @param string $tempDir
      * @return $this
      */
-    public function setTempDir($tempDir)
+    public function setTempDir($tempDir): self
     {
         if (!is_callable($this->artifactPathValidation) || ($this->artifactPathValidation)($tempDir, "tempDir") === true) {
             $this->tempDir = $tempDir;
@@ -1117,7 +1109,7 @@ class Options
      * @param string $rootDir
      * @return $this
      */
-    public function setRootDir($rootDir)
+    public function setRootDir($rootDir): self
     {
         if (!is_callable($this->artifactPathValidation) || ($this->artifactPathValidation)($rootDir, "rootDir") === true) {
             $this->rootDir = $rootDir;
@@ -1139,7 +1131,7 @@ class Options
      * @param resource|array $httpContext
      * @return $this
      */
-    public function setHttpContext($httpContext)
+    public function setHttpContext($httpContext): self
     {
         $this->httpContext = is_array($httpContext) ? stream_context_create($httpContext) : $httpContext;
         return $this;
@@ -1156,7 +1148,7 @@ class Options
     }
 
 
-    public function validateArtifactPath(?string $path, string $option)
+    public function validateArtifactPath(?string $path, string $option): bool
     {
         if ($path === null) {
             return true;
@@ -1168,9 +1160,9 @@ class Options
         return true;
     }
 
-    public function validateLocalUri(string $uri)
+    public function validateLocalUri(string $uri): array
     {
-        if ($uri === null || strlen($uri) === 0) {
+        if (strlen($uri) === 0) {
             return [false, "The URI must not be empty."];
         }
 
@@ -1199,7 +1191,7 @@ class Options
 
     public function validatePharUri(string $uri)
     {
-        if ($uri === null || strlen($uri) === 0) {
+        if (strlen($uri) === 0) {
             return [false, "The URI must not be empty."];
         }
 
@@ -1207,9 +1199,9 @@ class Options
         return $this->validateLocalUri($file);
     }
 
-    public function validateRemoteUri(string $uri)
+    public function validateRemoteUri(string $uri): array
     {
-        if ($uri === null || strlen($uri) === 0) {
+        if (strlen($uri) === 0) {
             return [false, "The URI must not be empty."];
         }
 

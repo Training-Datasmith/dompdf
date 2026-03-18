@@ -40,8 +40,6 @@ class Factory
      *
      * @param Frame  $root   The frame to decorate
      * @param Dompdf $dompdf The dompdf instance
-     *
-     * @return PageFrameDecorator
      */
     public static function decorate_root(Frame $root, Dompdf $dompdf): PageFrameDecorator
     {
@@ -71,6 +69,7 @@ class Factory
         switch ($display) {
 
             case "block":
+            case "list-item":
                 $positioner = "Block";
                 $decorator = "Block";
                 $reflower = "Block";
@@ -123,12 +122,6 @@ class Factory
                 $positioner = "TableCell";
                 $decorator = "TableCell";
                 $reflower = "TableCell";
-                break;
-
-            case "list-item":
-                $positioner = "Block";
-                $decorator = "Block";
-                $reflower = "Block";
                 break;
 
             case "-dompdf-list-bullet":
@@ -248,8 +241,6 @@ class Factory
      * Creates Positioners
      *
      * @param string $type Type of positioner to use
-     *
-     * @return AbstractPositioner
      */
     protected static function getPositionerInstance(string $type): AbstractPositioner
     {

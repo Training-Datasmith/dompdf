@@ -291,7 +291,7 @@ class Color
                 return null;
             }
 
-            $values = array_map(function ($c) {
+            $values = array_map(function ($c): float {
                 return min(1.0, max(0.0, floatval(trim($c))));
             }, $values);
 
@@ -305,9 +305,8 @@ class Color
     /**
      * @param array|string $color
      * @param float $alpha
-     * @return array
      */
-    static function getArray($color, $alpha = 1.0)
+    static function getArray($color, $alpha = 1.0): array
     {
         $c = [null, null, null, null, "alpha" => $alpha, "hex" => null];
 

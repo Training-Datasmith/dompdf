@@ -17,10 +17,7 @@ use Dompdf\FrameDecorator\Table;
  */
 class TableCell extends Block
 {
-    /**
-     * @param Frame $frame
-     */
-    function render(Frame $frame)
+    function render(Frame $frame): void
     {
         $style = $frame->get_style();
         $node = $frame->get_node();
@@ -67,10 +64,6 @@ class TableCell extends Block
         $this->debugBlockLayout($frame, "red", false);
     }
 
-    /**
-     * @param Frame $frame
-     * @param Table $table
-     */
     protected function _render_collapsed_border(Frame $frame, Table $table): void
     {
         $cellmap = $table->get_cellmap();

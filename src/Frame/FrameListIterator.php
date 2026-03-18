@@ -39,9 +39,6 @@ class FrameListIterator implements Iterator
      */
     protected $num;
 
-    /**
-     * @param Frame $frame
-     */
     public function __construct(Frame $frame)
     {
         $this->parent = $frame;
@@ -55,25 +52,16 @@ class FrameListIterator implements Iterator
         $this->num = 0;
     }
 
-    /**
-     * @return bool
-     */
     public function valid(): bool
     {
         return $this->cur !== null;
     }
 
-    /**
-     * @return int
-     */
     public function key(): int
     {
         return $this->num;
     }
 
-    /**
-     * @return Frame|null
-     */
     public function current(): ?Frame
     {
         return $this->cur;

@@ -38,19 +38,7 @@ class ListBullet extends AbstractFrameDecorator
     public const MARKER_INDENT = 0.52;
 
     /**
-     * ListBullet constructor.
-     * @param Frame $frame
-     * @param Dompdf $dompdf
-     */
-    function __construct(Frame $frame, Dompdf $dompdf)
-    {
-        parent::__construct($frame, $dompdf);
-    }
-
-    /**
      * Get the width of the bullet symbol.
-     *
-     * @return float
      */
     public function get_width(): float
     {
@@ -65,8 +53,6 @@ class ListBullet extends AbstractFrameDecorator
 
     /**
      * Get the height of the bullet symbol.
-     *
-     * @return float
      */
     public function get_height(): float
     {

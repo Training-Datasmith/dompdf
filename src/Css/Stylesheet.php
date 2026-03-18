@@ -216,36 +216,30 @@ class Stylesheet
         if (isset($_SERVER["SCRIPT_FILENAME"])) {
             $script = $_SERVER["SCRIPT_FILENAME"];
         }
-        list($this->_protocol, $this->_base_host, $this->_base_path) = Helpers::explode_url($script);
+        [$this->_protocol, $this->_base_host, $this->_base_path] = Helpers::explode_url($script);
         $this->_page_styles = ["base" => new Style($this)];
     }
 
     /**
      * Set the base protocol
-     *
-     * @param string $protocol
      */
-    function set_protocol(string $protocol)
+    function set_protocol(string $protocol): void
     {
         $this->_protocol = $protocol;
     }
 
     /**
      * Set the base host
-     *
-     * @param string $host
      */
-    function set_host(string $host)
+    function set_host(string $host): void
     {
         $this->_base_host = $host;
     }
 
     /**
      * Set the base path
-     *
-     * @param string $path
      */
-    function set_base_path(string $path)
+    function set_base_path(string $path): void
     {
         $this->_base_path = $path;
     }
@@ -312,8 +306,6 @@ class Stylesheet
 
     /**
      * Create a new Style object associated with this stylesheet
-     *
-     * @return Style
      */
     function create_style(): Style
     {
@@ -344,7 +336,7 @@ class Stylesheet
      * @param string $css
      * @param int $origin
      */
-    function load_css(&$css, $origin = self::ORIG_AUTHOR)
+    function load_css(&$css, $origin = self::ORIG_AUTHOR): void
     {
         if ($origin) {
             $this->_current_origin = $origin;
@@ -358,7 +350,7 @@ class Stylesheet
      * @param string $file
      * @param int $origin
      */
-    function load_css_file($file, $origin = self::ORIG_AUTHOR)
+    function load_css_file($file, $origin = self::ORIG_AUTHOR): void
     {
         if ($origin) {
             $this->_current_origin = $origin;
@@ -419,13 +411,11 @@ class Stylesheet
     /**
      * @link https://www.w3.org/TR/CSS21/cascade.html#specificity
      *
-     * @param string $selector
      * @param int    $origin
      *    - Stylesheet::ORIG_UA: user agent style sheet
      *    - Stylesheet::ORIG_USER: user style sheet
      *    - Stylesheet::ORIG_AUTHOR: author style sheet
      *
-     * @return int
      */
     protected function specificity(string $selector, int $origin = self::ORIG_AUTHOR): int
     {
@@ -470,10 +460,7 @@ class Stylesheet
     /**
      * Converts a CSS selector to an XPath query.
      *
-     * @param string $selector
-     * @param bool   $firstPass
      *
-     * @return array|null
      */
     protected function selectorToXpath(string $selector, bool $firstPass = false): ?array
     {
@@ -895,10 +882,7 @@ class Stylesheet
     /**
      * Parse an `nth-child` expression of the form `an+b`, `odd`, or `even`.
      *
-     * @param string $expr
-     * @param string $position
      *
-     * @return string
      *
      * @link https://www.w3.org/TR/selectors-3/#nth-child-pseudo
      */
@@ -907,11 +891,13 @@ class Stylesheet
         // odd
         if ($expr === "odd") {
             return "($position mod 2) = 1";
-        } // even
-        elseif ($expr === "even") {
+        }
+        // even
+        if ($expr === "even") {
             return "($position mod 2) = 0";
-        } // b
-        elseif (preg_match("/^\d+$/", $expr)) {
+        }
+        // odd
+        if (preg_match("/^\d+$/", $expr)) {
             return "$position = $expr";
         }
 
@@ -927,14 +913,13 @@ class Stylesheet
 
         if ($b === 0) {
             return "($position mod $a) = 0";
-        } else {
-            $compare = ($a < 0) ? "<=" : ">=";
-            $b2 = -$b;
-            if ($b2 >= 0) {
-                $b2 = "+$b2";
-            }
-            return "($position $compare $b) and ((($position $b2) mod " . abs($a) . ") = 0)";
         }
+        $compare = ($a < 0) ? "<=" : ">=";
+        $b2 = -$b;
+        if ($b2 >= 0) {
+            $b2 = "+$b2";
+        }
+        return "($position $compare $b) and ((($position $b2) mod " . abs($a) . ") = 0)";
     }
 
     /**
@@ -943,10 +928,8 @@ class Stylesheet
      * apply_styles() applies all currently loaded styles to the provided
      * {@link FrameTree}.  Aside from parsing CSS, this is the main purpose
      * of this class.
-     *
-     * @param FrameTree $tree
      */
-    function apply_styles(FrameTree $tree)
+    function apply_styles(FrameTree $tree): void
     {
         // Use XPath to select nodes.  This would be easier if we could attach
         // Frame objects directly to DOMNodes using the setUserData() method, but
@@ -1011,9 +994,8 @@ class Stylesheet
                             $specified = $style->get_specified("content");
                             if (!\preg_match("/". self::PATTERN_CSS_VAR_FN . "/", $specified)) {
                                 continue;
-                            } else {
-                                $content = [];
                             }
+                            $content = [];
                         }
 
                         // https://www.w3.org/TR/css-content-3/#content-property
@@ -1158,7 +1140,7 @@ class Stylesheet
                             $media_query_match = false;
                             foreach ($media_queries as $media_query_group) {
                                 foreach ($media_query_group as $media_query) {
-                                    list($media_query_feature, $media_query_value, $media_query_operator) = $media_query;
+                                    [$media_query_feature, $media_query_value, $media_query_operator] = $media_query;
                                     switch ($media_query_feature) {
                                         case "height":
                                             $feature_match = $paper_height === (float)$style->length_in_pt($media_query_value);
@@ -1228,7 +1210,7 @@ class Stylesheet
 
                 // set the page width, height, and orientation based on the parsed page style
                 if ($style->size !== "auto") {
-                    list($paper_width, $paper_height) = $style->size;
+                    [$paper_width, $paper_height] = $style->size;
                 }
                 $paper_width = $paper_width - (float)$style->length_in_pt($style->margin_left) - (float)$style->length_in_pt($style->margin_right);
                 $paper_height = $paper_height - (float)$style->length_in_pt($style->margin_top) - (float)$style->length_in_pt($style->margin_bottom);
@@ -1250,7 +1232,7 @@ class Stylesheet
      *
      * @param string $str
      */
-    private function _parse_css($str, $media_queries = [])
+    private function _parse_css($str, array $media_queries = []): void
     {
         $str = trim($str);
 
@@ -1524,7 +1506,7 @@ EOL;
      *
      * @param string $url the url of the imported CSS file
      */
-    private function _parse_import($url, $import_media_query)
+    private function _parse_import(string $url, string $import_media_query): void
     {
         // if URL is a CSS string, wrap it in the url function for parsing by the resolve_url method
         if (mb_strpos($url, "url(") === false) {
@@ -1636,7 +1618,7 @@ EOL;
      *
      * @param string $str CSS @font-face rules
      */
-    private function _parse_font_face($str)
+    private function _parse_font_face(string $str): void
     {
         $descriptors = $this->_parse_properties($str);
 
@@ -1685,9 +1667,8 @@ EOL;
      * CSS rules.
      *
      * @param string $str CSS rules
-     * @return Style
      */
-    private function _parse_properties($str)
+    private function _parse_properties($str): \Dompdf\Css\Style
     {
         $DEBUGCSS = $this->_dompdf->getOptions()->getDebugCss();
 
@@ -1773,9 +1754,8 @@ EOL;
      * parse selector + rulesets
      *
      * @param string $str CSS selectors and rulesets
-     * @param array $media_queries
      */
-    private function _parse_sections($str, $media_queries = [])
+    private function _parse_sections(string $str, array $media_queries = []): void
     {
         // Pre-process selectors: collapse all whitespace and strip whitespace
         // around '>', '.', ':', '+', '~', '#'
@@ -1828,8 +1808,6 @@ EOL;
      * https://www.w3.org/TR/CSS21/syndata.html#characters
      *
      * @param string $string The string to parse.
-     *
-     * @return string
      */
     public function parse_string(string $string): string
     {
@@ -1840,7 +1818,7 @@ EOL;
         // Convert escaped hex characters (e.g. \A => newline)
         return preg_replace_callback(
             "/\\\\([0-9a-fA-F]{1,6})\s?/",
-            function ($matches) { return Helpers::unichr(hexdec($matches[1])); },
+            function (array $matches) { return Helpers::unichr(hexdec($matches[1])); },
             $string
         ) ?? "";
     }
@@ -1856,10 +1834,9 @@ EOL;
     }
 
     /**
-     * @param FontMetrics $fontMetrics
      * @return $this
      */
-    public function setFontMetrics(FontMetrics $fontMetrics)
+    public function setFontMetrics(FontMetrics $fontMetrics): self
     {
         $this->fontMetrics = $fontMetrics;
         return $this;
@@ -1878,10 +1855,8 @@ EOL;
      *
      * Generates a string of each selector and associated style in the
      * Stylesheet.  Useful for debugging.
-     *
-     * @return string
      */
-    function __toString()
+    function __toString(): string
     {
         $str = "";
         foreach ($this->_styles as $selector => $selector_styles) {

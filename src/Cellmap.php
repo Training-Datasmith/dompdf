@@ -119,9 +119,6 @@ class Cellmap
      */
     private $_fixed_layout = false;
 
-    /**
-     * @param TableFrameDecorator $table
-     */
     public function __construct(TableFrameDecorator $table)
     {
         $this->_table = $table;
@@ -160,10 +157,7 @@ class Cellmap
         return $this->_columns_locked;
     }
 
-    /**
-     * @param bool $fixed
-     */
-    public function set_layout_fixed(bool $fixed)
+    public function set_layout_fixed(bool $fixed): void
     {
         $this->_fixed_layout = $fixed;
     }
@@ -203,7 +197,7 @@ class Cellmap
     /**
      * @param $columns
      */
-    public function set_columns($columns)
+    public function set_columns($columns): void
     {
         $this->_columns = $columns;
     }
@@ -284,10 +278,8 @@ class Cellmap
     /**
      * @param int $i
      * @param int $j
-     *
-     * @return array
      */
-    public function get_border_properties($i, $j)
+    public function get_border_properties($i, $j): array
     {
         return [
             "top"    => $this->get_border($i, $j, "horizontal"),
@@ -298,27 +290,16 @@ class Cellmap
     }
 
     /**
-     * @param Frame $frame
-     *
      * @return array|null
      */
     public function get_spanned_cells(Frame $frame)
     {
         $key = $frame->get_id();
 
-        if (isset($this->_frames[$key])) {
-            return $this->_frames[$key];
-        }
-
-        return null;
+        return $this->_frames[$key] ?? null;
     }
 
-    /**
-     * @param Frame $frame
-     *
-     * @return bool
-     */
-    public function frame_exists_in_cellmap(Frame $frame)
+    public function frame_exists_in_cellmap(Frame $frame): bool
     {
         $key = $frame->get_id();
 
@@ -326,12 +307,9 @@ class Cellmap
     }
 
     /**
-     * @param Frame $frame
-     *
-     * @return array
      * @throws Exception
      */
-    public function get_frame_position(Frame $frame)
+    public function get_frame_position(Frame $frame): array
     {
         global $_dompdf_warnings;
 
@@ -364,7 +342,6 @@ class Cellmap
     }
 
     /**
-     * @param Frame $frame
      *
      * @return int
      * @throws Exception
@@ -387,7 +364,6 @@ class Cellmap
     }
 
     /**
-     * @param Frame $frame
      *
      * @return int
      * @throws Exception
@@ -418,7 +394,7 @@ class Cellmap
      * @param int $j
      * @param mixed $width
      */
-    public function set_column_width($j, $width)
+    public function set_column_width($j, $width): void
     {
         if ($this->_columns_locked) {
             return;
@@ -434,7 +410,7 @@ class Cellmap
      * @param int $i
      * @param long $height
      */
-    public function set_row_height($i, $height)
+    public function set_row_height($i, $height): void
     {
         $row =& $this->get_row($i);
         if ($height > $row["height"]) {
@@ -447,10 +423,7 @@ class Cellmap
     /**
      * https://www.w3.org/TR/CSS21/tables.html#border-conflict-resolution
      *
-     * @param int    $i
-     * @param int    $j
      * @param string $h_v         `horizontal` or `vertical`
-     * @param array  $border_spec
      */
     protected function resolve_border(int $i, int $j, string $h_v, array $border_spec): void
     {
@@ -485,7 +458,6 @@ class Cellmap
     /**
      * Get the resolved border properties for the given frame.
      *
-     * @param AbstractFrameDecorator $frame
      *
      * @return array[]
      */
@@ -734,9 +706,9 @@ class Cellmap
 
             // Resolve the frame's width
             if ($this->_fixed_layout) {
-                list($frame_min, $frame_max) = [0, 10e-10];
+                [$frame_min, $frame_max] = [0, 10e-10];
             } else {
-                list($frame_min, $frame_max) = $frame->get_min_max_width();
+                [$frame_min, $frame_max] = $frame->get_min_max_width();
             }
 
             $width = $style->width;
@@ -819,7 +791,7 @@ class Cellmap
      *
      * @param Frame
      */
-    public function remove_row(Frame $row)
+    public function remove_row(Frame $row): void
     {
         $key = $row->get_id();
         if (!isset($this->_frames[$key])) {
@@ -867,7 +839,7 @@ class Cellmap
      *
      * @param Frame $group The group to remove
      */
-    public function remove_row_group(Frame $group)
+    public function remove_row_group(Frame $group): void
     {
         $key = $group->get_id();
         if (!isset($this->_frames[$key])) {
@@ -890,7 +862,7 @@ class Cellmap
      * @param Frame $group    The group to update
      * @param Frame $last_row The last row in the row group
      */
-    public function update_row_group(Frame $group, Frame $last_row)
+    public function update_row_group(Frame $group, Frame $last_row): void
     {
         $g_key = $group->get_id();
 
@@ -979,8 +951,6 @@ class Cellmap
 
     /**
      * Used for debugging:
-     *
-     * @return string
      */
     public function __toString(): string
     {
@@ -999,7 +969,7 @@ class Cellmap
         $str .= Helpers::pre_r($arr, true);
 
         if (php_sapi_name() == "cli") {
-            $str = strip_tags(str_replace(["<br/>", "<b>", "</b>"],
+            return strip_tags(str_replace(["<br/>", "<b>", "</b>"],
                 ["\n", chr(27) . "[01;33m", chr(27) . "[0m"],
                 $str));
         }

@@ -16,13 +16,4 @@ use Dompdf\Frame;
  */
 class TableRow extends AbstractFrameDecorator
 {
-    /**
-     * TableRow constructor.
-     * @param Frame $frame
-     * @param Dompdf $dompdf
-     */
-    function __construct(Frame $frame, Dompdf $dompdf)
-    {
-        parent::__construct($frame, $dompdf);
-    }
 }

@@ -42,8 +42,6 @@ class Block extends AbstractFrameDecorator
 
     /**
      * Block constructor.
-     * @param Frame $frame
-     * @param Dompdf $dompdf
      */
     function __construct(Frame $frame, Dompdf $dompdf)
     {
@@ -54,7 +52,7 @@ class Block extends AbstractFrameDecorator
         $this->dangling_markers = [];
     }
 
-    function reset()
+    function reset(): void
     {
         parent::reset();
 
@@ -101,17 +99,13 @@ class Block extends AbstractFrameDecorator
     /**
      * @param int $i
      */
-    function clear_line($i)
+    function clear_line($i): void
     {
         if (isset($this->_line_boxes[$i])) {
             unset($this->_line_boxes[$i]);
         }
     }
 
-    /**
-     * @param Frame $frame
-     * @return LineBox|null
-     */
     public function add_frame_to_line(Frame $frame): ?LineBox
     {
         $current_line = $this->_line_boxes[$this->_cl];
@@ -145,8 +139,6 @@ class Block extends AbstractFrameDecorator
 
     /**
      * Remove the given frame and all following frames and lines from the block.
-     *
-     * @param Frame $frame
      */
     public function remove_frames_from_line(Frame $frame): void
     {
@@ -198,18 +190,11 @@ class Block extends AbstractFrameDecorator
         $this->_cl = count($this->_line_boxes) - 1;
     }
 
-    /**
-     * @param float $w
-     */
     public function increase_line_width(float $w): void
     {
         $this->_line_boxes[$this->_cl]->w += $w;
     }
 
-    /**
-     * @param float $val
-     * @param Frame $frame
-     */
     public function maximize_line_height(float $val, Frame $frame): void
     {
         if ($val > $this->_line_boxes[$this->_cl]->h) {
@@ -218,9 +203,6 @@ class Block extends AbstractFrameDecorator
         }
     }
 
-    /**
-     * @param bool $br
-     */
     public function add_line(bool $br = false): void
     {
         $line = $this->_line_boxes[$this->_cl];
@@ -233,9 +215,6 @@ class Block extends AbstractFrameDecorator
         $this->_line_boxes[++$this->_cl] = $new_line;
     }
 
-    /**
-     * @param ListBullet $marker
-     */
     public function add_dangling_marker(ListBullet $marker): void
     {
         $this->dangling_markers[] = $marker;
@@ -243,8 +222,6 @@ class Block extends AbstractFrameDecorator
 
     /**
      * Inherit any dangling markers from the parent block.
-     *
-     * @param Block $block
      */
     public function inherit_dangling_markers(self $block): void
     {

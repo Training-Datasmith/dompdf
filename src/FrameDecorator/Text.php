@@ -33,12 +33,10 @@ class Text extends AbstractFrameDecorator
      *
      * @var string|null
      */
-    protected $trailingWs = null;
+    protected $trailingWs;
 
     /**
      * Text constructor.
-     * @param Frame $frame
-     * @param Dompdf $dompdf
      * @throws Exception
      */
     function __construct(Frame $frame, Dompdf $dompdf)
@@ -56,7 +54,6 @@ class Text extends AbstractFrameDecorator
      */
     public function trim_trailing_ws(): void
     {
-        $frame = $this->_frame;
         $text = $this->get_text();
         $trailing = mb_substr($text, -1, null, "UTF-8");
 
@@ -69,7 +66,7 @@ class Text extends AbstractFrameDecorator
         }
     }
 
-    function reset()
+    function reset(): void
     {
         parent::reset();
         $this->text_spacing = 0.0;
@@ -85,10 +82,6 @@ class Text extends AbstractFrameDecorator
     }
 
     // Accessor methods
-
-    /**
-     * @return float
-     */
     public function get_text_spacing(): float
     {
         return $this->text_spacing;
@@ -117,7 +110,6 @@ class Text extends AbstractFrameDecorator
     }
 
     //........................................................................
-
     /**
      * Vertical padding, border, and margin do not apply when determining the
      * height for inline frames.
@@ -128,8 +120,6 @@ class Text extends AbstractFrameDecorator
      * start at the top and bottom of the content area, not the
      * 'line-height'. But only the 'line-height' is used to calculate the
      * height of the line box.
-     *
-     * @return float
      */
     public function get_margin_height(): float
     {
@@ -151,9 +141,6 @@ class Text extends AbstractFrameDecorator
         return $pb;
     }
 
-    /**
-     * @param float $spacing
-     */
     public function set_text_spacing(float $spacing): void
     {
         $this->text_spacing = $spacing;
@@ -162,8 +149,6 @@ class Text extends AbstractFrameDecorator
 
     /**
      * Recalculate the text width
-     *
-     * @return float
      */
     public function recalculate_width(): float
     {
@@ -181,14 +166,11 @@ class Text extends AbstractFrameDecorator
     }
 
     // Text manipulation methods
-
     /**
      * Split the text in this frame at the offset specified.  The remaining
      * text is added as a sibling frame following this one and is returned.
      *
-     * @param int  $offset
      * @param bool $split_parent Whether to split parent inline frames.
-     *
      * @return Text|null
      */
     function split_text(int $offset, bool $split_parent = true): ?self
@@ -236,7 +218,7 @@ class Text extends AbstractFrameDecorator
      * @param int $offset
      * @param int $count
      */
-    function delete_text($offset, $count)
+    function delete_text($offset, $count): void
     {
         $this->_frame->get_node()->deleteData($offset, $count);
     }
@@ -244,7 +226,7 @@ class Text extends AbstractFrameDecorator
     /**
      * @param string $text
      */
-    function set_text($text)
+    function set_text($text): void
     {
         $this->_frame->get_node()->data = $text;
     }

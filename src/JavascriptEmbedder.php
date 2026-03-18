@@ -21,8 +21,6 @@ class JavascriptEmbedder
 
     /**
      * JavascriptEmbedder constructor.
-     *
-     * @param Dompdf $dompdf
      */
     public function __construct(Dompdf $dompdf)
     {
@@ -32,15 +30,12 @@ class JavascriptEmbedder
     /**
      * @param $script
      */
-    public function insert($script)
+    public function insert($script): void
     {
         $this->_dompdf->getCanvas()->javascript($script);
     }
 
-    /**
-     * @param Frame $frame
-     */
-    public function render(Frame $frame)
+    public function render(Frame $frame): void
     {
         if (!$this->_dompdf->getOptions()->getIsJavascriptEnabled()) {
             return;

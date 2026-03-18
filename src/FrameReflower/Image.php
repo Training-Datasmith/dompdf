@@ -20,17 +20,13 @@ class Image extends AbstractFrameReflower
 
     /**
      * Image constructor.
-     * @param ImageFrameDecorator $frame
      */
     function __construct(ImageFrameDecorator $frame)
     {
         parent::__construct($frame);
     }
 
-    /**
-     * @param BlockFrameDecorator|null $block
-     */
-    function reflow(?BlockFrameDecorator $block = null)
+    function reflow(?BlockFrameDecorator $block = null): void
     {
         $this->determine_absolute_containing_block();
 

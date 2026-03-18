@@ -20,17 +20,6 @@ class TableRowGroup extends AbstractFrameDecorator
 {
 
     /**
-     * Class constructor
-     *
-     * @param Frame $frame   Frame to decorate
-     * @param Dompdf $dompdf Current dompdf instance
-     */
-    function __construct(Frame $frame, Dompdf $dompdf)
-    {
-        parent::__construct($frame, $dompdf);
-    }
-
-    /**
      * Split the row group at the given child and remove all subsequent child
      * rows and all subsequent row groups from the cellmap.
      */

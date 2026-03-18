@@ -76,7 +76,7 @@ class FontMetrics
     /**
      * @deprecated
      */
-    public function save_font_families()
+    public function save_font_families(): void
     {
         $this->saveFontFamilies();
     }
@@ -90,7 +90,7 @@ class FontMetrics
      *
      * @see FontMetrics::loadFontFamilies()
      */
-    public function saveFontFamilies()
+    public function saveFontFamilies(): void
     {
         file_put_contents($this->getUserFontsFilePath(), json_encode($this->userFonts, JSON_PRETTY_PRINT));
     }
@@ -98,7 +98,7 @@ class FontMetrics
     /**
      * @deprecated
      */
-    public function load_font_families()
+    public function load_font_families(): void
     {
         $this->loadFontFamilies();
     }
@@ -108,7 +108,7 @@ class FontMetrics
      *
      * @see FontMetrics::saveFontFamilies()
      */
-    public function loadFontFamilies()
+    public function loadFontFamilies(): void
     {
         $file = $this->options->getRootDir() . "/lib/fonts/installed-fonts.dist.json";
         $this->bundledFonts = json_decode(file_get_contents($file), true);
@@ -120,7 +120,7 @@ class FontMetrics
         }
     }
 
-    private function loadFontFamiliesLegacy()
+    private function loadFontFamiliesLegacy(): void
     {
         $legacyCacheFile = $this->options->getFontDir() . '/dompdf_font_family_cache.php';
         if (is_readable($legacyCacheFile)) {
@@ -161,12 +161,10 @@ class FontMetrics
     }
 
     /**
-     * @param array $style
      * @param string $remoteFile
      * @param resource $context
-     * @return bool
      */
-    public function registerFont($style, $remoteFile, $context = null)
+    public function registerFont(array $style, $remoteFile, $context = null): bool
     {
         $fontname = mb_strtolower($style["family"], "UTF-8");
         $families = $this->getFontFamilies();
@@ -269,12 +267,9 @@ class FontMetrics
      * @param $text
      * @param $font
      * @param $size
-     * @param float $word_spacing
-     * @param float $char_spacing
-     * @return float
      * @deprecated
      */
-    public function get_text_width($text, $font, $size, $word_spacing = 0.0, $char_spacing = 0.0)
+    public function get_text_width(string $text, $font, float $size, float $word_spacing = 0.0, float $char_spacing = 0.0): float
     {
         //return self::$_pdf->get_text_width($text, $font, $size, $word_spacing, $char_spacing);
         return $this->getTextWidth($text, $font, $size, $word_spacing, $char_spacing);
@@ -288,8 +283,6 @@ class FontMetrics
      * @param float  $size        The font size, in points
      * @param float  $wordSpacing Word spacing, if any
      * @param float  $charSpacing Char spacing, if any
-     *
-     * @return float
      */
     public function getTextWidth(string $text, $font, float $size, float $wordSpacing = 0.0, float $charSpacing = 0.0): float
     {
@@ -335,7 +328,6 @@ class FontMetrics
      * @param string $subtype         The font subtype (italic, bold, etc.)
      * @param int    $count           The number of matches to return
      * @param bool   $returnSubstring Should the actual matched text be returned
-     * @return array
      */
     public function mapTextToFonts(string $text, array $fontFamilies, string $subtype = "normal", int $count = -1, bool $returnSubstring = false): array
     {
@@ -397,10 +389,9 @@ class FontMetrics
     /**
      * @param $font
      * @param $size
-     * @return float
      * @deprecated
      */
-    public function get_font_height($font, $size)
+    public function get_font_height($font, float $size): float
     {
         return $this->getFontHeight($font, $size);
     }
@@ -410,8 +401,6 @@ class FontMetrics
      *
      * @param string $font The font file to use
      * @param float  $size The font size, in points
-     *
-     * @return float
      */
     public function getFontHeight($font, float $size): float
     {
@@ -423,8 +412,6 @@ class FontMetrics
      *
      * @param string $font The font file to use
      * @param float  $size The font size, in points
-     *
-     * @return float
      */
     public function getFontBaseline($font, float $size): float
     {
@@ -545,11 +532,7 @@ class FontMetrics
         $family = str_replace(["'", '"'], "", mb_strtolower($family, "UTF-8"));
         $families = $this->getFontFamilies();
 
-        if (isset($families[$family])) {
-            return $families[$family];
-        }
-
-        return null;
+        return $families[$family] ?? null;
     }
 
     /**
@@ -613,16 +596,14 @@ class FontMetrics
 
     /**
      * Convert loaded fonts to font lookup table
-     *
-     * @return array
      */
-    public function setFontFamilies()
+    public function setFontFamilies(): void
     {
         $fontFamilies = [];
         if (isset($this->bundledFonts) && is_array($this->bundledFonts)) {
             foreach ($this->bundledFonts as $family => $variants) {
                 if (!isset($fontFamilies[$family])) {
-                    $fontFamilies[$family] = array_map(function ($variant) {
+                    $fontFamilies[$family] = array_map(function (string $variant): string {
                         return $this->getOptions()->getRootDir() . '/lib/fonts/' . $variant;
                     }, $variants);
                 }
@@ -647,7 +628,7 @@ class FontMetrics
      * @param mixed $entry
      * @deprecated
      */
-    public function set_font_family($fontname, $entry)
+    public function set_font_family($fontname, $entry): void
     {
         $this->setFontFamily($fontname, $entry);
     }
@@ -656,26 +637,22 @@ class FontMetrics
      * @param string $fontname
      * @param mixed $entry
      */
-    public function setFontFamily($fontname, $entry)
+    public function setFontFamily($fontname, $entry): void
     {
         $this->userFonts[mb_strtolower($fontname, "UTF-8")] = $entry;
         $this->saveFontFamilies();
         unset($this->fontFamilies);
     }
 
-    /**
-     * @return string
-     */
-    public function getUserFontsFilePath()
+    public function getUserFontsFilePath(): string
     {
         return $this->options->getFontDir() . '/' . self::USER_FONTS_FILE;
     }
 
     /**
-     * @param Options $options
      * @return $this
      */
-    public function setOptions(Options $options)
+    public function setOptions(Options $options): self
     {
         $this->options = $options;
         unset($this->fontFamilies);
@@ -691,10 +668,9 @@ class FontMetrics
     }
 
     /**
-     * @param Canvas $canvas
      * @return $this
      */
-    public function setCanvas(Canvas $canvas)
+    public function setCanvas(Canvas $canvas): self
     {
         $this->canvas = $canvas;
         return $this;

@@ -15,7 +15,7 @@ use Dompdf\Frame;
  */
 class Inline extends AbstractRenderer
 {
-    function render(Frame $frame)
+    function render(Frame $frame): void
     {
         // Get the first in-flow child
         $child = $frame->get_first_child();

@@ -19,7 +19,6 @@ class Inline extends AbstractFrameReflower
 {
     /**
      * Inline constructor.
-     * @param InlineFrameDecorator $frame
      */
     function __construct(InlineFrameDecorator $frame)
     {
@@ -32,8 +31,6 @@ class Inline extends AbstractFrameReflower
      * Regular inline frames are positioned together with their text (or inline)
      * children after child reflow. Empty inline frames have no children that
      * could determine the positioning, so they need to be handled separately.
-     *
-     * @param BlockFrameDecorator $block
      */
     protected function reflow_empty(BlockFrameDecorator $block): void
     {
@@ -71,10 +68,7 @@ class Inline extends AbstractFrameReflower
         $block->add_frame_to_line($frame);
     }
 
-    /**
-     * @param BlockFrameDecorator|null $block
-     */
-    function reflow(?BlockFrameDecorator $block = null)
+    function reflow(?BlockFrameDecorator $block = null): void
     {
         /** @var InlineFrameDecorator */
         $frame = $this->_frame;

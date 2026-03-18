@@ -54,7 +54,6 @@ abstract class AbstractFrameReflower
 
     /**
      * AbstractFrameReflower constructor.
-     * @param AbstractFrameDecorator $frame
      */
     function __construct(AbstractFrameDecorator $frame)
     {
@@ -247,10 +246,7 @@ abstract class AbstractFrameReflower
      *
      * See http://www.w3.org/TR/CSS21/box.html#collapsing-margins.
      *
-     * @param float $l1
-     * @param float $l2
      *
-     * @return float
      */
     private function get_collapsed_margin_length(float $l1, float $l2): float
     {
@@ -300,9 +296,6 @@ abstract class AbstractFrameReflower
         }
     }
 
-    /**
-     * @param Block|null $block
-     */
     abstract function reflow(?Block $block = null);
 
     /**
@@ -312,8 +305,6 @@ abstract class AbstractFrameReflower
      * width is not defined.
      *
      * @param float|null $cbw Width of the containing block.
-     *
-     * @return float
      */
     protected function resolve_min_width(?float $cbw): float
     {
@@ -332,8 +323,6 @@ abstract class AbstractFrameReflower
      * width is not defined.
      *
      * @param float|null $cbw Width of the containing block.
-     *
-     * @return float
      */
     protected function resolve_max_width(?float $cbw): float
     {
@@ -352,8 +341,6 @@ abstract class AbstractFrameReflower
      * height is not defined.
      *
      * @param float|null $cbh Height of the containing block.
-     *
-     * @return float
      */
     protected function resolve_min_height(?float $cbh): float
     {
@@ -372,8 +359,6 @@ abstract class AbstractFrameReflower
      * height is not defined.
      *
      * @param float|null $cbh Height of the containing block.
-     *
-     * @return float
      */
     protected function resolve_max_height(?float $cbh): float
     {
@@ -434,7 +419,7 @@ abstract class AbstractFrameReflower
                 $child = $iter->current();
                 $child->get_reflower()->_set_content();
                 if (!$iter->current()->is_absolute()) {
-                    list($low[], $high[]) = $child->get_min_max_width();
+                    [$low[], $high[]] = $child->get_min_max_width();
                 }
             }
         }

@@ -493,7 +493,7 @@ class Style
      *
      * @var array<string, mixed>
      */
-    protected static $_defaults = null;
+    protected static $_defaults;
 
     /**
      * Lookup table for properties that inherit by default.
@@ -736,17 +736,17 @@ class Style
      *
      * @var float|string|null
      */
-    private $_computed_bottom_spacing = null;
+    private $_computed_bottom_spacing;
 
     /**
      * @var bool|null
      */
-    private $has_border_radius_cache = null;
+    private $has_border_radius_cache;
 
     /**
      * @var array|null
      */
-    private $resolved_border_radius = null;
+    private $resolved_border_radius;
 
     /**
      * @var FontMetrics
@@ -755,7 +755,6 @@ class Style
 
     /**
      * @param Stylesheet $stylesheet The stylesheet the style is associated with.
-     * @param int        $origin
      */
     public function __construct(Stylesheet $stylesheet, int $origin = Stylesheet::ORIG_AUTHOR)
     {
@@ -955,49 +954,31 @@ class Style
         $this->non_final_used = [];
     }
 
-    /**
-     * @param array $media_queries
-     */
     public function set_media_queries(array $media_queries): void
     {
         $this->_media_queries = $media_queries;
     }
 
-    /**
-     * @return array
-     */
     public function get_media_queries(): array
     {
         return $this->_media_queries;
     }
 
-    /**
-     * @param Frame $frame
-     */
     public function set_frame(Frame $frame): void
     {
         $this->_frame = $frame;
     }
 
-    /**
-     * @return Frame|null
-     */
     public function get_frame(): ?Frame
     {
         return $this->_frame;
     }
 
-    /**
-     * @param int $origin
-     */
     public function set_origin(int $origin): void
     {
         $this->_origin = $origin;
     }
 
-    /**
-     * @return int
-     */
     public function get_origin(): int
     {
         return $this->_origin;
@@ -1005,8 +986,6 @@ class Style
 
     /**
      * Returns the {@link Stylesheet} the style is associated with.
-     *
-     * @return Stylesheet
      */
     public function get_stylesheet(): Stylesheet
     {
@@ -1182,7 +1161,6 @@ class Style
     /**
      * Shunting-yard Algorithm
      * @param string $expr infix expression
-     * @return array
      */
     private function parse_func(string $expr): array
     {
@@ -1238,10 +1216,6 @@ class Style
 
     /**
      * Reverse Polish Notation
-     * @param array $rpn
-     * @param float $ref_size
-     * @param float|null $font_size
-     * @return float|null
      */
     private function evaluate_func(array $rpn, float $ref_size = 0, ?float $font_size = null): ?float
     {
@@ -1398,7 +1372,7 @@ class Style
      * This function receives the whole content of the var() function, which
      * can also include a fallback value.
      */
-    private function parse_var($matches) {
+    private function parse_var(array $matches) {
         $variable = is_array($matches) ? $matches[1] : $matches;
 
         if (\in_array($variable, $this->_var_stack, true)) {
@@ -1430,8 +1404,6 @@ class Style
      * default values, in case no parent style exists.
      *
      * https://www.w3.org/TR/css-cascade-3/#inheriting
-     *
-     * @param Style|null $parent
      */
     public function inherit(?Style $parent = null): void
     {
@@ -1496,8 +1468,6 @@ class Style
 
     /**
      * Override properties in this style with those in $style
-     *
-     * @param Style $style
      */
     public function merge(Style $style): void
     {
@@ -1729,7 +1699,7 @@ class Style
             //TODO: this should be a directed dependency map
             if ($this->is_custom_property($prop) && !\in_array($prop, $this->_prop_stack, true)) {
                 array_push($this->_prop_stack, $prop);
-                $specified_props = array_filter($this->_props, function($key) {
+                $specified_props = array_filter($this->_props, function($key): bool {
                     return \array_key_exists($key, $this->_props_specified);
                 }, ARRAY_FILTER_USE_KEY); // copy existing props filtered by those set explicitly before parsing vars
                 foreach ($specified_props as $specified_prop => $specified_value) {
@@ -1765,7 +1735,6 @@ class Style
     /**
      * Get the specified value of a style property.
      *
-     * @param string $prop
      *
      * @return mixed
      * @throws Exception
@@ -1861,7 +1830,6 @@ class Style
      * Get the used or computed value of a style property, depending on whether
      * the used value has been determined yet.
      *
-     * @param string $prop
      *
      * @return mixed
      * @throws Exception
@@ -1893,21 +1861,18 @@ class Style
             // sub-property values
             if (self::$_methods_cache[$method]) {
                 return $this->$method();
-            } else {
-                return implode(" ", array_map(function ($sub_prop) {
-                    $val = $this->__get($sub_prop);
-                    return \is_array($val) ? implode(" ", $val) : $val;
-                }, self::$_props_shorthand[$prop]));
             }
-        } else {
-            $computed = $this->computed($prop);
-            $used = self::$_methods_cache[$method]
-                ? $this->$method($computed)
-                : $computed;
-
-            $this->_props_used[$prop] = $used;
-            return $used;
+            return implode(" ", array_map(function (string $sub_prop) {
+                $val = $this->__get($sub_prop);
+                return \is_array($val) ? implode(" ", $val) : $val;
+            }, self::$_props_shorthand[$prop]));
         }
+        $computed = $this->computed($prop);
+        $used = self::$_methods_cache[$method]
+            ? $this->$method($computed)
+            : $computed;
+        $this->_props_used[$prop] = $used;
+        return $used;
     }
 
     /**
@@ -1942,14 +1907,14 @@ class Style
         if (!isset(self::$_methods_cache[$method])) {
             self::$_methods_cache[$method] = method_exists($this, $method);
         }
-
         if (self::$_methods_cache[$method]) {
             return $this->$method($val);
-        } elseif ($val !== "") {
-            return strtolower($val);
-        } else {
-            return null;
         }
+
+        if ($val !== "") {
+            return strtolower($val);
+        }
+        return null;
     }
 
     /**
@@ -2016,9 +1981,6 @@ class Style
         return Color::parse($color);
     }
 
-    /**
-     * @return string
-     */
     public function get_font_family_raw(): string
     {
         return trim($this->_props["font_family"], " \t\n\r\x0B\"'");
@@ -2039,10 +2001,8 @@ class Style
      * actual font file.
      *
      * @param string[] $computed
-     * @return string
      *
      * @throws Exception
-     *
      * @link https://www.w3.org/TR/CSS21/fonts.html#propdef-font-family
      */
     protected function _get_font_family($computed): string
@@ -2079,11 +2039,10 @@ class Style
 
     /**
      * @param float $computed
-     * @return float
      *
      * @link https://www.w3.org/TR/CSS21/fonts.html#propdef-font-size
      */
-    protected function _get_font_size($computed)
+    protected function _get_font_size($computed): float
     {
         // Computed value may be negative when specified via `calc()`
         return max($computed, 0.0);
@@ -2095,7 +2054,7 @@ class Style
      *
      * @link https://www.w3.org/TR/css-text-4/#word-spacing-property
      */
-    protected function _get_word_spacing($computed)
+    protected function _get_word_spacing($computed): ?float
     {
         if (\is_float($computed)) {
             return $computed;
@@ -2112,7 +2071,7 @@ class Style
      *
      * @link https://www.w3.org/TR/css-text-4/#letter-spacing-property
      */
-    protected function _get_letter_spacing($computed)
+    protected function _get_letter_spacing($computed): ?float
     {
         if (\is_float($computed)) {
             return $computed;
@@ -2147,7 +2106,6 @@ class Style
 
     /**
      * @param string $computed
-     * @param bool   $current_is_parent
      *
      * @return array|string
      */
@@ -2204,7 +2162,6 @@ class Style
      * Returns the background image URI, or "none"
      *
      * @param string $computed
-     * @return string
      *
      * @link https://www.w3.org/TR/CSS21/colors.html#propdef-background-image
      */
@@ -2266,8 +2223,6 @@ class Style
      *                      "color" => [border-color (array)]),
      *       "bottom" ... )
      * ```
-     *
-     * @return array
      */
     public function get_border_properties(): array
     {
@@ -2297,9 +2252,6 @@ class Style
 
     /**
      * Return a single border-side property
-     *
-     * @param string $side
-     * @return string
      */
     protected function get_border_side(string $side): string
     {
@@ -2317,7 +2269,6 @@ class Style
      * `[width] [style] [color]`
      * e.g. "1px solid blue"
      *
-     * @return string
      *
      * @link https://www.w3.org/TR/CSS21/box.html#border-shorthand-properties
      */
@@ -2326,25 +2277,16 @@ class Style
         return $this->get_border_side("top");
     }
 
-    /**
-     * @return string
-     */
     protected function _get_border_right(): string
     {
         return $this->get_border_side("right");
     }
 
-    /**
-     * @return string
-     */
     protected function _get_border_bottom(): string
     {
         return $this->get_border_side("bottom");
     }
 
-    /**
-     * @return string
-     */
     protected function _get_border_left(): string
     {
         return $this->get_border_side("left");
@@ -2469,7 +2411,6 @@ class Style
 
     /**
      * @param string $computed
-     * @return string
      *
      * @link https://www.w3.org/TR/css-ui-4/#propdef-outline-style
      */
@@ -2485,7 +2426,6 @@ class Style
      * `[width] [style] [color]`
      * e.g. "1px solid blue"
      *
-     * @return string
      *
      * @link https://www.w3.org/TR/CSS21/box.html#border-shorthand-properties
      */
@@ -2502,7 +2442,6 @@ class Style
      * Returns the list style image URI, or "none"
      *
      * @param string $computed
-     * @return string
      *
      * @link https://www.w3.org/TR/CSS21/generate.html#propdef-list-style-image
      */
@@ -2529,11 +2468,9 @@ class Style
     }
 
     /*==============================*/
-
     /**
      * Parse a property value into its components.
      *
-     * @param string $value
      *
      * @return string[]
      */
@@ -2568,10 +2505,6 @@ class Style
             || preg_match("/^#|rgb\(|rgba\(|cmyk\(/", $val);
     }
 
-    /**
-     * @param string $val
-     * @return string|null
-     */
     protected function compute_color_value(string $val): ?string
     {
         // https://www.w3.org/TR/css-color-4/#resolving-other-colors
@@ -2587,10 +2520,6 @@ class Style
         return \is_array($munged_color) ? $munged_color["hex"] : $munged_color;
     }
 
-    /**
-     * @param string $val
-     * @return int|null
-     */
     protected function compute_integer(string $val): ?int
     {
         $integer = self::CSS_INTEGER;
@@ -2599,10 +2528,6 @@ class Style
             : null;
     }
 
-    /**
-     * @param string $val
-     * @return float|null
-     */
     protected function compute_number(string $val): ?float
     {
         $number = self::CSS_NUMBER;
@@ -2611,10 +2536,6 @@ class Style
             : null;
     }
 
-    /**
-     * @param string $val
-     * @return float|null
-     */
     protected function compute_length(string $val): ?float
     {
         return strpos($val, "%") === false
@@ -2622,10 +2543,6 @@ class Style
             : null;
     }
 
-    /**
-     * @param string $val
-     * @return float|null
-     */
     protected function compute_length_positive(string $val): ?float
     {
         $computed = $this->compute_length($val);
@@ -2641,7 +2558,6 @@ class Style
     }
 
     /**
-     * @param string $val
      * @return float|string|null
      */
     protected function compute_length_percentage(string $val)
@@ -2659,7 +2575,6 @@ class Style
     }
 
     /**
-     * @param string $val
      * @return float|string|null
      */
     protected function compute_length_percentage_positive(string $val)
@@ -2680,10 +2595,8 @@ class Style
     }
 
     /**
-     * @param string $val
      * @param string $style_prop The corresponding border-/outline-style property.
      *
-     * @return float|null
      *
      * @link https://www.w3.org/TR/css-backgrounds-3/#typedef-line-width
      */
@@ -2715,10 +2628,6 @@ class Style
         return $hasLineStyle ? $computed : 0.0;
     }
 
-    /**
-     * @param string $val
-     * @return string|null
-     */
     protected function compute_border_style(string $val): ?string
     {
         $val = strtolower($val);
@@ -2726,8 +2635,6 @@ class Style
     }
 
     /**
-     * @param string $val
-     * @return float|null
      *
      * @link https://www.w3.org/TR/css3-values/#angles
      */
@@ -2760,8 +2667,6 @@ class Style
     /**
      * Common computation logic for `background-position` and `transform-origin`.
      *
-     * @param string $v1
-     * @param string $v2
      *
      * @return (float|string|null)[]
      */
@@ -2905,31 +2810,30 @@ class Style
         // https://www.w3.org/TR/CSS21/visuren.html#dis-pos-flo
         if ($this->is_in_flow()) {
             return $val;
-        } else {
-            switch ($val) {
-                case "inline":
-                case "inline-block":
-                // case "table-row-group":
-                // case "table-header-group":
-                // case "table-footer-group":
-                // case "table-row":
-                // case "table-cell":
-                // case "table-column-group":
-                // case "table-column":
-                // case "table-caption":
-                    return "block";
-                case "inline-table":
-                    return "table";
-                default:
-                    return $val;
-            }
+        }
+        switch ($val) {
+            case "inline":
+            case "inline-block":
+            // case "table-row-group":
+            // case "table-header-group":
+            // case "table-footer-group":
+            // case "table-row":
+            // case "table-cell":
+            // case "table-column-group":
+            // case "table-column":
+            // case "table-caption":
+                return "block";
+            case "inline-table":
+                return "table";
+            default:
+                return $val;
         }
     }
 
     /**
      * @link https://www.w3.org/TR/CSS21/colors.html#propdef-color
      */
-    protected function _compute_color(string $color)
+    protected function _compute_color(string $color): ?string
     {
         return $this->compute_color_value($color);
     }
@@ -2937,7 +2841,7 @@ class Style
     /**
      * @link https://www.w3.org/TR/CSS21/colors.html#propdef-background-color
      */
-    protected function _compute_background_color(string $color)
+    protected function _compute_background_color(string $color): ?string
     {
         return $this->compute_color_value($color);
     }
@@ -2945,21 +2849,20 @@ class Style
     /**
      * @link https://www.w3.org/TR/CSS21/colors.html#propdef-background-image
      */
-    protected function _compute_background_image(string $val)
+    protected function _compute_background_image(string $val): string
     {
         $parsed_val = $this->_stylesheet->resolve_url($val);
 
         if ($parsed_val === "none") {
             return "none";
-        } else {
-            return "url(\"" . str_replace("\"", "\\\"", $parsed_val) . "\")";
         }
+        return "url(\"" . str_replace("\"", "\\\"", $parsed_val) . "\")";
     }
 
     /**
      * @link https://www.w3.org/TR/CSS21/colors.html#propdef-background-repeat
      */
-    protected function _compute_background_repeat(string $val)
+    protected function _compute_background_repeat(string $val): ?string
     {
         $keywords = ["repeat", "repeat-x", "repeat-y", "no-repeat"];
         $val = strtolower($val);
@@ -2969,7 +2872,7 @@ class Style
     /**
      * @link https://www.w3.org/TR/CSS21/colors.html#propdef-background-attachment
      */
-    protected function _compute_background_attachment(string $val)
+    protected function _compute_background_attachment(string $val): ?string
     {
         $keywords = ["scroll", "fixed"];
         $val = strtolower($val);
@@ -2979,7 +2882,7 @@ class Style
     /**
      * @link https://www.w3.org/TR/CSS21/colors.html#propdef-background-position
      */
-    protected function _compute_background_position(string $val)
+    protected function _compute_background_position(string $val): ?array
     {
         $val = strtolower($val);
         $parts = $this->parse_property_value($val);
@@ -3094,10 +2997,10 @@ class Style
     /**
      * @link https://www.w3.org/TR/CSS21/fonts.html#propdef-font-family
      */
-    protected function _compute_font_family(string $val)
+    protected function _compute_font_family(string $val): array
     {
         return array_map(
-            function ($name) {
+            function ($name): string {
                 return trim($name, " '\"");
             },
             preg_split("/\s*,\s*/", $val)
@@ -3151,7 +3054,7 @@ class Style
     /**
      * @link https://www.w3.org/TR/CSS21/fonts.html#propdef-font-style
      */
-    protected function _compute_font_style(string $val)
+    protected function _compute_font_style(string $val): ?string
     {
         $val = strtolower($val);
         return $val === "normal" || $val === "italic" || $val === "oblique"
@@ -3178,32 +3081,34 @@ class Style
                 $w = isset($this->parent_style)
                     ? $this->parent_style->__get("font_weight")
                     : 400;
-
                 if ($w < 350) {
                     return 400;
-                } elseif ($w < 550) {
-                    return 700;
-                } elseif ($w < 900) {
-                    return 900;
-                } else {
-                    return $w;
                 }
+                if ($w < 550) {
+                    return 700;
+                }
+
+                if ($w < 900) {
+                    return 900;
+                }
+                return $w;
 
             case "lighter":
                 // https://www.w3.org/TR/css-fonts-4/#relative-weights
                 $w = isset($this->parent_style)
                     ? $this->parent_style->__get("font_weight")
                     : 400;
-
                 if ($w < 100) {
                     return $w;
-                } elseif ($w < 550) {
-                    return 100;
-                } elseif ($w < 750) {
-                    return 400;
-                } else {
-                    return 700;
                 }
+                if ($w < 550) {
+                    return 100;
+                }
+
+                if ($w < 750) {
+                    return 400;
+                }
+                return 700;
 
             default:
                 $number = self::CSS_NUMBER;
@@ -3219,7 +3124,7 @@ class Style
     /**
      * @link https://www.w3.org/TR/css-fonts-4/#src-desc
      */
-    protected function _compute_src(string $val)
+    protected function _compute_src(string $val): string
     {
         return $val;
     }
@@ -3313,7 +3218,7 @@ class Style
      *
      * @link https://www.w3.org/TR/CSS21/text.html#propdef-text-align
      */
-    protected function _compute_text_align(string $val)
+    protected function _compute_text_align(string $val): ?string
     {
         $alignment = strtolower($val);
 
@@ -3371,7 +3276,7 @@ class Style
 
         // Compute number values to string and lengths to float (in pt)
         if (is_numeric($val)) {
-            return (string) $val;
+            return $val;
         }
 
         $font_size = $this->__get("font_size");
@@ -3398,12 +3303,12 @@ class Style
     /**
      * @link https://www.w3.org/TR/CSS21/page.html#propdef-page-break-before
      */
-    protected function _compute_page_break_before(string $val)
+    protected function _compute_page_break_before(string $val): string
     {
         $break = strtolower($val);
 
         if ($break === "left" || $break === "right") {
-            $break = "always";
+            return "always";
         }
 
         return $break;
@@ -3412,12 +3317,12 @@ class Style
     /**
      * @link https://www.w3.org/TR/CSS21/page.html#propdef-page-break-after
      */
-    protected function _compute_page_break_after(string $val)
+    protected function _compute_page_break_after(string $val): string
     {
         $break = strtolower($val);
 
         if ($break === "left" || $break === "right") {
-            $break = "always";
+            return "always";
         }
 
         return $break;
@@ -3521,7 +3426,6 @@ class Style
     }
 
     /**
-     * @param string $val
      * @return float|string|null
      */
     protected function compute_box_inset(string $val)
@@ -3565,7 +3469,6 @@ class Style
     }
 
     /**
-     * @param string $val
      * @return float|string|null
      */
     protected function compute_margin(string $val)
@@ -3614,7 +3517,6 @@ class Style
     }
 
     /**
-     * @param string $val
      * @return float|string|null
      */
     protected function compute_padding(string $val)
@@ -3700,11 +3602,6 @@ class Style
         );
     }
 
-    /**
-     * @param string $prop
-     * @param string $value
-     * @return array
-     */
     protected function set_border_side(string $prop, string $value): array
     {
         $values = $this->parse_border_side($value);
@@ -3744,22 +3641,22 @@ class Style
         return $this->set_quad_shorthand("border_color", $val);
     }
 
-    protected function _compute_border_top_color(string $val)
+    protected function _compute_border_top_color(string $val): ?string
     {
         return $this->compute_color_value($val);
     }
 
-    protected function _compute_border_right_color(string $val)
+    protected function _compute_border_right_color(string $val): ?string
     {
         return $this->compute_color_value($val);
     }
 
-    protected function _compute_border_bottom_color(string $val)
+    protected function _compute_border_bottom_color(string $val): ?string
     {
         return $this->compute_color_value($val);
     }
 
-    protected function _compute_border_left_color(string $val)
+    protected function _compute_border_left_color(string $val): ?string
     {
         return $this->compute_color_value($val);
     }
@@ -3772,22 +3669,22 @@ class Style
         return $this->set_quad_shorthand("border_style", $val);
     }
 
-    protected function _compute_border_top_style(string $val)
+    protected function _compute_border_top_style(string $val): ?string
     {
         return $this->compute_border_style($val);
     }
 
-    protected function _compute_border_right_style(string $val)
+    protected function _compute_border_right_style(string $val): ?string
     {
         return $this->compute_border_style($val);
     }
 
-    protected function _compute_border_bottom_style(string $val)
+    protected function _compute_border_bottom_style(string $val): ?string
     {
         return $this->compute_border_style($val);
     }
 
-    protected function _compute_border_left_style(string $val)
+    protected function _compute_border_left_style(string $val): ?string
     {
         return $this->compute_border_style($val);
     }
@@ -3800,22 +3697,22 @@ class Style
         return $this->set_quad_shorthand("border_width", $val);
     }
 
-    protected function _compute_border_top_width(string $val)
+    protected function _compute_border_top_width(string $val): ?float
     {
         return $this->compute_line_width($val, "border_top_style");
     }
 
-    protected function _compute_border_right_width(string $val)
+    protected function _compute_border_right_width(string $val): ?float
     {
         return $this->compute_line_width($val, "border_right_style");
     }
 
-    protected function _compute_border_bottom_width(string $val)
+    protected function _compute_border_bottom_width(string $val): ?float
     {
         return $this->compute_line_width($val, "border_bottom_style");
     }
 
-    protected function _compute_border_left_width(string $val)
+    protected function _compute_border_left_width(string $val): ?float
     {
         return $this->compute_line_width($val, "border_left_style");
     }
@@ -3864,18 +3761,18 @@ class Style
         return array_combine(self::$_props_shorthand["outline"], $values);
     }
 
-    protected function _compute_outline_color(string $val)
+    protected function _compute_outline_color(string $val): ?string
     {
         return $this->compute_color_value($val);
     }
 
-    protected function _compute_outline_style(string $val)
+    protected function _compute_outline_style(string $val): ?string
     {
         $val = strtolower($val);
         return \in_array($val, self::OUTLINE_STYLES, true) ? $val : null;
     }
 
-    protected function _compute_outline_width(string $val)
+    protected function _compute_outline_width(string $val): ?float
     {
         return $this->compute_line_width($val, "outline_style");
     }
@@ -3883,7 +3780,7 @@ class Style
     /**
      * @link https://www.w3.org/TR/css-ui-4/#propdef-outline-offset
      */
-    protected function _compute_outline_offset(string $val)
+    protected function _compute_outline_offset(string $val): ?float
     {
         return $this->compute_length($val);
     }
@@ -3894,7 +3791,7 @@ class Style
      *
      * @link https://www.w3.org/TR/CSS21/tables.html#propdef-border-spacing
      */
-    protected function _compute_border_spacing(string $val)
+    protected function _compute_border_spacing(string $val): ?array
     {
         $val = strtolower($val);
         $parts = $this->parse_property_value($val);
@@ -3919,21 +3816,20 @@ class Style
     /**
      * @link https://www.w3.org/TR/CSS21/generate.html#propdef-list-style-image
      */
-    protected function _compute_list_style_image(string $val)
+    protected function _compute_list_style_image(string $val): string
     {
         $parsed_val = $this->_stylesheet->resolve_url($val);
 
         if ($parsed_val === "none") {
             return "none";
-        } else {
-            return "url(\"" . str_replace("\"", "\\\"", $parsed_val) . "\")";
         }
+        return "url(\"" . str_replace("\"", "\\\"", $parsed_val) . "\")";
     }
 
     /**
      * @link https://www.w3.org/TR/CSS21/generate.html#propdef-list-style-type
      */
-    protected function _compute_list_style_position(string $val)
+    protected function _compute_list_style_position(string $val): ?string
     {
         $val = strtolower($val);
         return $val === "inside" || $val === "outside" ? $val : null;
@@ -4019,9 +3915,6 @@ class Style
     }
 
     /**
-     * @param string $value
-     * @param int    $default
-     * @param bool   $sumDuplicates
      *
      * @return array|string|null
      */
@@ -4136,18 +4029,22 @@ class Style
             }
 
             $lower = strtolower($value);
-
             // Keywords
             if ($lower === "open-quote") {
                 $parts[] = new OpenQuote;
                 continue;
-            } elseif ($lower === "close-quote") {
+            }
+            if ($lower === "close-quote") {
                 $parts[] = new CloseQuote;
                 continue;
-            } elseif ($lower === "no-open-quote") {
+            }
+            if ($lower === "no-open-quote") {
                 $parts[] = new NoOpenQuote;
                 continue;
-            } elseif ($lower === "no-close-quote") {
+            }
+
+            // Keywords
+            if ($lower === "no-close-quote") {
                 $parts[] = new NoCloseQuote;
                 continue;
             }
@@ -4296,7 +4193,7 @@ class Style
     /**
      * @link https://www.w3.org/TR/css-transforms-1/#transform-property
      */
-    protected function _compute_transform(string $val)
+    protected function _compute_transform(string $val): ?array
     {
         $val = strtolower($val);
 
@@ -4319,7 +4216,7 @@ class Style
             $name = $matches[1];
             $arguments = trim($matches[2]);
             $values = $this->parse_property_value($arguments);
-            $values = array_values(array_filter($values, function ($v) {
+            $values = array_values(array_filter($values, function (string $v): bool {
                 return $v !== ",";
             }));
             $count = \count($values);
@@ -4453,7 +4350,7 @@ class Style
     /**
      * @link https://www.w3.org/TR/css-transforms-1/#transform-origin-property
      */
-    protected function _compute_transform_origin(string $val)
+    protected function _compute_transform_origin(string $val): ?array
     {
         $val = strtolower($val);
         $parts = $this->parse_property_value($val);
@@ -4475,10 +4372,6 @@ class Style
         return [$x, $y, $z];
     }
 
-    /**
-     * @param string $val
-     * @return string|null
-     */
     protected function parse_image_resolution(string $val): ?string
     {
         // If exif data could be get:
@@ -4497,7 +4390,7 @@ class Style
     /**
      * auto | normal | dpi
      */
-    protected function _compute_background_image_resolution(string $val)
+    protected function _compute_background_image_resolution(string $val): ?string
     {
         return $this->parse_image_resolution($val);
     }
@@ -4505,7 +4398,7 @@ class Style
     /**
      * auto | normal | dpi
      */
-    protected function _compute_image_resolution(string $val)
+    protected function _compute_image_resolution(string $val): ?string
     {
         return $this->parse_image_resolution($val);
     }
@@ -4513,7 +4406,7 @@ class Style
     /**
      * @link https://www.w3.org/TR/css-break-3/#propdef-orphans
      */
-    protected function _compute_orphans(string $val)
+    protected function _compute_orphans(string $val): ?int
     {
         return $this->compute_integer($val);
     }
@@ -4521,7 +4414,7 @@ class Style
     /**
      * @link https://www.w3.org/TR/css-break-3/#propdef-widows
      */
-    protected function _compute_widows(string $val)
+    protected function _compute_widows(string $val): ?int
     {
         return $this->compute_integer($val);
     }
@@ -4529,7 +4422,7 @@ class Style
     /**
      * @link https://www.w3.org/TR/css-color-4/#propdef-opacity
      */
-    protected function _compute_opacity(string $val)
+    protected function _compute_opacity(string $val): ?float
     {
         $number = self::CSS_NUMBER;
         $pattern = "/^($number)(%?)$/";
@@ -4560,10 +4453,9 @@ class Style
     }
 
     /**
-     * @param FontMetrics $fontMetrics
      * @return $this
      */
-    public function setFontMetrics(FontMetrics $fontMetrics)
+    public function setFontMetrics(FontMetrics $fontMetrics): self
     {
         $this->fontMetrics = $fontMetrics;
         return $this;
@@ -4582,8 +4474,6 @@ class Style
      *
      * This dumps the entire property array into a string via print_r.  Useful
      * for debugging.
-     *
-     * @return string
      */
     /*DEBUGCSS print: see below additional debugging util*/
     public function __toString(): string

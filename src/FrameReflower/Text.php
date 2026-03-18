@@ -55,10 +55,6 @@ class Text extends AbstractFrameReflower
      */
     private $fontMetrics;
 
-    /**
-     * @param TextFrameDecorator $frame
-     * @param FontMetrics $fontMetrics
-     */
     public function __construct(TextFrameDecorator $frame, FontMetrics $fontMetrics)
     {
         parent::__construct($frame);
@@ -70,9 +66,6 @@ class Text extends AbstractFrameReflower
      *
      * * http://www.w3.org/TR/CSS21/text.html#propdef-text-transform
      * * http://www.w3.org/TR/CSS21/text.html#propdef-white-space
-     *
-     * @param string $text
-     * @return string
      */
     protected function pre_process_text(string $text): string
     {
@@ -116,9 +109,6 @@ class Text extends AbstractFrameReflower
     }
 
     /**
-     * @param string              $text
-     * @param BlockFrameDecorator $block
-     * @param bool                $nowrap
      *
      * @return int|false
      */
@@ -241,13 +231,10 @@ class Text extends AbstractFrameReflower
                 $str = $word;
             }
         }
-
-        $offset = mb_strlen($str, "UTF-8");
-        return $offset;
+        return mb_strlen($str, "UTF-8");
     }
 
     /**
-     * @param string $text
      * @return int|false
      */
     protected function newline_break(string $text)
@@ -260,7 +247,6 @@ class Text extends AbstractFrameReflower
     }
 
     /**
-     * @param BlockFrameDecorator $block
      * @return bool|null Whether to add a new line at the end. `null` if reflow
      *         should be stopped.
      */
@@ -370,10 +356,9 @@ class Text extends AbstractFrameReflower
     }
 
     /**
-     * @param BlockFrameDecorator|null $block
      * @throws Exception
      */
-    function reflow(?BlockFrameDecorator $block = null)
+    function reflow(?BlockFrameDecorator $block = null): void
     {
         $frame = $this->_frame;
         $page = $frame->get_root();
@@ -513,7 +498,7 @@ class Text extends AbstractFrameReflower
                 } else {
                     // Find the longest word
                     $words = preg_split(self::$_wordbreak_pattern, $text, -1, PREG_SPLIT_DELIM_CAPTURE);
-                    $lengths = array_map(function ($chunk) use ($fontMetrics, $font, $size, $word_spacing, $letter_spacing) {
+                    $lengths = array_map(function (array $chunk) use ($fontMetrics, $font, $size, $word_spacing, $letter_spacing) {
                         // Allow trailing white space to overflow. As in actual
                         // layout above, only handle a single space for now
                         $sep = $chunk[1] ?? "";
@@ -527,7 +512,7 @@ class Text extends AbstractFrameReflower
             case "pre":
                 // Find the longest line
                 $lines = array_flip(preg_split("/\R/u", $visible_text));
-                array_walk($lines, function (&$chunked_text_width, $chunked_text) use ($fontMetrics, $font, $size, $word_spacing, $letter_spacing) {
+                array_walk($lines, function (&$chunked_text_width, string $chunked_text) use ($fontMetrics, $font, $size, $word_spacing, $letter_spacing): void {
                     $chunked_text_width = $fontMetrics->getTextWidth($chunked_text, $font, $size, $word_spacing, $letter_spacing);
                 });
                 arsort($lines);
@@ -550,7 +535,7 @@ class Text extends AbstractFrameReflower
             case "pre-wrap":
                 // Find the longest line
                 $lines = array_flip(preg_split("/\R/u", $visible_text));
-                array_walk($lines, function (&$chunked_text_width, $chunked_text) use ($fontMetrics, $font, $size, $word_spacing, $letter_spacing) {
+                array_walk($lines, function (&$chunked_text_width, string $chunked_text) use ($fontMetrics, $font, $size, $word_spacing, $letter_spacing): void {
                     $chunked_text_width = $fontMetrics->getTextWidth($chunked_text, $font, $size, $word_spacing, $letter_spacing);
                 });
                 arsort($lines);
@@ -582,10 +567,9 @@ class Text extends AbstractFrameReflower
     }
 
     /**
-     * @param FontMetrics $fontMetrics
      * @return $this
      */
-    public function setFontMetrics(FontMetrics $fontMetrics)
+    public function setFontMetrics(FontMetrics $fontMetrics): self
     {
         $this->fontMetrics = $fontMetrics;
         return $this;

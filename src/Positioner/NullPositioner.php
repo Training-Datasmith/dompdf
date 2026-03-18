@@ -16,11 +16,7 @@ use Dompdf\FrameDecorator\AbstractFrameDecorator;
 class NullPositioner extends AbstractPositioner
 {
 
-    /**
-     * @param AbstractFrameDecorator $frame
-     */
     function position(AbstractFrameDecorator $frame): void
     {
-        return;
     }
 }

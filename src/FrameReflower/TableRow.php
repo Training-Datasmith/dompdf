@@ -20,17 +20,13 @@ class TableRow extends AbstractFrameReflower
 {
     /**
      * TableRow constructor.
-     * @param TableRowFrameDecorator $frame
      */
     function __construct(TableRowFrameDecorator $frame)
     {
         parent::__construct($frame);
     }
 
-    /**
-     * @param BlockFrameDecorator|null $block
-     */
-    function reflow(?BlockFrameDecorator $block = null)
+    function reflow(?BlockFrameDecorator $block = null): void
     {
         /** @var TableRowFrameDecorator */
         $frame = $this->_frame;

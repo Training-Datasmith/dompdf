@@ -33,7 +33,6 @@ class Table extends AbstractFrameReflower
 
     /**
      * Table constructor.
-     * @param TableFrameDecorator $frame
      */
     function __construct(TableFrameDecorator $frame)
     {
@@ -251,10 +250,8 @@ class Table extends AbstractFrameReflower
 
     /**
      * Determine the frame's height based on min/max height
-     *
-     * @return float
      */
-    protected function _calculate_height()
+    protected function _calculate_height(): float
     {
         $frame = $this->_frame;
         $style = $frame->get_style();
@@ -293,10 +290,7 @@ class Table extends AbstractFrameReflower
         return $height;
     }
 
-    /**
-     * @param BlockFrameDecorator|null $block
-     */
-    function reflow(?BlockFrameDecorator $block = null)
+    function reflow(?BlockFrameDecorator $block = null): void
     {
         /** @var TableFrameDecorator */
         $frame = $this->_frame;
@@ -503,7 +497,7 @@ class Table extends AbstractFrameReflower
         ];
 
         if ($style->border_collapse !== "collapse") {
-            list($dims[]) = $style->border_spacing;
+            [$dims[]] = array_reverse($style->border_spacing);
         }
 
         $delta = (float) $style->length_in_pt($dims, $cb_w);

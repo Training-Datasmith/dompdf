@@ -43,7 +43,7 @@ class Renderer extends AbstractRenderer
     /**
      * Advance the canvas to the next page
      */
-    function new_page()
+    function new_page(): void
     {
         $this->_canvas->new_page();
     }
@@ -53,7 +53,7 @@ class Renderer extends AbstractRenderer
      *
      * @param Frame $frame the frame to render
      */
-    public function render(Frame $frame)
+    public function render(Frame $frame): void
     {
         global $_dompdf_debug;
 
@@ -253,7 +253,7 @@ class Renderer extends AbstractRenderer
      * @param string $type type of renderer to use
      * @param Frame $frame the frame to render
      */
-    protected function _render_frame($type, $frame)
+    protected function _render_frame($type, \Dompdf\Frame $frame)
     {
 
         if (!isset($this->_renderers[$type])) {

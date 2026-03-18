@@ -19,19 +19,7 @@ use Dompdf\Helpers;
  */
 class TableCell extends Block
 {
-    /**
-     * TableCell constructor.
-     * @param BlockFrameDecorator $frame
-     */
-    function __construct(BlockFrameDecorator $frame)
-    {
-        parent::__construct($frame);
-    }
-
-    /**
-     * @param BlockFrameDecorator|null $block
-     */
-    function reflow(?BlockFrameDecorator $block = null)
+    function reflow(?BlockFrameDecorator $block = null): void
     {
         /** @var TableCellFrameDecorator */
         $frame = $this->_frame;

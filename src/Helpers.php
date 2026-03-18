@@ -16,10 +16,8 @@ class Helpers
      *
      * @param mixed $mixed variable or expression to display
      * @param bool $return
-     *
-     * @return string|null
      */
-    public static function pre_r($mixed, $return = false)
+    public static function pre_r($mixed, $return = false): ?string
     {
         if ($return) {
             return "<pre>" . print_r($mixed, true) . "</pre>";
@@ -51,12 +49,11 @@ class Helpers
      *
      * @param string $protocol
      * @param string $host
-     * @param string $base_path
      * @param string $url
      * @param array  $chrootDirs array of strings representing the chroot paths
      * @return string
      */
-    public static function build_url($protocol, $host, $base_path, $url, $chrootDirs = [])
+    public static function build_url($protocol, $host, string $base_path, $url, $chrootDirs = [])
     {
         $protocol = mb_strtolower($protocol, "UTF-8");
         if (empty($protocol)) {
@@ -111,9 +108,7 @@ class Helpers
 
             $filepath = realpath($ret);
             if ($filepath !== false) {
-                $ret = "$protocol$filepath$res";
-
-                return $ret;
+                return "$protocol$filepath$res";
             }
 
             if ($url[0] == '/' && !empty($chrootDirs)) {
@@ -122,9 +117,7 @@ class Helpers
                     $ret = preg_replace('/\?(.*)$/', "", $ret);
 
                     if ($filepath = realpath($ret)) {
-                        $ret = "$protocol$filepath$res";
-
-                        return $ret;
+                        return "$protocol$filepath$res";
                     }
                 }
             }
@@ -151,23 +144,21 @@ class Helpers
 
         // reproduced from https://www.php.net/manual/en/function.parse-url.php#106731
         $scheme   = isset($parsed_url['scheme']) ? $parsed_url['scheme'] . '://' : '';
-        $host     = isset($parsed_url['host']) ? $parsed_url['host'] : '';
+        $host     = $parsed_url['host'] ?? '';
         $port     = isset($parsed_url['port']) ? ':' . $parsed_url['port'] : '';
-        $user     = isset($parsed_url['user']) ? $parsed_url['user'] : '';
+        $user     = $parsed_url['user'] ?? '';
         $pass     = isset($parsed_url['pass']) ? ':' . $parsed_url['pass']  : '';
         $pass     = ($user || $pass) ? "$pass@" : '';
-        $path     = isset($parsed_url['path']) ? $parsed_url['path'] : '';
+        $path     = $parsed_url['path'] ?? '';
         $query    = isset($parsed_url['query']) ? '?' . $parsed_url['query'] : '';
         $fragment = isset($parsed_url['fragment']) ? '#' . $parsed_url['fragment'] : '';
         
         // partially reproduced from https://stackoverflow.com/a/1243431/264628
         /* replace '//' or '/./' or '/foo/../' with '/' */
-        $re = array('#(/\.?/)#', '#/(?!\.\.)[^/]+/\.\./#');
+        $re = ['#(/\.?/)#', '#/(?!\.\.)[^/]+/\.\./#'];
         for ($n=1; $n>0; $path=preg_replace($re, '/', $path, -1, $n)) {}
 
-        $ret = "$scheme$user$pass$host$port$path$query$fragment";
-
-        return $ret;
+        return "$scheme$user$pass$host$port$path$query$fragment";
     }
 
     /**
@@ -180,9 +171,8 @@ class Helpers
      *
      * @param string $dispositionType
      * @param string $filename
-     * @return string
      */
-    public static function buildContentDispositionHeader($dispositionType, $filename)
+    public static function buildContentDispositionHeader($dispositionType, $filename): string
     {
         $encoding = mb_detect_encoding($filename);
         $fallbackfilename = mb_convert_encoding($filename, "ISO-8859-1", $encoding);
@@ -208,7 +198,6 @@ class Helpers
      * @param int|string $num
      *
      * @throws Exception
-     * @return string
      */
     public static function dec2roman($num): string
     {
@@ -256,7 +245,6 @@ class Helpers
      * @param int|string $num
      *
      * @throws Exception
-     * @return string
      */
     public static function dec2base26($num): string
     {
@@ -284,11 +272,7 @@ class Helpers
      *
      * If min > max, the result is min.
      *
-     * @param float $length
-     * @param float $min
-     * @param float $max
      *
-     * @return float
      */
     public static function clamp(float $length, float $min, float $max): float
     {
@@ -299,8 +283,6 @@ class Helpers
      * Determines whether $value is a percentage or not
      *
      * @param string|float|int $value
-     *
-     * @return bool
      */
     public static function is_percent($value): bool
     {
@@ -327,13 +309,12 @@ class Helpers
         }
 
         $match['data'] = rawurldecode($match['data']);
-        $result = [
-            'charset' => $match['charset'] ? $match['charset'] : 'US-ASCII',
-            'mime' => $match['mime'] ? $match['mime'] : 'text/plain',
+
+        return [
+            'charset' => $match['charset'] ?: 'US-ASCII',
+            'mime' => $match['mime'] ?: 'text/plain',
             'data' => $match['base64'] ? base64_decode($match['data']) : $match['data'],
         ];
-
-        return $result;
     }
 
     /**
@@ -352,7 +333,7 @@ class Helpers
      * @param string $uri The URI to encode
      * @return string The original URL with special characters encoded
      */
-    public static function encodeURI($uri) {
+    public static function encodeURI($uri): ?string {
         $unescaped = [
             '%2D'=>'-','%5F'=>'_','%2E'=>'.','%21'=>'!', '%7E'=>'~',
             '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')'
@@ -377,10 +358,8 @@ class Helpers
      *
      * @param string $str Data to decode
      * @param int $width Image width
-     *
-     * @return string
      */
-    public static function rle8_decode($str, $width)
+    public static function rle8_decode($str, $width): string
     {
         $lineWidth = $width + (3 - ($width - 1) % 4);
         $out = '';
@@ -430,10 +409,8 @@ class Helpers
      *
      * @param string $str Data to decode
      * @param int $width Image width
-     *
-     * @return string
      */
-    public static function rle4_decode($str, $width)
+    public static function rle4_decode($str, $width): string
     {
         $w = floor($width / 2) + ($width % 2);
         $lineWidth = $w + (3 - (($width - 1) / 2) % 4);
@@ -503,9 +480,8 @@ class Helpers
      * file + query + fragment)
      *
      * @param string $url
-     * @return array
      */
-    public static function explode_url($url)
+    public static function explode_url($url): array
     {
         $protocol = "";
         $host = "";
@@ -579,14 +555,12 @@ class Helpers
             $file = basename($url);
             $path = dirname($url) . "/";
         }
-
-        $ret = [$protocol, $host, $path, $file,
+        return [$protocol, $host, $path, $file,
             "protocol" => $protocol,
             "host" => $host,
             "path" => $path,
             "file" => $file,
             "resource" => $res];
-        return $ret;
     }
 
     /**
@@ -595,7 +569,7 @@ class Helpers
      * @param string $type The type of debug messages to print
      * @param string $msg The message to show
      */
-    public static function dompdf_debug($type, $msg)
+    public static function dompdf_debug($type, $msg): void
     {
         global $_DOMPDF_DEBUG_TYPES, $_dompdf_show_warnings, $_dompdf_debug;
         if (isset($_DOMPDF_DEBUG_TYPES[$type]) && ($_dompdf_show_warnings || $_dompdf_debug)) {
@@ -615,13 +589,11 @@ class Helpers
      * @see http://www.php.net/manual/en/function.set-error_handler.php
      *
      * @param int $errno
-     * @param string $errstr
      * @param string $errfile
      * @param string $errline
-     *
      * @throws Exception
      */
-    public static function record_warnings($errno, $errstr, $errfile, $errline)
+    public static function record_warnings($errno, string $errstr, $errfile, $errline): void
     {
         // Not a warning or notice
         if (!($errno & (E_WARNING | E_NOTICE | E_USER_NOTICE | E_USER_WARNING | E_DEPRECATED | E_USER_DEPRECATED))) {
@@ -643,8 +615,6 @@ class Helpers
      *
      * Shim for use on systems running PHP < 7.2
      *
-     * @param string $c
-     * @param string|null $encoding
      * @return int|false
      */
     public static function uniord(string $c, ?string $encoding = null)
@@ -698,9 +668,10 @@ class Helpers
                         // encoding form (as surrogate pairs) and do not directly represent
                         // characters.
                         return false;
-                    } else {
-                        $ord = $o; // add char to array
                     }
+                    $ord = $o;
+                    // add char to array
+
                     // reset data for next char
                     $bytes = [];
                     $numbytes = 1;
@@ -719,8 +690,6 @@ class Helpers
      *
      * Shim for use on systems running PHP < 7.2
      *
-     * @param int    $c
-     * @param string|null $encoding
      * @return string|false
      */
     public static function unichr(int $c, ?string $encoding = null)
@@ -760,7 +729,7 @@ class Helpers
      *
      * @return float[]
      */
-    public static function cmyk_to_rgb($c, $m = null, $y = null, $k = null)
+    public static function cmyk_to_rgb($c, $m = null, $y = null, $k = null): array
     {
         if (is_array($c)) {
             [$c, $m, $y, $k] = $c;
@@ -858,7 +827,7 @@ class Helpers
      * http://www.programmierer-forum.de/function-imagecreatefrombmp-welche-variante-laeuft-t143137.htm
      * Modified by Fabien Menager to support RGB555 BMP format
      */
-    public static function imagecreatefrombmp($filename)
+    public static function imagecreatefrombmp(string $filename)
     {
         if (!function_exists("imagecreatetruecolor")) {
             trigger_error("The PHP GD extension is required, but is not installed.", E_ERROR);
@@ -917,7 +886,7 @@ class Helpers
         }
 
         // calculate colors
-        $meta['colors'] = !$meta['colors'] ? pow(2, $meta['bits']) : $meta['colors'];
+        $meta['colors'] = !$meta['colors'] ? 2 ** $meta['bits'] : $meta['colors'];
 
         // read color palette
         $palette = [];
@@ -1047,7 +1016,7 @@ class Helpers
      * @param int $maxlen
      * @return string[]
      */
-    public static function getFileContent($uri, $context = null, $offset = 0, $maxlen = null)
+    public static function getFileContent($uri, $context = null, $offset = 0, $maxlen = null): array
     {
         $content = null;
         $headers = null;
@@ -1060,9 +1029,6 @@ class Helpers
         try {
             if ($is_local_path || ini_get('allow_url_fopen') && !$can_use_curl) {
                 $http_response_header = null;
-                if (version_compare(PHP_VERSION, "8.4.0", ">=")) {
-                    \http_clear_last_response_headers();
-                }
                 if ($is_local_path === false) {
                     $uri = Helpers::encodeURI($uri);
                 }
@@ -1093,7 +1059,7 @@ class Helpers
                 if ($maxlen > 0) {
                     curl_setopt($curl, CURLOPT_BUFFERSIZE, 128);
                     curl_setopt($curl, CURLOPT_NOPROGRESS, false);
-                    curl_setopt($curl, CURLOPT_PROGRESSFUNCTION, function ($res, $download_size_total, $download_size, $upload_size_total, $upload_size) use ($maxlen) {
+                    curl_setopt($curl, CURLOPT_PROGRESSFUNCTION, function ($res, $download_size_total, $download_size, $upload_size_total, $upload_size) use ($maxlen): int {
                         return ($download_size > $maxlen) ? 1 : 0;
                     });
                 }
@@ -1159,10 +1125,6 @@ class Helpers
         return [$content, $headers];
     }
 
-    /**
-     * @param string $str
-     * @return string
-     */
     public static function mb_ucwords(string $str): string
     {
         $max_len = mb_strlen($str, "UTF-8");
@@ -1177,7 +1139,7 @@ class Helpers
             while (($pos = mb_strpos($str, $s, $pos, "UTF-8")) !== false) {
                 $pos++;
                 // Nothing to do if the separator is the last char of the string
-                if ($pos !== false && $pos < $max_len) {
+                if ($pos < $max_len) {
                     // If the char we want to upper is the last char there is nothing to append behind
                     if ($pos + 1 < $max_len) {
                         $str = mb_substr($str, 0, $pos, "UTF-8") . mb_strtoupper(mb_substr($str, $pos, 1, "UTF-8"), "UTF-8") . mb_substr($str, $pos + 1, null, "UTF-8");
@@ -1199,10 +1161,7 @@ class Helpers
      * very large, nor with very small numbers in layout. Adapted from
      * https://floating-point-gui.de/errors/comparison/.
      *
-     * @param float $a
-     * @param float $b
      *
-     * @return bool
      */
     public static function lengthEqual(float $a, float $b): bool
     {

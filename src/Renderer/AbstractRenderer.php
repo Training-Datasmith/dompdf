@@ -58,7 +58,6 @@ abstract class AbstractRenderer
     abstract function render(Frame $frame);
 
     /**
-     * @param Frame   $frame
      * @param float[] $border_box
      */
     protected function _render_background(Frame $frame, array $border_box): void
@@ -91,9 +90,7 @@ abstract class AbstractRenderer
     }
 
     /**
-     * @param Frame   $frame
      * @param float[] $border_box
-     * @param string  $corner_style
      */
     protected function _render_border(Frame $frame, array $border_box, string $corner_style = "bevel"): void
     {
@@ -129,14 +126,18 @@ abstract class AbstractRenderer
         ];
 
         foreach ($bp as $side => $props) {
-            if ($props["style"] === "none" ||
-                $props["style"] === "hidden" ||
-                $props["color"] === "transparent" ||
-                $props["width"] <= 0
-            ) {
+            if ($props["style"] === "none") {
                 continue;
             }
-
+            if ($props["style"] === "hidden") {
+                continue;
+            }
+            if ($props["color"] === "transparent") {
+                continue;
+            }
+            if ($props["width"] <= 0) {
+                continue;
+            }
             [$x, $y, $w, $h] = $border_box;
             $method = "_border_" . $props["style"];
 
@@ -177,9 +178,7 @@ abstract class AbstractRenderer
     }
 
     /**
-     * @param Frame   $frame
      * @param float[] $border_box
-     * @param string  $corner_style
      */
     protected function _render_outline(Frame $frame, array $border_box, string $corner_style = "bevel"): void
     {
@@ -319,7 +318,7 @@ abstract class AbstractRenderer
         //Therefore read dimension directly from file, instead of creating gd object first.
         //$img_w = imagesx($src); $img_h = imagesy($src);
 
-        list($img_w, $img_h) = Helpers::dompdf_getimagesize($img, $this->_dompdf->getHttpContext());
+        [$img_w, $img_h] = Helpers::dompdf_getimagesize($img, $this->_dompdf->getHttpContext());
         if ($img_w == 0 || $img_h == 0) {
             return;
         }
@@ -333,10 +332,10 @@ abstract class AbstractRenderer
 
         //Increase background resolution and dependent box size according to image resolution to be placed in
         //Then image can be copied in without resize
-        $bg_width = round((float)($width * $dpi) / 72);
-        $bg_height = round((float)($height * $dpi) / 72);
+        $bg_width = round($width * $dpi / 72);
+        $bg_height = round($height * $dpi / 72);
 
-        list($img_w, $img_h) = $this->_resize_background_image(
+        [$img_w, $img_h] = $this->_resize_background_image(
             $img_w,
             $img_h,
             $bg_width,
@@ -346,7 +345,7 @@ abstract class AbstractRenderer
         );
         //Need %bg_x, $bg_y as background pos, where img starts, converted to pixel
 
-        list($bg_x, $bg_y) = $style->background_position;
+        [$bg_x, $bg_y] = $style->background_position;
 
         if (Helpers::is_percent($bg_x)) {
             // The point $bg_x % from the left edge of the image is placed
@@ -663,7 +662,7 @@ abstract class AbstractRenderer
             // Note: CPDF_Adapter image converts y position
             $this->_canvas->get_cpdf()->addImagePng($bg, $cpdfKey, $x, $this->_canvas->get_height() - $y - $height, $width, $height);
 
-            if (isset($bg) && PHP_MAJOR_VERSION < 8) {
+            if (PHP_MAJOR_VERSION < 8) {
                 imagedestroy($bg);
             }
         } else {
@@ -674,12 +673,7 @@ abstract class AbstractRenderer
     }
 
     /**
-     * @param float        $img_width
-     * @param float        $img_height
-     * @param float        $container_width
-     * @param float        $container_height
      * @param array|string $bg_resize
-     * @param int          $dpi
      *
      * @return float[]
      */
@@ -866,7 +860,7 @@ abstract class AbstractRenderer
      */
     protected function _border_double($x, $y, $length, $color, $widths, $side, $corner_style = "bevel", $r1 = 0, $r2 = 0)
     {
-        list($top, $right, $bottom, $left) = $widths;
+        [$top, $right, $bottom, $left] = $widths;
 
         $third_widths = [$top / 3, $right / 3, $bottom / 3, $left / 3];
 
@@ -891,7 +885,7 @@ abstract class AbstractRenderer
      */
     protected function _border_groove($x, $y, $length, $color, $widths, $side, $corner_style = "bevel", $r1 = 0, $r2 = 0)
     {
-        list($top, $right, $bottom, $left) = $widths;
+        [$top, $right, $bottom, $left] = $widths;
 
         $half_widths = [$top / 2, $right / 2, $bottom / 2, $left / 2];
 
@@ -915,7 +909,7 @@ abstract class AbstractRenderer
      */
     protected function _border_ridge($x, $y, $length, $color, $widths, $side, $corner_style = "bevel", $r1 = 0, $r2 = 0)
     {
-        list($top, $right, $bottom, $left) = $widths;
+        [$top, $right, $bottom, $left] = $widths;
 
         $half_widths = [$top / 2, $right / 2, $bottom / 2, $left / 2];
 
@@ -1021,11 +1015,7 @@ abstract class AbstractRenderer
      * The base pattern is adjusted so that it fits the given line length
      * symmetrically.
      *
-     * @param string $style
-     * @param float  $width
-     * @param float  $length
      *
-     * @return array
      */
     protected function dashPattern(string $style, float $width, float $length): array
     {
@@ -1076,15 +1066,14 @@ abstract class AbstractRenderer
      * @param float[] $widths
      * @param string  $side
      * @param string  $corner_style
-     * @param string  $pattern_name
      * @param float   $r1
      * @param float   $r2
      */
-    protected function _border_line($x, $y, $length, $color, $widths, $side, $corner_style = "bevel", $pattern_name = "none", $r1 = 0, $r2 = 0)
+    protected function _border_line($x, $y, $length, $color, $widths, $side, $corner_style = "bevel", string $pattern_name = "none", $r1 = 0, $r2 = 0)
     {
         /** used by $$side */
         [$top, $right, $bottom, $left] = $widths;
-        $width = $$side;
+        $width = ${$side};
 
         // No need to clip corners if border radius is large enough
         $cornerClip = $corner_style === "bevel" && ($r1 < $width || $r2 < $width);
@@ -1232,9 +1221,6 @@ abstract class AbstractRenderer
         }
     }
 
-    /**
-     * @param float $opacity
-     */
     protected function _set_opacity(float $opacity): void
     {
         if ($opacity >= 0.0 && $opacity <= 1.0) {
@@ -1245,8 +1231,6 @@ abstract class AbstractRenderer
     /**
      * Add a named destination if the element has an ID or is an anchor element
      * with `name` attribute.
-     *
-     * @param DOMElement $node
      */
     protected function addNamedDest(DOMElement $node): void
     {
@@ -1267,7 +1251,6 @@ abstract class AbstractRenderer
      * Add a hyperlink if the element is an anchor element with `href`
      * attribute.
      *
-     * @param DOMElement $node
      * @param float[]    $borderBox
      */
     protected function addHyperlink(DOMElement $node, array $borderBox): void
@@ -1289,7 +1272,6 @@ abstract class AbstractRenderer
     /**
      * @param float[]      $box
      * @param array|string $color
-     * @param array        $style
      */
     protected function debugLayout(array $box, $color = "red", array $style = []): void
     {

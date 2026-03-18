@@ -19,16 +19,6 @@ class Inline extends AbstractFrameDecorator
 {
 
     /**
-     * Inline constructor.
-     * @param Frame $frame
-     * @param Dompdf $dompdf
-     */
-    function __construct(Frame $frame, Dompdf $dompdf)
-    {
-        parent::__construct($frame, $dompdf);
-    }
-
-    /**
      * Vertical padding, border, and margin do not apply when determining the
      * height for inline frames.
      *
@@ -38,8 +28,6 @@ class Inline extends AbstractFrameDecorator
      * start at the top and bottom of the content area, not the
      * 'line-height'. But only the 'line-height' is used to calculate the
      * height of the line box.
-     *
-     * @return float
      */
     public function get_margin_height(): float
     {

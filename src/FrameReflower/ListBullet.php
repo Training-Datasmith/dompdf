@@ -19,17 +19,13 @@ class ListBullet extends AbstractFrameReflower
 
     /**
      * ListBullet constructor.
-     * @param ListBulletFrameDecorator $frame
      */
     function __construct(ListBulletFrameDecorator $frame)
     {
         parent::__construct($frame);
     }
 
-    /**
-     * @param BlockFrameDecorator|null $block
-     */
-    function reflow(?BlockFrameDecorator $block = null)
+    function reflow(?BlockFrameDecorator $block = null): void
     {
         if ($block === null) {
             return;

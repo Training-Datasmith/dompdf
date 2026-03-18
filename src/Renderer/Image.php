@@ -20,7 +20,7 @@ class Image extends Block
     /**
      * @param ImageFrameDecorator $frame
      */
-    function render(Frame $frame)
+    function render(Frame $frame): void
     {
         $style = $frame->get_style();
         $node = $frame->get_node();

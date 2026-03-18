@@ -41,10 +41,8 @@ class Block extends AbstractFrameReflower
      *  http://www.w3.org/TR/CSS21/visudet.html#Computing_widths_and_margins
      *
      * @param float $width
-     *
-     * @return array
      */
-    protected function _calculate_width($width)
+    protected function _calculate_width($width): array
     {
         $frame = $this->_frame;
         $style = $frame->get_style();
@@ -219,9 +217,8 @@ class Block extends AbstractFrameReflower
      * Call the above function, but resolve max/min widths
      *
      * @throws Exception
-     * @return array
      */
-    protected function _calculate_restricted_width()
+    protected function _calculate_restricted_width(): array
     {
         $frame = $this->_frame;
         $style = $frame->get_style();
@@ -270,8 +267,6 @@ class Block extends AbstractFrameReflower
      * Determine the unrestricted height of content within the block
      * not by adding each line's height, but by getting the last line's position.
      * This because lines could have been pushed lower by a clearing element.
-     *
-     * @return float
      */
     protected function _calculate_content_height(): float
     {
@@ -287,10 +282,8 @@ class Block extends AbstractFrameReflower
 
     /**
      * Determine the frame's restricted height
-     *
-     * @return array
      */
-    protected function _calculate_restricted_height()
+    protected function _calculate_restricted_height(): array
     {
         $frame = $this->_frame;
         $style = $frame->get_style();
@@ -488,8 +481,10 @@ class Block extends AbstractFrameReflower
                             $frame->move($line->left, 0);
                         }
                     }
-
-                    if ($line->br || $i === $last_line_index) {
+                    if ($line->br) {
+                        continue;
+                    }
+                    if ($i === $last_line_index) {
                         continue;
                     }
 
@@ -556,7 +551,7 @@ class Block extends AbstractFrameReflower
      * Align inline children vertically.
      * Aligns each child vertically after each line is reflowed
      */
-    function vertical_align()
+    function vertical_align(): void
     {
         $fontMetrics = $this->get_dompdf()->getFontMetrics();
 
@@ -610,6 +605,9 @@ class Block extends AbstractFrameReflower
                                 break;
 
                             case "sub":
+                            case "text-bottom":
+                            // FIXME: align bottom of image with the descender?
+                            case "bottom":
                                 $y_offset = 0.3 * $height + $imageHeightDiff;
                                 break;
 
@@ -622,11 +620,6 @@ class Block extends AbstractFrameReflower
                                 break;
 
                             case "top":
-                                break;
-
-                            case "text-bottom": // FIXME: align bottom of image with the descender?
-                            case "bottom":
-                                $y_offset = 0.3 * $height + $imageHeightDiff;
                                 break;
 
                             case "baseline":
@@ -664,8 +657,6 @@ class Block extends AbstractFrameReflower
 
                             case "text-bottom":
                             case "bottom":
-                                $y_offset = $height * 0.8 - $baseline;
-                                break;
 
                             case "baseline":
                             default:
@@ -684,10 +675,7 @@ class Block extends AbstractFrameReflower
         }
     }
 
-    /**
-     * @param AbstractFrameDecorator $child
-     */
-    function process_clear(AbstractFrameDecorator $child)
+    function process_clear(AbstractFrameDecorator $child): void
     {
         $child_style = $child->get_style();
         $root = $this->_frame->get_root();
@@ -719,11 +707,10 @@ class Block extends AbstractFrameReflower
     }
 
     /**
-     * @param AbstractFrameDecorator $child
      * @param float $cb_x
      * @param float $cb_w
      */
-    function process_float(AbstractFrameDecorator $child, $cb_x, $cb_w)
+    function process_float(AbstractFrameDecorator $child, $cb_x, $cb_w): void
     {
         $child_style = $child->get_style();
         $root = $this->_frame->get_root();
@@ -739,7 +726,7 @@ class Block extends AbstractFrameReflower
             }
 
             $line_box = $this->_frame->get_current_line_box();
-            list($old_x, $old_y) = $child->get_position();
+            [$old_x, $old_y] = $child->get_position();
 
             $float_x = $cb_x;
             $float_y = $old_y;
@@ -775,10 +762,7 @@ class Block extends AbstractFrameReflower
         }
     }
 
-    /**
-     * @param BlockFrameDecorator|null $block
-     */
-    function reflow(?BlockFrameDecorator $block = null)
+    function reflow(?BlockFrameDecorator $block = null): void
     {
 
         // Check if a page break is forced

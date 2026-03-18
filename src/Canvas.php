@@ -370,8 +370,6 @@ interface Canvas
      *
      * @param string $font The font file to use
      * @param string $char The character to check
-     *
-     * @return bool
      */
     function font_supports_char(string $font, string $char): bool;
 
@@ -434,9 +432,6 @@ interface Canvas
 
     /**
      * Sets the opacity
-     *
-     * @param float  $opacity
-     * @param string $mode
      */
     public function set_opacity(float $opacity, string $mode = "Normal"): void;
 

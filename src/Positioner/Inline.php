@@ -20,7 +20,6 @@ class Inline extends AbstractPositioner
 {
 
     /**
-     * @param AbstractFrameDecorator $frame
      * @throws Exception
      */
     function position(AbstractFrameDecorator $frame): void
