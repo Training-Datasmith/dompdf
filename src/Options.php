@@ -388,6 +388,42 @@ class Options
      */
     public function set($attributes, $value = null): self
     {
+        // Allowlist of permitted setter methods to prevent arbitrary method dispatch
+        static $allowedSetters = [
+            'setAllowedProtocols',
+            'setAllowedRemoteHosts',
+            'setArtifactPathValidation',
+            'setChroot',
+            'setDebugCss',
+            'setDebugKeepTemp',
+            'setDebugLayout',
+            'setDebugLayoutBlocks',
+            'setDebugLayoutInline',
+            'setDebugLayoutLines',
+            'setDebugLayoutPaddingBox',
+            'setDebugPng',
+            'setDefaultFont',
+            'setDefaultMediaType',
+            'setDefaultPaperOrientation',
+            'setDefaultPaperSize',
+            'setDpi',
+            'setFontCache',
+            'setFontDir',
+            'setFontHeightRatio',
+            'setHttpContext',
+            'setIsFontSubsettingEnabled',
+            'setIsHtml5ParserEnabled',
+            'setIsJavascriptEnabled',
+            'setIsPdfAEnabled',
+            'setIsPhpEnabled',
+            'setIsRemoteEnabled',
+            'setLogOutputFile',
+            'setPdfBackend',
+            'setPdflibLicense',
+            'setRootDir',
+            'setTempDir',
+        ];
+
         if (!is_array($attributes)) {
             $attributes = [$attributes => $value];
         }
@@ -410,7 +446,7 @@ class Options
                 $methodForCall = 'setIsFontSubsettingEnabled';
             }
 
-            if (method_exists($this, $methodForCall)) {
+            if (in_array($methodForCall, $allowedSetters, true) && method_exists($this, $methodForCall)) {
                 $this->{$methodForCall}($value);
             }
         }
@@ -1175,7 +1211,7 @@ class Options
         $chrootValid = false;
         foreach ($dirs as $chrootPath) {
             $chrootPath = realpath($chrootPath);
-            if ($chrootPath !== false && strpos($realfile, $chrootPath) === 0) {
+            if ($chrootPath !== false && strpos($realfile, $chrootPath . DIRECTORY_SEPARATOR) === 0) {
                 $chrootValid = true;
                 break;
             }
@@ -1205,6 +1241,11 @@ class Options
     {
         if (strlen($uri) === 0) {
             return [false, 'The URI must not be empty.'];
+        }
+
+        $scheme = strtolower(parse_url($uri, PHP_URL_SCHEME) ?? '');
+        if (!in_array($scheme, ['http', 'https'], true)) {
+            return [false, 'Remote URI must use http or https protocol.'];
         }
 
         if (!$this->isRemoteEnabled) {
