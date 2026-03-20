@@ -1,17 +1,15 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-
 namespace Dompdf\Frame;
 
 use Dompdf\Frame;
 use Iterator;
-
 /**
  * Linked-list Iterator
  *
@@ -20,62 +18,52 @@ use Iterator;
  *
  * @package dompdf
  */
-class FrameListIterator implements Iterator
+class Frame_List_Iterator implements Iterator
 {
     /**
      * @var Frame
      */
     protected $parent;
-
     /**
      * @var Frame|null
      */
     protected $cur;
-
     /**
      * @var Frame|null
      */
     protected $prev;
-
     /**
      * @var int
      */
     protected $num;
-
     public function __construct(Frame $frame)
     {
         $this->parent = $frame;
         $this->rewind();
     }
-
     public function rewind(): void
     {
         $this->cur = $this->parent->get_first_child();
         $this->prev = null;
         $this->num = 0;
     }
-
     public function valid(): bool
     {
         return $this->cur !== null;
     }
-
     public function key(): int
     {
         return $this->num;
     }
-
     public function current(): ?Frame
     {
         return $this->cur;
     }
-
     public function next(): void
     {
         if ($this->cur === null) {
             return;
         }
-
         if ($this->cur->get_parent() === $this->parent) {
             $this->prev = $this->cur;
             $this->cur = $this->cur->get_next_sibling();
@@ -83,9 +71,7 @@ class FrameListIterator implements Iterator
         } else {
             // Continue from the previous child if the current frame has been
             // moved to another parent
-            $this->cur = $this->prev !== null
-                ? $this->prev->get_next_sibling()
-                : $this->parent->get_first_child();
+            $this->cur = $this->prev !== null ? $this->prev->get_next_sibling() : $this->parent->get_first_child();
         }
     }
 }

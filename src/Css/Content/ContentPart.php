@@ -1,10 +1,9 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Dompdf\Css\Content;
 
-abstract class ContentPart
+abstract class Content_Part
 {
     public function equals(self $other): bool
     {

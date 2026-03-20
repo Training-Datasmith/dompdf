@@ -1,23 +1,21 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-
-namespace Dompdf\FrameDecorator;
+namespace Dompdf\Frame_Decorator;
 
 use Dompdf\Dompdf;
 use Dompdf\Frame;
-
 /**
  * Dummy decorator
  *
  * @package dompdf
  */
-class NullFrameDecorator extends AbstractFrameDecorator
+class Null_Frame_Decorator extends Abstract_Frame_Decorator
 {
     /**
      * NullFrameDecorator constructor.

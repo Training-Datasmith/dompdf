@@ -1,12 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-
 namespace Dompdf;
 
 class Helpers
@@ -25,24 +24,18 @@ class Helpers
         if ($return) {
             return '<pre>' . print_r($mixed, true) . '</pre>';
         }
-
         if (php_sapi_name() !== 'cli') {
             echo '<pre>';
         }
-
         print_r($mixed);
-
         if (php_sapi_name() !== 'cli') {
             echo '</pre>';
         } else {
             echo "\n";
         }
-
         flush();
-
         return null;
     }
-
     /**
      * Builds a full url given a protocol, hostname, base path and URL.
      *
@@ -56,7 +49,7 @@ class Helpers
      * @param array  $chrootDirs array of strings representing the chroot paths
      * @return string
      */
-    public static function build_url($protocol, $host, string $base_path, $url, $chrootDirs = [])
+    public static function build_url($protocol, $host, string $base_path, $url, $chroot_dirs = [])
     {
         $protocol = mb_strtolower($protocol, 'UTF-8');
         if (empty($protocol)) {
@@ -65,24 +58,12 @@ class Helpers
         if ($url === '') {
             return null;
         }
-
         $url_lc = mb_strtolower($url, 'UTF-8');
-
         // Is the url already fully qualified, a Data URI, or a reference to a named anchor?
         // File-protocol URLs may require additional processing (e.g. for URLs with a relative path)
-        if (
-            (
-                mb_strpos($url_lc, '://') !== false
-                && !in_array(substr($url_lc, 0, 7), ['file://', 'phar://'], true)
-            )
-            || mb_substr($url_lc, 0, 1) === '#'
-            || mb_strpos($url_lc, 'data:') === 0
-            || mb_strpos($url_lc, 'mailto:') === 0
-            || mb_strpos($url_lc, 'tel:') === 0
-        ) {
+        if (mb_strpos($url_lc, '://') !== false && !in_array(substr($url_lc, 0, 7), ['file://', 'phar://'], true) || mb_substr($url_lc, 0, 1) === '#' || mb_strpos($url_lc, 'data:') === 0 || mb_strpos($url_lc, 'mailto:') === 0 || mb_strpos($url_lc, 'tel:') === 0) {
             return $url;
         }
-
         $res = '';
         if (strpos($url_lc, 'file://') === 0) {
             $url = substr($url, 7);
@@ -92,42 +73,34 @@ class Helpers
             $url = substr($url, 7, strpos($url_lc, '.phar') - 2);
             $protocol = 'phar://';
         }
-
         $ret = '';
-
         $is_local_path = in_array($protocol, ['file://', 'phar://'], true);
-
         if ($is_local_path) {
             //On Windows local file, an abs path can begin also with a '\' or a drive letter and colon
             //drive: followed by a relative path would be a drive specific default folder.
             //not known in php app code, treat as abs path
             //($url[1] !== ':' || ($url[2]!=='\\' && $url[2]!=='/'))
-            if ($url[0] !== '/' && (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN' || (mb_strlen($url) > 1 && $url[0] !== '\\' && $url[1] !== ':'))) {
+            if ($url[0] !== '/' && (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN' || mb_strlen($url) > 1 && $url[0] !== '\\' && $url[1] !== ':')) {
                 // For rel path and local access we ignore the host, and run the path through realpath()
                 $ret .= realpath($base_path) . '/';
             }
             $ret .= $url;
             $ret = preg_replace('/\?(.*)$/', '', $ret);
-
             $filepath = realpath($ret);
             if ($filepath !== false) {
-                return "$protocol$filepath$res";
+                return "{$protocol}{$filepath}{$res}";
             }
-
-            if ($url[0] == '/' && !empty($chrootDirs)) {
-                foreach ($chrootDirs as $dir) {
+            if ($url[0] == '/' && !empty($chroot_dirs)) {
+                foreach ($chroot_dirs as $dir) {
                     $ret = realpath($dir) . $url;
                     $ret = preg_replace('/\?(.*)$/', '', $ret);
-
                     if ($filepath = realpath($ret)) {
-                        return "$protocol$filepath$res";
+                        return "{$protocol}{$filepath}{$res}";
                     }
                 }
             }
-
             return null;
         }
-
         $ret = $protocol;
         // Protocol relative urls (e.g. "//example.org/style.css")
         if (strpos($url, '//') === 0) {
@@ -141,30 +114,25 @@ class Helpers
             //$base_path = $base_path !== "" ? rtrim($base_path, "/\\") . "/" : "";
             $ret .= $host . $base_path . $url;
         }
-
         // URL should now be complete, final cleanup
         $parsed_url = parse_url($ret);
-
         // reproduced from https://www.php.net/manual/en/function.parse-url.php#106731
-        $scheme   = isset($parsed_url['scheme']) ? $parsed_url['scheme'] . '://' : '';
-        $host     = $parsed_url['host'] ?? '';
-        $port     = isset($parsed_url['port']) ? ':' . $parsed_url['port'] : '';
-        $user     = $parsed_url['user'] ?? '';
-        $pass     = isset($parsed_url['pass']) ? ':' . $parsed_url['pass'] : '';
-        $pass     = ($user || $pass) ? "$pass@" : '';
-        $path     = $parsed_url['path'] ?? '';
-        $query    = isset($parsed_url['query']) ? '?' . $parsed_url['query'] : '';
+        $scheme = isset($parsed_url['scheme']) ? $parsed_url['scheme'] . '://' : '';
+        $host = $parsed_url['host'] ?? '';
+        $port = isset($parsed_url['port']) ? ':' . $parsed_url['port'] : '';
+        $user = $parsed_url['user'] ?? '';
+        $pass = isset($parsed_url['pass']) ? ':' . $parsed_url['pass'] : '';
+        $pass = $user || $pass ? "{$pass}@" : '';
+        $path = $parsed_url['path'] ?? '';
+        $query = isset($parsed_url['query']) ? '?' . $parsed_url['query'] : '';
         $fragment = isset($parsed_url['fragment']) ? '#' . $parsed_url['fragment'] : '';
-
         // partially reproduced from https://stackoverflow.com/a/1243431/264628
         /* replace '//' or '/./' or '/foo/../' with '/' */
         $re = ['#(/\.?/)#', '#/(?!\.\.)[^/]+/\.\./#'];
         for ($n = 1; $n > 0; $path = preg_replace($re, '/', $path, -1, $n)) {
         }
-
-        return "$scheme$user$pass$host$port$path$query$fragment";
+        return "{$scheme}{$user}{$pass}{$host}{$port}{$path}{$query}{$fragment}";
     }
-
     /**
      * Builds a HTTP Content-Disposition header string using `$dispositionType`
      * and `$filename`.
@@ -176,21 +144,18 @@ class Helpers
      * @param string $dispositionType
      * @param string $filename
      */
-    public static function buildContentDispositionHeader($dispositionType, $filename): string
+    public static function build_content_disposition_header($disposition_type, $filename): string
     {
         $encoding = mb_detect_encoding($filename);
         $fallbackfilename = mb_convert_encoding($filename, 'ISO-8859-1', $encoding);
         $fallbackfilename = str_replace('"', '', $fallbackfilename);
         $encodedfilename = rawurlencode($filename);
-
-        $contentDisposition = "Content-Disposition: $dispositionType; filename=\"$fallbackfilename\"";
+        $content_disposition = "Content-Disposition: {$disposition_type}; filename=\"{$fallbackfilename}\"";
         if ($fallbackfilename !== $filename) {
-            $contentDisposition .= "; filename*=UTF-8''$encodedfilename";
+            $content_disposition .= "; filename*=UTF-8''{$encodedfilename}";
         }
-
-        return $contentDisposition;
+        return $content_disposition;
     }
-
     /**
      * Converts decimal numbers to roman numerals.
      *
@@ -205,47 +170,40 @@ class Helpers
      */
     public static function dec2roman($num): string
     {
-
         static $ones = ['', 'i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix'];
         static $tens = ['', 'x', 'xx', 'xxx', 'xl', 'l', 'lx', 'lxx', 'lxxx', 'xc'];
         static $hund = ['', 'c', 'cc', 'ccc', 'cd', 'd', 'dc', 'dcc', 'dccc', 'cm'];
         static $thou = ['', 'm', 'mm', 'mmm'];
-
         if (!is_numeric($num)) {
             throw new Exception('dec2roman() requires a numeric argument.');
         }
-
         if ($num >= 4000 || $num <= 0) {
             return (string) $num;
         }
-
-        $num = strrev((string)$num);
-
+        $num = strrev((string) $num);
         $ret = '';
         switch (mb_strlen($num)) {
             /** @noinspection PhpMissingBreakStatementInspection */
             case 4:
                 $ret .= $thou[$num[3]];
-                /** @noinspection PhpMissingBreakStatementInspection */
-                // no break
+            /** @noinspection PhpMissingBreakStatementInspection */
+            // no break
             case 3:
                 $ret .= $hund[$num[2]];
-                /** @noinspection PhpMissingBreakStatementInspection */
-                // no break
+            /** @noinspection PhpMissingBreakStatementInspection */
+            // no break
             case 2:
                 $ret .= $tens[$num[1]];
-                /** @noinspection PhpMissingBreakStatementInspection */
-                // no break
+            /** @noinspection PhpMissingBreakStatementInspection */
+            // no break
             case 1:
                 $ret .= $ones[$num[0]];
-                // no break
+            // no break
             default:
                 break;
         }
-
         return $ret;
     }
-
     /**
      * Converts decimal numbers to base26 (hexavigesimal)
      * represented in lower case letters.
@@ -259,13 +217,10 @@ class Helpers
         if (!is_numeric($num)) {
             throw new Exception('dec2base26() requires a numeric argument.');
         }
-
         $num = intval($num);
-
         if ($num <= 0) {
             return (string) $num;
         }
-
         $ret = '';
         while ($num > 0) {
             $remainder = ($num - 1) % 26;
@@ -274,7 +229,6 @@ class Helpers
         }
         return $ret;
     }
-
     /**
      * Restrict a length to the given range.
      *
@@ -286,7 +240,6 @@ class Helpers
     {
         return max($min, min($length, $max));
     }
-
     /**
      * Determines whether $value is a percentage or not
      *
@@ -296,7 +249,6 @@ class Helpers
     {
         return is_string($value) && false !== mb_strpos($value, '%');
     }
-
     /**
      * Parses a data URI scheme
      * http://en.wikipedia.org/wiki/Data_URI_scheme
@@ -310,21 +262,14 @@ class Helpers
         $expression = '/^data:(?P<mime>[a-z0-9\/+-.]+)(;charset=(?P<charset>[a-z0-9-])+)?(?P<base64>;base64)?\,(?P<data>.*)?/is';
         if (!preg_match($expression, $data_uri, $match)) {
             $parts = explode(',', $data_uri);
-            $parts[0] = preg_replace('/\\s/', '', $parts[0]);
-            if (preg_match('/\\s/', $data_uri) && !preg_match($expression, implode(',', $parts), $match)) {
+            $parts[0] = preg_replace('/\s/', '', $parts[0]);
+            if (preg_match('/\s/', $data_uri) && !preg_match($expression, implode(',', $parts), $match)) {
                 return false;
             }
         }
-
         $match['data'] = rawurldecode($match['data']);
-
-        return [
-            'charset' => $match['charset'] ?: 'US-ASCII',
-            'mime' => $match['mime'] ?: 'text/plain',
-            'data' => $match['base64'] ? base64_decode($match['data']) : $match['data'],
-        ];
+        return ['charset' => $match['charset'] ?: 'US-ASCII', 'mime' => $match['mime'] ?: 'text/plain', 'data' => $match['base64'] ? base64_decode($match['data']) : $match['data']];
     }
-
     /**
      * Encodes a Uniform Resource Identifier (URI) by replacing non-alphanumeric
      * characters with a percent (%) sign followed by two hex digits, excepting
@@ -341,26 +286,13 @@ class Helpers
      * @param string $uri The URI to encode
      * @return string The original URL with special characters encoded
      */
-    public static function encodeURI($uri): ?string
+    public static function encode_uri($uri): ?string
     {
-        $unescaped = [
-            '%2D' => '-','%5F' => '_','%2E' => '.','%21' => '!', '%7E' => '~',
-            '%2A' => '*', '%27' => "'", '%28' => '(', '%29' => ')',
-        ];
-        $reserved = [
-            '%3B' => ';','%2C' => ',','%2F' => '/','%3F' => '?','%3A' => ':',
-            '%40' => '@','%26' => '&','%3D' => '=','%2B' => '+','%24' => '$',
-        ];
-        $score = [
-            '%23' => '#',
-        ];
-        return preg_replace(
-            '/%25([a-fA-F0-9]{2,2})/',
-            '%$1',
-            strtr(rawurlencode($uri), array_merge($reserved, $unescaped, $score))
-        );
+        $unescaped = ['%2D' => '-', '%5F' => '_', '%2E' => '.', '%21' => '!', '%7E' => '~', '%2A' => '*', '%27' => "'", '%28' => '(', '%29' => ')'];
+        $reserved = ['%3B' => ';', '%2C' => ',', '%2F' => '/', '%3F' => '?', '%3A' => ':', '%40' => '@', '%26' => '&', '%3D' => '=', '%2B' => '+', '%24' => '$'];
+        $score = ['%23' => '#'];
+        return preg_replace('/%25([a-fA-F0-9]{2,2})/', '%$1', strtr(rawurlencode($uri), array_merge($reserved, $unescaped, $score)));
     }
-
     /**
      * Decoder for RLE8 compression in windows bitmaps
      * http://msdn.microsoft.com/library/default.asp?url=/library/en-us/gdi/bitmaps_6x0u.asp
@@ -370,32 +302,38 @@ class Helpers
      */
     public static function rle8_decode($str, $width): string
     {
-        $lineWidth = $width + (3 - ($width - 1) % 4);
+        $line_width = $width + (3 - ($width - 1) % 4);
         $out = '';
         $cnt = strlen($str);
-
         for ($i = 0; $i < $cnt; $i++) {
             $o = ord($str[$i]);
             switch ($o) {
-                case 0: # ESCAPE
+                case 0:
+                    # ESCAPE
                     $i++;
                     switch (ord($str[$i])) {
-                        case 0: # NEW LINE
-                            $padCnt = $lineWidth - strlen($out) % $lineWidth;
-                            if ($padCnt < $lineWidth) {
-                                $out .= str_repeat(chr(0), $padCnt); # pad line
+                        case 0:
+                            # NEW LINE
+                            $pad_cnt = $line_width - strlen($out) % $line_width;
+                            if ($pad_cnt < $line_width) {
+                                $out .= str_repeat(chr(0), $pad_cnt);
+                                # pad line
                             }
                             break;
-                        case 1: # END OF FILE
-                            $padCnt = $lineWidth - strlen($out) % $lineWidth;
-                            if ($padCnt < $lineWidth) {
-                                $out .= str_repeat(chr(0), $padCnt); # pad line
+                        case 1:
+                            # END OF FILE
+                            $pad_cnt = $line_width - strlen($out) % $line_width;
+                            if ($pad_cnt < $line_width) {
+                                $out .= str_repeat(chr(0), $pad_cnt);
+                                # pad line
                             }
                             break 3;
-                        case 2: # DELTA
+                        case 2:
+                            # DELTA
                             $i += 2;
                             break;
-                        default: # ABSOLUTE MODE
+                        default:
+                            # ABSOLUTE MODE
                             $num = ord($str[$i]);
                             for ($j = 0; $j < $num; $j++) {
                                 $out .= $str[++$i];
@@ -411,7 +349,6 @@ class Helpers
         }
         return $out;
     }
-
     /**
      * Decoder for RLE4 compression in windows bitmaps
      * see http://msdn.microsoft.com/library/default.asp?url=/library/en-us/gdi/bitmaps_6x0u.asp
@@ -421,32 +358,36 @@ class Helpers
      */
     public static function rle4_decode($str, $width): string
     {
-        $w = floor($width / 2) + ($width % 2);
-        $lineWidth = $w + (3 - (($width - 1) / 2) % 4);
+        $w = floor($width / 2) + $width % 2;
+        $line_width = $w + (3 - ($width - 1) / 2 % 4);
         $pixels = [];
         $cnt = strlen($str);
         $c = 0;
-
         for ($i = 0; $i < $cnt; $i++) {
             $o = ord($str[$i]);
             switch ($o) {
-                case 0: # ESCAPE
+                case 0:
+                    # ESCAPE
                     $i++;
                     switch (ord($str[$i])) {
-                        case 0: # NEW LINE
-                            while (count($pixels) % $lineWidth != 0) {
+                        case 0:
+                            # NEW LINE
+                            while (count($pixels) % $line_width != 0) {
                                 $pixels[] = 0;
                             }
                             break;
-                        case 1: # END OF FILE
-                            while (count($pixels) % $lineWidth != 0) {
+                        case 1:
+                            # END OF FILE
+                            while (count($pixels) % $line_width != 0) {
                                 $pixels[] = 0;
                             }
                             break 3;
-                        case 2: # DELTA
+                        case 2:
+                            # DELTA
                             $i += 2;
                             break;
-                        default: # ABSOLUTE MODE
+                        default:
+                            # ABSOLUTE MODE
                             $num = ord($str[$i]);
                             for ($j = 0; $j < $num; $j++) {
                                 if ($j % 2 == 0) {
@@ -456,7 +397,6 @@ class Helpers
                                     $pixels[] = $c & 15;
                                 }
                             }
-
                             if ($num % 2 == 0) {
                                 $i++;
                             }
@@ -465,25 +405,20 @@ class Helpers
                 default:
                     $c = ord($str[++$i]);
                     for ($j = 0; $j < $o; $j++) {
-                        $pixels[] = ($j % 2 == 0 ? ($c & 240) >> 4 : $c & 15);
+                        $pixels[] = $j % 2 == 0 ? ($c & 240) >> 4 : $c & 15;
                     }
             }
         }
-
         $out = '';
         if (count($pixels) % 2) {
             $pixels[] = 0;
         }
-
         $cnt = count($pixels) / 2;
-
         for ($i = 0; $i < $cnt; $i++) {
             $out .= chr(16 * $pixels[2 * $i] + $pixels[2 * $i + 1]);
         }
-
         return $out;
     }
-
     /**
      * parse a full url or pathname and return an array(protocol, host, path,
      * file + query + fragment)
@@ -497,33 +432,25 @@ class Helpers
         $path = '';
         $file = '';
         $res = '';
-
         $arr = parse_url($url);
         if (isset($arr['scheme'])) {
             $arr['scheme'] = mb_strtolower($arr['scheme'], 'UTF-8');
         }
-
         if (isset($arr['scheme']) && $arr['scheme'] !== 'file' && $arr['scheme'] !== 'phar' && strlen($arr['scheme']) > 1) {
             $protocol = $arr['scheme'] . '://';
-
             if (isset($arr['user'])) {
                 $host .= $arr['user'];
-
                 if (isset($arr['pass'])) {
                     $host .= ':' . $arr['pass'];
                 }
-
                 $host .= '@';
             }
-
             if (isset($arr['host'])) {
                 $host .= $arr['host'];
             }
-
             if (isset($arr['port'])) {
                 $host .= ':' . $arr['port'];
             }
-
             if (isset($arr['path']) && $arr['path'] !== '') {
                 // Do we have a trailing slash?
                 if ($arr['path'][mb_strlen($arr['path'], '8bit') - 1] === '/') {
@@ -534,20 +461,16 @@ class Helpers
                     $file = basename($arr['path']);
                 }
             }
-
             if (isset($arr['query'])) {
                 $file .= '?' . $arr['query'];
             }
-
             if (isset($arr['fragment'])) {
                 $file .= '#' . $arr['fragment'];
             }
-
         } else {
-
             $protocol = '';
-            $host = ''; // localhost, really
-
+            $host = '';
+            // localhost, really
             $i = mb_stripos($url, '://', 0, 'UTF-8');
             if ($i !== false) {
                 $protocol = mb_strtolower(mb_substr($url, 0, $i + 3, 'UTF-8'), 'UTF-8');
@@ -555,23 +478,15 @@ class Helpers
             } else {
                 $protocol = 'file://';
             }
-
             if ($protocol === 'phar://') {
                 $res = substr($url, stripos($url, '.phar') + 5);
                 $url = substr($url, 7, stripos($url, '.phar') - 2);
             }
-
             $file = basename($url);
             $path = dirname($url) . '/';
         }
-        return [$protocol, $host, $path, $file,
-            'protocol' => $protocol,
-            'host' => $host,
-            'path' => $path,
-            'file' => $file,
-            'resource' => $res];
+        return [$protocol, $host, $path, $file, 'protocol' => $protocol, 'host' => $host, 'path' => $path, 'file' => $file, 'resource' => $res];
     }
-
     /**
      * Print debug messages
      *
@@ -583,12 +498,10 @@ class Helpers
         global $_DOMPDF_DEBUG_TYPES, $_dompdf_show_warnings, $_dompdf_debug;
         if (isset($_DOMPDF_DEBUG_TYPES[$type]) && ($_dompdf_show_warnings || $_dompdf_debug)) {
             $arr = debug_backtrace();
-
             echo basename($arr[0]['file']) . ' (' . $arr[0]['line'] . '): ' . $arr[1]['function'] . ': ';
             Helpers::pre_r($msg);
         }
     }
-
     /**
      * Stores warnings in an array for display later
      * This function allows warnings generated by the DomDocument parser
@@ -606,19 +519,15 @@ class Helpers
     {
         // Not a warning or notice
         if (!($errno & (E_WARNING | E_NOTICE | E_USER_NOTICE | E_USER_WARNING | E_DEPRECATED | E_USER_DEPRECATED))) {
-            throw new Exception($errstr . " $errno");
+            throw new Exception($errstr . " {$errno}");
         }
-
         global $_dompdf_warnings;
         global $_dompdf_show_warnings;
-
         if ($_dompdf_show_warnings) {
             echo $errstr . "\n";
         }
-
         $_dompdf_warnings[] = $errstr;
     }
-
     /**
      * Get Unicode code point of character
      *
@@ -635,43 +544,47 @@ class Helpers
             }
             return mb_ord($c, $encoding);
         }
-
         if ($encoding != 'UTF-8' && $encoding !== null) {
             $c = mb_convert_encoding($c, 'UTF-8', $encoding);
         }
-
         $length = mb_strlen(mb_substr($c, 0, 1, 'UTF-8'), '8bit');
         $ord = false;
         $bytes = [];
         $numbytes = 1;
         for ($i = 0; $i < $length; $i++) {
-            $o = ord($c[$i]); // get one string character at time
-            if (count($bytes) === 0) { // get starting octect
-                if ($o <= 0x7F) {
+            $o = ord($c[$i]);
+            // get one string character at time
+            if (count($bytes) === 0) {
+                // get starting octect
+                if ($o <= 0x7f) {
                     $ord = $o;
                     $numbytes = 1;
-                } elseif (($o >> 0x05) === 0x06) { // 2 bytes character (0x06 = 110 BIN)
-                    $bytes[] = ($o - 0xC0) << 0x06;
+                } elseif ($o >> 0x5 === 0x6) {
+                    // 2 bytes character (0x06 = 110 BIN)
+                    $bytes[] = $o - 0xc0 << 0x6;
                     $numbytes = 2;
-                } elseif (($o >> 0x04) === 0x0E) { // 3 bytes character (0x0E = 1110 BIN)
-                    $bytes[] = ($o - 0xE0) << 0x0C;
+                } elseif ($o >> 0x4 === 0xe) {
+                    // 3 bytes character (0x0E = 1110 BIN)
+                    $bytes[] = $o - 0xe0 << 0xc;
                     $numbytes = 3;
-                } elseif (($o >> 0x03) === 0x1E) { // 4 bytes character (0x1E = 11110 BIN)
-                    $bytes[] = ($o - 0xF0) << 0x12;
+                } elseif ($o >> 0x3 === 0x1e) {
+                    // 4 bytes character (0x1E = 11110 BIN)
+                    $bytes[] = $o - 0xf0 << 0x12;
                     $numbytes = 4;
                 } else {
                     $ord = false;
                     break;
                 }
-            } elseif (($o >> 0x06) === 0x02) { // bytes 2, 3 and 4 must start with 0x02 = 10 BIN
+            } elseif ($o >> 0x6 === 0x2) {
+                // bytes 2, 3 and 4 must start with 0x02 = 10 BIN
                 $bytes[] = $o - 0x80;
                 if (count($bytes) === $numbytes) {
                     // compose UTF-8 bytes to a single unicode value
                     $o = $bytes[0];
                     for ($j = 1; $j < $numbytes; $j++) {
-                        $o += ($bytes[$j] << (($numbytes - $j - 1) * 0x06));
+                        $o += $bytes[$j] << ($numbytes - $j - 1) * 0x6;
                     }
-                    if ((($o >= 0xD800) and ($o <= 0xDFFF)) or ($o >= 0x10FFFF)) {
+                    if ($o >= 0xd800 and $o <= 0xdfff or $o >= 0x10ffff) {
                         // The definition of UTF-8 prohibits encoding character numbers between
                         // U+D800 and U+DFFF, which are reserved for use with the UTF-16
                         // encoding form (as surrogate pairs) and do not directly represent
@@ -680,7 +593,6 @@ class Helpers
                     }
                     $ord = $o;
                     // add char to array
-
                     // reset data for next char
                     $bytes = [];
                     $numbytes = 1;
@@ -690,10 +602,8 @@ class Helpers
                 break;
             }
         }
-
         return $ord;
     }
-
     /**
      * Return character by Unicode code point value
      *
@@ -710,24 +620,18 @@ class Helpers
             }
             return mb_chr($c, $encoding);
         }
-
         $chr = false;
-        if ($c <= 0x7F) {
+        if ($c <= 0x7f) {
             $chr = chr($c);
-        } elseif ($c <= 0x7FF) {
-            $chr = chr(0xC0 | $c >> 6) . chr(0x80 | $c & 0x3F);
-        } elseif ($c <= 0xFFFF) {
-            $chr = chr(0xE0 | $c >> 12) . chr(0x80 | $c >> 6 & 0x3F)
-            . chr(0x80 | $c & 0x3F);
-        } elseif ($c <= 0x10FFFF) {
-            $chr = chr(0xF0 | $c >> 18) . chr(0x80 | $c >> 12 & 0x3F)
-            . chr(0x80 | $c >> 6 & 0x3F)
-            . chr(0x80 | $c & 0x3F);
+        } elseif ($c <= 0x7ff) {
+            $chr = chr(0xc0 | $c >> 6) . chr(0x80 | $c & 0x3f);
+        } elseif ($c <= 0xffff) {
+            $chr = chr(0xe0 | $c >> 12) . chr(0x80 | $c >> 6 & 0x3f) . chr(0x80 | $c & 0x3f);
+        } elseif ($c <= 0x10ffff) {
+            $chr = chr(0xf0 | $c >> 18) . chr(0x80 | $c >> 12 & 0x3f) . chr(0x80 | $c >> 6 & 0x3f) . chr(0x80 | $c & 0x3f);
         }
-
         return $chr;
     }
-
     /**
      * Converts a CMYK color to RGB
      *
@@ -743,16 +647,13 @@ class Helpers
         if (is_array($c)) {
             [$c, $m, $y, $k] = $c;
         }
-
         $c *= 255;
         $m *= 255;
         $y *= 255;
         $k *= 255;
-
-        $r = (1 - round(2.55 * ($c + $k)));
-        $g = (1 - round(2.55 * ($m + $k)));
-        $b = (1 - round(2.55 * ($y + $k)));
-
+        $r = 1 - round(2.55 * ($c + $k));
+        $g = 1 - round(2.55 * ($m + $k));
+        $b = 1 - round(2.55 * ($y + $k));
         if ($r < 0) {
             $r = 0;
         }
@@ -762,13 +663,8 @@ class Helpers
         if ($b < 0) {
             $b = 0;
         }
-
-        return [
-            $r, $g, $b,
-            'r' => $r, 'g' => $g, 'b' => $b,
-        ];
+        return [$r, $g, $b, 'r' => $r, 'g' => $g, 'b' => $b];
     }
-
     /**
      * getimagesize doesn't give a good size for 32bit BMP image v5
      *
@@ -780,33 +676,22 @@ class Helpers
     public static function dompdf_getimagesize($filename, $context = null)
     {
         static $cache = [];
-
         // Custom types
-        $types = [
-            IMAGETYPE_JPEG => 'jpeg',
-            IMAGETYPE_GIF  => 'gif',
-            IMAGETYPE_BMP  => 'bmp',
-            IMAGETYPE_PNG  => 'png',
-            IMAGETYPE_WEBP => 'webp',
-        ];
+        $types = [IMAGETYPE_JPEG => 'jpeg', IMAGETYPE_GIF => 'gif', IMAGETYPE_BMP => 'bmp', IMAGETYPE_PNG => 'png', IMAGETYPE_WEBP => 'webp'];
         if (defined('IMAGETYPE_SVG')) {
             $types[IMAGETYPE_SVG] = 'svg';
         }
-
         if (isset($cache[$filename])) {
             return $cache[$filename];
         }
-
         $parse_result = @getimagesize($filename);
         $width = $height = $type = null;
         if ($parse_result !== false) {
             [$width, $height, $type] = $parse_result;
             $type = $types[$type] ?? null;
         }
-
         if ($width == null || $height == null) {
-            [$data] = Helpers::getFileContent($filename, $context);
-
+            [$data] = Helpers::get_file_content($filename, $context);
             if ($data !== null) {
                 if (substr($data, 0, 2) === 'BM') {
                     $meta = unpack('vtype/Vfilesize/Vreserved/Voffset/Vheadersize/Vwidth/Vheight', $data);
@@ -816,21 +701,18 @@ class Helpers
                 } elseif (strpos($data, '<svg') !== false) {
                     $doc = new \Svg\Document();
                     if (property_exists($doc, 'allowExternalReferences')) {
-                        $doc->allowExternalReferences = true;
+                        $doc->allow_external_references = true;
                     }
-                    $doc->loadFile($filename);
-
-                    [$width, $height] = $doc->getDimensions();
+                    $doc->load_file($filename);
+                    [$width, $height] = $doc->get_dimensions();
                     $width = (float) $width;
                     $height = (float) $height;
                     $type = 'svg';
                 }
             }
         }
-
         return $cache[$filename] = [$width ?? 0, $height ?? 0, $type];
     }
-
     /**
      * Credit goes to mgutt
      * http://www.programmierer-forum.de/function-imagecreatefrombmp-welche-variante-laeuft-t143137.htm
@@ -842,45 +724,36 @@ class Helpers
             trigger_error('The PHP GD extension is required, but is not installed.', E_ERROR);
             return false;
         }
-
         if (function_exists('imagecreatefrombmp') && ($im = imagecreatefrombmp($filename)) !== false) {
             return $im;
         }
-
         // version 1.00
-        if (!($fh = fopen($filename, 'rb'))) {
+        if (!$fh = fopen($filename, 'rb')) {
             trigger_error('imagecreatefrombmp: Can not open ' . $filename, E_USER_WARNING);
             return false;
         }
-
         $bytes_read = 0;
-
         // read file header
         $meta = unpack('vtype/Vfilesize/Vreserved/Voffset', fread($fh, 14));
-
         // check for bitmap
         if ($meta['type'] != 19778) {
             trigger_error('imagecreatefrombmp: ' . $filename . ' is not a bitmap!', E_USER_WARNING);
             return false;
         }
-
         // read image header
         $meta += unpack('Vheadersize/Vwidth/Vheight/vplanes/vbits/Vcompression/Vimagesize/Vxres/Vyres/Vcolors/Vimportant', fread($fh, 40));
         $bytes_read += 40;
-
         // read additional bitfield header
         if ($meta['compression'] == 3) {
             $meta += unpack('VrMask/VgMask/VbMask', fread($fh, 12));
             $bytes_read += 12;
         }
-
         // set bytes and padding
         $meta['bytes'] = $meta['bits'] / 8;
-        $meta['decal'] = 4 - (4 * (($meta['width'] * $meta['bytes'] / 4) - floor($meta['width'] * $meta['bytes'] / 4)));
+        $meta['decal'] = 4 - 4 * ($meta['width'] * $meta['bytes'] / 4 - floor($meta['width'] * $meta['bytes'] / 4));
         if ($meta['decal'] == 4) {
             $meta['decal'] = 0;
         }
-
         // obtain imagesize
         if ($meta['imagesize'] < 1) {
             $meta['imagesize'] = $meta['filesize'] - $meta['offset'];
@@ -893,10 +766,8 @@ class Helpers
                 }
             }
         }
-
         // calculate colors
         $meta['colors'] = !$meta['colors'] ? 2 ** $meta['bits'] : $meta['colors'];
-
         // read color palette
         $palette = [];
         if ($meta['bits'] < 16) {
@@ -908,16 +779,13 @@ class Helpers
                 }
             }
         }
-
         // ignore extra bitmap headers
         if ($meta['headersize'] > $bytes_read) {
             fread($fh, $meta['headersize'] - $bytes_read);
         }
-
         // create gd image
         $im = imagecreatetruecolor($meta['width'], $meta['height']);
         $data = fread($fh, $meta['imagesize']);
-
         // uncompress data
         switch ($meta['compression']) {
             case 1:
@@ -927,12 +795,10 @@ class Helpers
                 $data = Helpers::rle4_decode($data, $meta['width']);
                 break;
         }
-
         $p = 0;
         $vide = chr(0);
         $y = $meta['height'] - 1;
         $error = 'imagecreatefrombmp: ' . $filename . ' has not enough data!';
-
         // loop through the image data beginning with the lower left corner
         while ($y >= 0) {
             $x = 0;
@@ -940,23 +806,24 @@ class Helpers
                 switch ($meta['bits']) {
                     case 32:
                     case 24:
-                        if (!($part = substr($data, $p, 3 /*$meta['bytes']*/))) {
+                        if (!$part = substr($data, $p, 3)) {
                             trigger_error($error, E_USER_WARNING);
                             return $im;
                         }
                         $color = unpack('V', $part . $vide);
                         break;
                     case 16:
-                        if (!($part = substr($data, $p, 2 /*$meta['bytes']*/))) {
+                        if (!$part = substr($data, $p, 2)) {
                             trigger_error($error, E_USER_WARNING);
                             return $im;
                         }
                         $color = unpack('v', $part);
-
                         if (empty($meta['rMask']) || $meta['rMask'] != 0xf800) {
-                            $color[1] = (($color[1] & 0x7c00) >> 7) * 65536 + (($color[1] & 0x03e0) >> 2) * 256 + (($color[1] & 0x001f) << 3); // 555
+                            $color[1] = (($color[1] & 0x7c00) >> 7) * 65536 + (($color[1] & 0x3e0) >> 2) * 256 + (($color[1] & 0x1f) << 3);
+                            // 555
                         } else {
-                            $color[1] = (($color[1] & 0xf800) >> 8) * 65536 + (($color[1] & 0x07e0) >> 3) * 256 + (($color[1] & 0x001f) << 3); // 565
+                            $color[1] = (($color[1] & 0xf800) >> 8) * 65536 + (($color[1] & 0x7e0) >> 3) * 256 + (($color[1] & 0x1f) << 3);
+                            // 565
                         }
                         break;
                     case 8:
@@ -965,12 +832,12 @@ class Helpers
                         break;
                     case 4:
                         $color = unpack('n', $vide . substr($data, floor($p), 1));
-                        $color[1] = ($p * 2) % 2 == 0 ? $color[1] >> 4 : $color[1] & 0x0F;
+                        $color[1] = $p * 2 % 2 == 0 ? $color[1] >> 4 : $color[1] & 0xf;
                         $color[1] = $palette[$color[1] + 1];
                         break;
                     case 1:
                         $color = unpack('n', $vide . substr($data, floor($p), 1));
-                        switch (($p * 8) % 8) {
+                        switch ($p * 8 % 8) {
                             case 0:
                                 $color[1] = $color[1] >> 7;
                                 break;
@@ -993,7 +860,7 @@ class Helpers
                                 $color[1] = ($color[1] & 0x2) >> 1;
                                 break;
                             case 7:
-                                $color[1] = ($color[1] & 0x1);
+                                $color[1] = $color[1] & 0x1;
                                 break;
                         }
                         $color[1] = $palette[$color[1] + 1];
@@ -1012,7 +879,6 @@ class Helpers
         fclose($fh);
         return $im;
     }
-
     /**
      * Gets the content of the file at the specified path using one of
      * the following methods, in preferential order:
@@ -1025,21 +891,19 @@ class Helpers
      * @param int $maxlen
      * @return string[]
      */
-    public static function getFileContent($uri, $context = null, $offset = 0, $maxlen = null): array
+    public static function get_file_content($uri, $context = null, $offset = 0, $maxlen = null): array
     {
         $content = null;
         $headers = null;
         [$protocol] = Helpers::explode_url($uri);
         $is_local_path = in_array(strtolower($protocol), ['', 'file://', 'phar://'], true);
         $can_use_curl = in_array(strtolower($protocol), ['http://', 'https://'], true) && function_exists('curl_exec');
-
         set_error_handler([self::class, 'record_warnings']);
-
         try {
             if ($is_local_path || ini_get('allow_url_fopen') && !$can_use_curl) {
                 $http_response_header = null;
                 if ($is_local_path === false) {
-                    $uri = Helpers::encodeURI($uri);
+                    $uri = Helpers::encode_uri($uri);
                 }
                 if (isset($maxlen)) {
                     $result = file_get_contents($uri, false, $context, $offset, $maxlen);
@@ -1055,24 +919,20 @@ class Helpers
                 } elseif (isset($http_response_header)) {
                     $headers = $http_response_header;
                 }
-
             } elseif ($can_use_curl) {
                 $curl = curl_init($uri);
-
                 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($curl, CURLOPT_HEADER, true);
                 if ($offset > 0) {
                     curl_setopt($curl, CURLOPT_RESUME_FROM, $offset);
                 }
-
                 if ($maxlen > 0) {
                     curl_setopt($curl, CURLOPT_BUFFERSIZE, 128);
                     curl_setopt($curl, CURLOPT_NOPROGRESS, false);
                     curl_setopt($curl, CURLOPT_PROGRESSFUNCTION, function ($res, $download_size_total, $download_size, $upload_size_total, $upload_size) use ($maxlen): int {
-                        return ($download_size > $maxlen) ? 1 : 0;
+                        return $download_size > $maxlen ? 1 : 0;
                     });
                 }
-
                 $context_options = [];
                 if (!is_null($context)) {
                     $context_options = stream_context_get_options($context);
@@ -1110,9 +970,7 @@ class Helpers
                         }
                     }
                 }
-
                 $data = curl_exec($curl);
-
                 if ($data !== false && !curl_errno($curl)) {
                     switch ($http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE)) {
                         case 200:
@@ -1122,7 +980,6 @@ class Helpers
                             break;
                     }
                 }
-
                 if (PHP_MAJOR_VERSION < 8) {
                     curl_close($curl);
                 }
@@ -1130,19 +987,15 @@ class Helpers
         } finally {
             restore_error_handler();
         }
-
         return [$content, $headers];
     }
-
     public static function mb_ucwords(string $str): string
     {
         $max_len = mb_strlen($str, 'UTF-8');
         if ($max_len === 1) {
             return mb_strtoupper($str, 'UTF-8');
         }
-
         $str = mb_strtoupper(mb_substr($str, 0, 1, 'UTF-8'), 'UTF-8') . mb_substr($str, 1, null, 'UTF-8');
-
         foreach ([' ', '.', ',', '!', '?', '-', '+'] as $s) {
             $pos = 0;
             while (($pos = mb_strpos($str, $s, $pos, 'UTF-8')) !== false) {
@@ -1158,10 +1011,8 @@ class Helpers
                 }
             }
         }
-
         return $str;
     }
-
     /**
      * Check whether two lengths should be considered equal, accounting for
      * inaccuracies in float computation.
@@ -1172,53 +1023,46 @@ class Helpers
      *
      *
      */
-    public static function lengthEqual(float $a, float $b): bool
+    public static function length_equal(float $a, float $b): bool
     {
         // The epsilon results in a precision of at least:
         // * 7 decimal digits at around 1
         // * 4 decimal digits at around 1000 (around the size of common paper formats)
         // * 2 decimal digits at around 100,000 (100,000pt ~ 35.28m)
-        static $epsilon = 1e-8;
-        static $almostZero = 1e-12;
-
+        static $epsilon = 1.0E-8;
+        static $almost_zero = 1.0E-12;
         $diff = abs($a - $b);
-
-        if ($a === $b || $diff < $almostZero) {
+        if ($a === $b || $diff < $almost_zero) {
             return true;
         }
-
         return $diff < $epsilon * max(abs($a), abs($b));
     }
-
     /**
      * Check `$a < $b`, accounting for inaccuracies in float computation.
      */
-    public static function lengthLess(float $a, float $b): bool
+    public static function length_less(float $a, float $b): bool
     {
-        return $a < $b && !self::lengthEqual($a, $b);
+        return $a < $b && !self::length_equal($a, $b);
     }
-
     /**
      * Check `$a <= $b`, accounting for inaccuracies in float computation.
      */
-    public static function lengthLessOrEqual(float $a, float $b): bool
+    public static function length_less_or_equal(float $a, float $b): bool
     {
-        return $a <= $b || self::lengthEqual($a, $b);
+        return $a <= $b || self::length_equal($a, $b);
     }
-
     /**
      * Check `$a > $b`, accounting for inaccuracies in float computation.
      */
-    public static function lengthGreater(float $a, float $b): bool
+    public static function length_greater(float $a, float $b): bool
     {
-        return $a > $b && !self::lengthEqual($a, $b);
+        return $a > $b && !self::length_equal($a, $b);
     }
-
     /**
      * Check `$a >= $b`, accounting for inaccuracies in float computation.
      */
-    public static function lengthGreaterOrEqual(float $a, float $b): bool
+    public static function length_greater_or_equal(float $a, float $b): bool
     {
-        return $a >= $b || self::lengthEqual($a, $b);
+        return $a >= $b || self::length_equal($a, $b);
     }
 }

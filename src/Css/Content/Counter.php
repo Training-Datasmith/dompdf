@@ -1,36 +1,29 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Dompdf\Css\Content;
 
-final class Counter extends ContentPart
+final class Counter extends Content_Part
 {
     /**
      * @var string
      */
     public $name;
-
     /**
      * @var string
      */
     public $style;
-
     public function __construct(string $name, string $style)
     {
         $this->name = $name;
         $this->style = $style;
     }
-
-    public function equals(ContentPart $other): bool
+    public function equals(Content_Part $other): bool
     {
-        return $other instanceof self
-            && $other->name === $this->name
-            && $other->style === $this->style;
+        return $other instanceof self && $other->name === $this->name && $other->style === $this->style;
     }
-
     public function __toString(): string
     {
-        return "counter($this->name, $this->style)";
+        return "counter({$this->name}, {$this->style})";
     }
 }

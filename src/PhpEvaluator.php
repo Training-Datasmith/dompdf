@@ -1,12 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-
 namespace Dompdf;
 
 /**
@@ -14,13 +13,12 @@ namespace Dompdf;
  *
  * @package dompdf
  */
-class PhpEvaluator
+class Php_Evaluator
 {
     /**
      * @var Canvas
      */
     protected $_canvas;
-
     /**
      * PhpEvaluator constructor.
      */
@@ -28,33 +26,28 @@ class PhpEvaluator
     {
         $this->_canvas = $canvas;
     }
-
     /**
      * @param $code
      * @param array $vars
      */
     public function evaluate($code, $vars = []): void
     {
-        if (!$this->_canvas->get_dompdf()->getOptions()->getIsPhpEnabled()) {
+        if (!$this->_canvas->get_dompdf()->get_options()->get_is_php_enabled()) {
             return;
         }
-
         // Set up some variables for the inline code
         $pdf = $this->_canvas;
-        $fontMetrics = $pdf->get_dompdf()->getFontMetrics();
+        $font_metrics = $pdf->get_dompdf()->get_font_metrics();
         $PAGE_NUM = $pdf->get_page_number();
         $PAGE_COUNT = $pdf->get_page_count();
-
         // Override those variables if passed in
         foreach ($vars as $k => $v) {
             ${$k} = $v;
         }
-
         eval($code);
     }
-
     public function render(Frame $frame): void
     {
-        $this->evaluate($frame->get_node()->nodeValue);
+        $this->evaluate($frame->get_node()->node_value);
     }
 }

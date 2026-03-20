@@ -1,24 +1,22 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-
-namespace Dompdf\FrameDecorator;
+namespace Dompdf\Frame_Decorator;
 
 use Dompdf\Dompdf;
 use Dompdf\Frame;
-use Dompdf\LineBox;
-
+use Dompdf\Line_Box;
 /**
  * Decorates frames for block layout
  *
  * @package dompdf
  */
-class Block extends AbstractFrameDecorator
+class Block extends Abstract_Frame_Decorator
 {
     /**
      * Current line index
@@ -26,14 +24,12 @@ class Block extends AbstractFrameDecorator
      * @var int
      */
     protected $_cl;
-
     /**
      * The block's line boxes
      *
      * @var LineBox[]
      */
     protected $_line_boxes;
-
     /**
      * List of markers that have not found their line box to vertically align
      * with yet. Markers are collected by nested block containers until an
@@ -42,28 +38,23 @@ class Block extends AbstractFrameDecorator
      * @var ListBullet[]
      */
     protected $dangling_markers;
-
     /**
      * Block constructor.
      */
     public function __construct(Frame $frame, Dompdf $dompdf)
     {
         parent::__construct($frame, $dompdf);
-
-        $this->_line_boxes = [new LineBox($this)];
+        $this->_line_boxes = [new Line_Box($this)];
         $this->_cl = 0;
         $this->dangling_markers = [];
     }
-
     public function reset(): void
     {
         parent::reset();
-
-        $this->_line_boxes = [new LineBox($this)];
+        $this->_line_boxes = [new Line_Box($this)];
         $this->_cl = 0;
         $this->dangling_markers = [];
     }
-
     /**
      * @return LineBox
      */
@@ -71,7 +62,6 @@ class Block extends AbstractFrameDecorator
     {
         return $this->_line_boxes[$this->_cl];
     }
-
     /**
      * @return int
      */
@@ -79,7 +69,6 @@ class Block extends AbstractFrameDecorator
     {
         return $this->_cl;
     }
-
     /**
      * @return LineBox[]
      */
@@ -87,7 +76,6 @@ class Block extends AbstractFrameDecorator
     {
         return $this->_line_boxes;
     }
-
     /**
      * @param int $line_number
      * @return int
@@ -96,9 +84,8 @@ class Block extends AbstractFrameDecorator
     {
         $line_boxes_count = count($this->_line_boxes);
         $cl = max(min($line_number, $line_boxes_count), 0);
-        return ($this->_cl = $cl);
+        return $this->_cl = $cl;
     }
-
     /**
      * @param int $i
      */
@@ -108,38 +95,28 @@ class Block extends AbstractFrameDecorator
             unset($this->_line_boxes[$i]);
         }
     }
-
-    public function add_frame_to_line(Frame $frame): ?LineBox
+    public function add_frame_to_line(Frame $frame): ?Line_Box
     {
         $current_line = $this->_line_boxes[$this->_cl];
         $frame->set_containing_line($current_line);
-
         // Inline frames are currently treated as wrappers, and are not actually
         // added to the line
         if ($frame instanceof Inline) {
             return null;
         }
-
         $current_line->add_frame($frame);
-
         $this->increase_line_width($frame->get_margin_width());
         $this->maximize_line_height($frame->get_margin_height(), $frame);
-
         // Add any dangling list markers to the first line box if it is inline
-        if ($this->_cl === 0 && $current_line->inline
-            && $this->dangling_markers !== []
-        ) {
+        if ($this->_cl === 0 && $current_line->inline && $this->dangling_markers !== []) {
             foreach ($this->dangling_markers as $marker) {
                 $current_line->add_list_marker($marker);
                 $this->maximize_line_height($marker->get_margin_height(), $marker);
             }
-
             $this->dangling_markers = [];
         }
-
         return $current_line;
     }
-
     /**
      * Remove the given frame and all following frames and lines from the block.
      */
@@ -147,20 +124,17 @@ class Block extends AbstractFrameDecorator
     {
         // Inline frames are not added to line boxes themselves, only their
         // text frame children
-        $actualFrame = $frame;
-        while ($actualFrame !== null && $actualFrame instanceof Inline) {
-            $actualFrame = $actualFrame->get_first_child();
+        $actual_frame = $frame;
+        while ($actual_frame !== null && $actual_frame instanceof Inline) {
+            $actual_frame = $actual_frame->get_first_child();
         }
-
-        if ($actualFrame === null) {
+        if ($actual_frame === null) {
             return;
         }
-
         // Search backwards through the lines for $frame
-        $frame = $actualFrame;
+        $frame = $actual_frame;
         $i = $this->_cl;
         $j = null;
-
         while ($i >= 0) {
             $line = $this->_line_boxes[$i];
             foreach ($line->get_frames() as $index => $f) {
@@ -171,33 +145,27 @@ class Block extends AbstractFrameDecorator
             }
             $i--;
         }
-
         if ($j === null) {
             return;
         }
-
         // Remove all lines that follow
         for ($k = $this->_cl; $k > $i; $k--) {
             unset($this->_line_boxes[$k]);
         }
-
         // Remove the line, if it is empty
         if ($j > 0) {
             $line->remove_frames($j);
         } else {
             unset($this->_line_boxes[$i]);
         }
-
         // Reset array indices
         $this->_line_boxes = array_values($this->_line_boxes);
         $this->_cl = count($this->_line_boxes) - 1;
     }
-
     public function increase_line_width(float $w): void
     {
         $this->_line_boxes[$this->_cl]->w += $w;
     }
-
     public function maximize_line_height(float $val, Frame $frame): void
     {
         if ($val > $this->_line_boxes[$this->_cl]->h) {
@@ -205,24 +173,18 @@ class Block extends AbstractFrameDecorator
             $this->_line_boxes[$this->_cl]->h = $val;
         }
     }
-
     public function add_line(bool $br = false): void
     {
         $line = $this->_line_boxes[$this->_cl];
-
         $line->br = $br;
         $y = $line->y + $line->h;
-
-        $new_line = new LineBox($this, $y);
-
+        $new_line = new Line_Box($this, $y);
         $this->_line_boxes[++$this->_cl] = $new_line;
     }
-
-    public function add_dangling_marker(ListBullet $marker): void
+    public function add_dangling_marker(List_Bullet $marker): void
     {
         $this->dangling_markers[] = $marker;
     }
-
     /**
      * Inherit any dangling markers from the parent block.
      */

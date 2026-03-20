@@ -1,23 +1,20 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-
 namespace Dompdf\Frame;
 
-use DOMDocument;
-use DOMElement;
-use DOMNode;
+use Dom_Document;
+use Dom_Element;
+use Dom_Node;
 use Dompdf\Exception;
-
 use Dompdf\Frame;
-use DOMXPath;
+use Domx_Path;
 use IteratorAggregate;
-
 /**
  * Represents an entire document as a tree of frames
  *
@@ -28,27 +25,14 @@ use IteratorAggregate;
  *
  * @package dompdf
  */
-class FrameTree implements IteratorAggregate
+class Frame_Tree implements IteratorAggregate
 {
     /**
      * Tags to ignore while parsing the tree
      *
      * @var array
      */
-    protected static $HIDDEN_TAGS = [
-        'area',
-        'base',
-        'basefont',
-        'head',
-        'style',
-        'meta',
-        'title',
-        'colgroup',
-        'noembed',
-        'param',
-        '#comment',
-    ];
-
+    protected static $HIDDEN_TAGS = ['area', 'base', 'basefont', 'head', 'style', 'meta', 'title', 'colgroup', 'noembed', 'param', '#comment'];
     /**
      * The main DomDocument
      *
@@ -56,40 +40,35 @@ class FrameTree implements IteratorAggregate
      * @var DOMDocument
      */
     protected $_dom;
-
     /**
      * The root node of the FrameTree.
      *
      * @var Frame
      */
     protected $_root;
-
     /**
      * Subtrees of absolutely positioned elements
      *
      * @var array of Frames
      */
     protected $_absolute_frames;
-
     /**
      * A mapping of {@link Frame} objects to DOMNode objects
      *
      * @var array
      */
     protected $_registry;
-
     /**
      * Class constructor
      *
      * @param DOMDocument $dom the main DomDocument object representing the current html document
      */
-    public function __construct(DomDocument $dom)
+    public function __construct(Dom_Document $dom)
     {
         $this->_dom = $dom;
         $this->_root = null;
         $this->_registry = [];
     }
-
     /**
      * Returns the DOMDocument object representing the current html document
      *
@@ -99,7 +78,6 @@ class FrameTree implements IteratorAggregate
     {
         return $this->_dom;
     }
-
     /**
      * Returns the root frame of the tree
      *
@@ -109,7 +87,6 @@ class FrameTree implements IteratorAggregate
     {
         return $this->_root;
     }
-
     /**
      * Returns a specific frame given its id
      *
@@ -121,84 +98,74 @@ class FrameTree implements IteratorAggregate
     {
         return $this->_registry[$id] ?? null;
     }
-
     /**
      * Returns a post-order iterator for all frames in the tree
      *
      * @deprecated Iterate the tree directly instead
      */
-    public function get_frames(): FrameTreeIterator
+    public function get_frames(): Frame_Tree_Iterator
     {
-        return new FrameTreeIterator($this->_root);
+        return new Frame_Tree_Iterator($this->_root);
     }
-
     /**
      * Returns a post-order iterator for all frames in the tree
      */
-    public function getIterator(): FrameTreeIterator
+    public function getIterator(): Frame_Tree_Iterator
     {
-        return new FrameTreeIterator($this->_root);
+        return new Frame_Tree_Iterator($this->_root);
     }
-
     /**
      * Builds the tree
      */
     public function build_tree(): void
     {
-        $html = $this->_dom->getElementsByTagName('html')->item(0);
+        $html = $this->_dom->get_elements_by_tag_name('html')->item(0);
         if (is_null($html)) {
-            $html = $this->_dom->firstChild;
+            $html = $this->_dom->first_child;
         }
-
         if (is_null($html)) {
             throw new Exception('Requested HTML document contains no data.');
         }
-
         $this->fix_tables();
-
         $this->_root = $this->_build_tree_r($html);
     }
-
     /**
      * Adds missing TBODYs around TR
      */
     protected function fix_tables()
     {
-        $xp = new DOMXPath($this->_dom);
-
+        $xp = new Domx_Path($this->_dom);
         // Move table caption before the table
         // FIXME find a better way to deal with it...
         $captions = $xp->query('//table/caption');
         foreach ($captions as $caption) {
-            $table = $caption->parentNode;
-            $table->parentNode->insertBefore($caption, $table);
+            $table = $caption->parent_node;
+            $table->parent_node->insert_before($caption, $table);
         }
-
-        $firstRows = $xp->query('//table/tr[1]');
+        $first_rows = $xp->query('//table/tr[1]');
         /** @var DOMElement $tableChild */
-        foreach ($firstRows as $tableChild) {
-            $tbody = $this->_dom->createElement('tbody');
-            $tableNode = $tableChild->parentNode;
+        foreach ($first_rows as $table_child) {
+            $tbody = $this->_dom->create_element('tbody');
+            $table_node = $table_child->parent_node;
             do {
-                if ($tableChild->nodeName === 'tr') {
-                    $tmpNode = $tableChild;
-                    $tableChild = $tableChild->nextSibling;
-                    $tableNode->removeChild($tmpNode);
-                    $tbody->appendChild($tmpNode);
+                if ($table_child->node_name === 'tr') {
+                    $tmp_node = $table_child;
+                    $table_child = $table_child->next_sibling;
+                    $table_node->remove_child($tmp_node);
+                    $tbody->append_child($tmp_node);
                 } else {
-                    if ($tbody->hasChildNodes() === true) {
-                        $tableNode->insertBefore($tbody, $tableChild);
-                        $tbody = $this->_dom->createElement('tbody');
+                    if ($tbody->has_child_nodes() === true) {
+                        $table_node->insert_before($tbody, $table_child);
+                        $tbody = $this->_dom->create_element('tbody');
                     }
-                    $tableChild = $tableChild->nextSibling;
+                    $table_child = $table_child->next_sibling;
                 }
-            } while ($tableChild);
-            if ($tbody->hasChildNodes() === true) {
-                $tableNode->appendChild($tbody);
+            } while ($table_child);
+            if ($tbody->has_child_nodes() === true) {
+                $table_node->append_child($tbody);
             }
         }
     }
-
     // FIXME: temporary hack, preferably we will improve rendering of sequential #text nodes
     /**
      * Remove a child from a node
@@ -210,21 +177,20 @@ class FrameTree implements IteratorAggregate
      * @param array $children an array of nodes that are the children of $node
      * @param int $index index from the $children array of the node to remove
      */
-    protected function _remove_node(DOMNode $node, array &$children, $index)
+    protected function _remove_node(Dom_Node $node, array &$children, $index)
     {
         $child = $children[$index];
-        $previousChild = $child->previousSibling;
-        $nextChild = $child->nextSibling;
-        $node->removeChild($child);
-        if (isset($previousChild, $nextChild)) {
-            if ($previousChild->nodeName === '#text' && $nextChild->nodeName === '#text') {
-                $previousChild->nodeValue .= $nextChild->nodeValue;
+        $previous_child = $child->previous_sibling;
+        $next_child = $child->next_sibling;
+        $node->remove_child($child);
+        if (isset($previous_child, $next_child)) {
+            if ($previous_child->node_name === '#text' && $next_child->node_name === '#text') {
+                $previous_child->node_value .= $next_child->node_value;
                 $this->_remove_node($node, $children, $index + 1);
             }
         }
         array_splice($children, $index, 1);
     }
-
     /**
      * Recursively adds {@link Frame} objects to the tree
      *
@@ -235,31 +201,28 @@ class FrameTree implements IteratorAggregate
      *
      * @param DOMNode $node the current DOMNode being considered
      */
-    protected function _build_tree_r(DOMNode $node): \Dompdf\Frame
+    protected function _build_tree_r(Dom_Node $node): \Dompdf\Frame
     {
         $frame = new Frame($node);
         $id = $frame->get_id();
         $this->_registry[$id] = $frame;
-
-        if (!$node->hasChildNodes()) {
+        if (!$node->has_child_nodes()) {
             return $frame;
         }
-
         // Store the children in an array so that the tree can be modified
         $children = [];
-        $length = $node->childNodes->length;
+        $length = $node->child_nodes->length;
         for ($i = 0; $i < $length; $i++) {
-            $children[] = $node->childNodes->item($i);
+            $children[] = $node->child_nodes->item($i);
         }
         $index = 0;
         // INFO: We don't advance $index if a node is removed to avoid skipping nodes
         while ($index < count($children)) {
             $child = $children[$index];
-            $nodeName = strtolower($child->nodeName);
-
+            $node_name = strtolower($child->node_name);
             // Skip non-displaying nodes
-            if (in_array($nodeName, self::$HIDDEN_TAGS)) {
-                if ($nodeName !== 'head' && $nodeName !== 'style') {
+            if (in_array($node_name, self::$HIDDEN_TAGS)) {
+                if ($node_name !== 'head' && $node_name !== 'style') {
                     $this->_remove_node($node, $children, $index);
                 } else {
                     $index++;
@@ -267,46 +230,39 @@ class FrameTree implements IteratorAggregate
                 continue;
             }
             // Skip empty text nodes
-            if ($nodeName === '#text' && $child->nodeValue === '') {
+            if ($node_name === '#text' && $child->node_value === '') {
                 $this->_remove_node($node, $children, $index);
                 continue;
             }
             // Skip empty image nodes
-            if ($nodeName === 'img' && $child->getAttribute('src') === '') {
+            if ($node_name === 'img' && $child->get_attribute('src') === '') {
                 $this->_remove_node($node, $children, $index);
                 continue;
             }
-
             if (is_object($child)) {
                 $frame->append_child($this->_build_tree_r($child), false);
             }
             $index++;
         }
-
         return $frame;
     }
-
     /**
      * @param string $pos
      *
      * @return mixed
      */
-    public function insert_node(DOMElement $node, DOMElement $new_node, $pos)
+    public function insert_node(Dom_Element $node, Dom_Element $new_node, $pos)
     {
-        if ($pos === 'after' || !$node->firstChild) {
-            $node->appendChild($new_node);
+        if ($pos === 'after' || !$node->first_child) {
+            $node->append_child($new_node);
         } else {
-            $node->insertBefore($new_node, $node->firstChild);
+            $node->insert_before($new_node, $node->first_child);
         }
-
         $this->_build_tree_r($new_node);
-
-        $frame_id = $new_node->getAttribute('frame_id');
+        $frame_id = $new_node->get_attribute('frame_id');
         $frame = $this->get_frame($frame_id);
-
-        $parent_id = $node->getAttribute('frame_id');
+        $parent_id = $node->get_attribute('frame_id');
         $parent = $this->get_frame($parent_id);
-
         if ($parent) {
             if ($pos === 'before') {
                 $parent->prepend_child($frame, false);
@@ -314,7 +270,6 @@ class FrameTree implements IteratorAggregate
                 $parent->append_child($frame, false);
             }
         }
-
         return $frame_id;
     }
 }

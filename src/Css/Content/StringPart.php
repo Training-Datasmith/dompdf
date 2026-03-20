@@ -1,27 +1,22 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Dompdf\Css\Content;
 
-final class StringPart extends ContentPart
+final class String_Part extends Content_Part
 {
     /**
      * @var string
      */
     public $string;
-
     public function __construct(string $string)
     {
         $this->string = $string;
     }
-
-    public function equals(ContentPart $other): bool
+    public function equals(Content_Part $other): bool
     {
-        return $other instanceof self
-            && $other->string === $this->string;
+        return $other instanceof self && $other->string === $this->string;
     }
-
     public function __toString(): string
     {
         return '"' . $this->string . '"';

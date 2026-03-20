@@ -1,10 +1,9 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Dompdf\Css\Content;
 
-final class CloseQuote extends ContentPart
+final class Close_Quote extends Content_Part
 {
     public function __toString(): string
     {

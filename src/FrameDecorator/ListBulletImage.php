@@ -1,24 +1,22 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-
-namespace Dompdf\FrameDecorator;
+namespace Dompdf\Frame_Decorator;
 
 use Dompdf\Dompdf;
 use Dompdf\Frame;
 use Dompdf\Image\Cache;
-
 /**
  * Decorates frames for list bullets with custom images
  *
  * @package dompdf
  */
-class ListBulletImage extends ListBullet
+class List_Bullet_Image extends List_Bullet
 {
     /**
      * The underlying image frame
@@ -26,21 +24,18 @@ class ListBulletImage extends ListBullet
      * @var Image
      */
     protected $_img;
-
     /**
      * The image's width in pixels
      *
      * @var float
      */
     protected $_width;
-
     /**
      * The image's height in pixels
      *
      * @var float
      */
     protected $_height;
-
     /**
      * ListBulletImage constructor.
      */
@@ -48,12 +43,10 @@ class ListBulletImage extends ListBullet
     {
         $style = $frame->get_style();
         $url = $style->list_style_image;
-        $frame->get_node()->setAttribute('src', $url);
+        $frame->get_node()->set_attribute('src', $url);
         $this->_img = new Image($frame, $dompdf);
         parent::__construct($this->_img, $dompdf);
-
         $url = $this->_img->get_image_url();
-
         if (Cache::is_broken($url)) {
             $this->_width = parent::get_width();
             $this->_height = parent::get_height();
@@ -64,41 +57,34 @@ class ListBulletImage extends ListBullet
             $this->_height = $this->_img->resample($height);
         }
     }
-
     public function get_width(): float
     {
         return $this->_width;
     }
-
     public function get_height(): float
     {
         return $this->_height;
     }
-
     public function get_margin_width(): float
     {
         $style = $this->get_style();
         return $this->_width + $style->font_size * self::MARKER_INDENT;
     }
-
     public function get_margin_height(): float
     {
-        $fontMetrics = $this->_dompdf->getFontMetrics();
+        $font_metrics = $this->_dompdf->get_font_metrics();
         $style = $this->get_style();
         $font = $style->font_family;
         $size = $style->font_size;
-        $fontHeight = $fontMetrics->getFontHeight($font, $size);
-        $baseline = $fontMetrics->getFontBaseline($font, $size);
-
+        $font_height = $font_metrics->get_font_height($font, $size);
+        $baseline = $font_metrics->get_font_baseline($font, $size);
         // This is the same factor as used in
         // `FrameDecorator\Text::get_margin_height()`
         $f = $style->line_height / ($size > 0 ? $size : 1);
-
         // FIXME: Tries to approximate replacing the space above the font
         // baseline with the image
-        return $f * ($fontHeight - $baseline) + $this->_height;
+        return $f * ($font_height - $baseline) + $this->_height;
     }
-
     /**
      * Return image url
      *

@@ -1,33 +1,30 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+namespace Dompdf\Frame_Reflower;
 
-namespace Dompdf\FrameReflower;
-
-use Dompdf\FrameDecorator\Block as BlockFrameDecorator;
-use Dompdf\FrameDecorator\Inline as InlineFrameDecorator;
-use Dompdf\FrameDecorator\Text as TextFrameDecorator;
-
+use Dompdf\Frame_Decorator\Block as BlockFrameDecorator;
+use Dompdf\Frame_Decorator\Inline as InlineFrameDecorator;
+use Dompdf\Frame_Decorator\Text as TextFrameDecorator;
 /**
  * Reflows inline frames
  *
  * @package dompdf
  */
-class Inline extends AbstractFrameReflower
+class Inline extends Abstract_Frame_Reflower
 {
     /**
      * Inline constructor.
      */
-    public function __construct(InlineFrameDecorator $frame)
+    public function __construct(Inline_Frame_Decorator $frame)
     {
         parent::__construct($frame);
     }
-
     /**
      * Handle reflow of empty inline frames.
      *
@@ -35,60 +32,48 @@ class Inline extends AbstractFrameReflower
      * children after child reflow. Empty inline frames have no children that
      * could determine the positioning, so they need to be handled separately.
      */
-    protected function reflow_empty(BlockFrameDecorator $block): void
+    protected function reflow_empty(Block_Frame_Decorator $block): void
     {
         /** @var InlineFrameDecorator */
         $frame = $this->_frame;
         $style = $frame->get_style();
-
         // Resolve width, so the margin width can be checked
         $style->set_used('width', 0.0);
-
         $cb = $frame->get_containing_block();
         $line = $block->get_current_line_box();
         $width = $frame->get_margin_width();
-
-        if ($width > ($cb['w'] - $line->left - $line->w - $line->right)) {
+        if ($width > $cb['w'] - $line->left - $line->w - $line->right) {
             $block->add_line();
-
             // Find the appropriate inline ancestor to split
             $child = $frame;
             $p = $child->get_parent();
-            while ($p instanceof InlineFrameDecorator && !$child->get_prev_sibling()) {
+            while ($p instanceof Inline_Frame_Decorator && !$child->get_prev_sibling()) {
                 $child = $p;
                 $p = $p->get_parent();
             }
-
-            if ($p instanceof InlineFrameDecorator) {
+            if ($p instanceof Inline_Frame_Decorator) {
                 // Split parent and stop current reflow. Reflow continues
                 // via child-reflow loop of split parent
                 $p->split($child);
                 return;
             }
         }
-
         $frame->position();
         $block->add_frame_to_line($frame);
     }
-
-    public function reflow(?BlockFrameDecorator $block = null): void
+    public function reflow(?Block_Frame_Decorator $block = null): void
     {
         /** @var InlineFrameDecorator */
         $frame = $this->_frame;
-
         // Check if a page break is forced
         $page = $frame->get_root();
         $page->check_forced_page_break($frame);
-
         if ($page->is_full()) {
             return;
         }
-
         // Counters and generated content
         $this->_set_content();
-
         $style = $frame->get_style();
-
         // Resolve auto margins
         // https://www.w3.org/TR/CSS21/visudet.html#inline-width
         // https://www.w3.org/TR/CSS21/visudet.html#inline-non-replaced
@@ -104,25 +89,21 @@ class Inline extends AbstractFrameReflower
         if ($style->margin_bottom === 'auto') {
             $style->set_used('margin_bottom', 0.0);
         }
-
         // Handle line breaks
-        if ($frame->get_node()->nodeName === 'br') {
+        if ($frame->get_node()->node_name === 'br') {
             if ($block) {
                 $line = $block->get_current_line_box();
                 $frame->set_containing_line($line);
                 $block->maximize_line_height($frame->get_margin_height(), $frame);
                 $block->add_line(true);
-
                 $next = $frame->get_next_sibling();
                 $p = $frame->get_parent();
-
-                if ($next && $p instanceof InlineFrameDecorator) {
+                if ($next && $p instanceof Inline_Frame_Decorator) {
                     $p->split($next);
                 }
             }
             return;
         }
-
         // Handle empty inline frames
         if (!$frame->get_first_child()) {
             if ($block) {
@@ -130,57 +111,47 @@ class Inline extends AbstractFrameReflower
             }
             return;
         }
-
         // Add margin, padding & border width to the first and last children,
         // so they are accounted for during text layout
-        if (($f = $frame->get_first_child()) && $f instanceof TextFrameDecorator) {
+        if (($f = $frame->get_first_child()) && $f instanceof Text_Frame_Decorator) {
             $f_style = $f->get_style();
             $f_style->margin_left = $style->margin_left;
             $f_style->padding_left = $style->padding_left;
             $f_style->border_left_width = $style->border_left_width;
         }
-
-        if (($l = $frame->get_last_child()) && $l instanceof TextFrameDecorator) {
+        if (($l = $frame->get_last_child()) && $l instanceof Text_Frame_Decorator) {
             $l_style = $l->get_style();
             $l_style->margin_right = $style->margin_right;
             $l_style->padding_right = $style->padding_right;
             $l_style->border_right_width = $style->border_right_width;
         }
-
         $frame->position();
-
         $cb = $frame->get_containing_block();
-
         // Set the containing blocks and reflow each child.  The containing
         // block is not changed by line boxes.
         foreach ($frame->get_children() as $child) {
             $child->set_containing_block($cb);
             $child->reflow($block);
-
             // Stop reflow if the frame has been reset by a line or page break
             // due to child reflow
             if (!$frame->content_set) {
                 return;
             }
         }
-
         // Assume the position of the first in-flow child, otherwise use the
         // fallback position that was set before child reflow
         $child = $frame->get_first_child();
         while ($child && !$child->is_in_flow()) {
             $child = $child->get_next_sibling();
         }
-
         if ($child) {
             [$x, $y] = $child->get_position();
             $frame->set_position($x, $y);
         }
-
         // Handle relative positioning
         foreach ($frame->get_children() as $child) {
             $this->position_relative($child);
         }
-
         if ($block) {
             $block->add_frame_to_line($frame);
         }

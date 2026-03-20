@@ -1,23 +1,21 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-
 namespace Dompdf\Positioner;
 
-use Dompdf\FrameDecorator\AbstractFrameDecorator;
-use Dompdf\FrameReflower\Block;
-
+use Dompdf\Frame_Decorator\Abstract_Frame_Decorator;
+use Dompdf\Frame_Reflower\Block;
 /**
  * Positions fixely positioned frames
  */
 class Fixed extends Absolute
 {
-    public function position(AbstractFrameDecorator $frame): void
+    public function position(Abstract_Frame_Decorator $frame): void
     {
         if ($frame->get_reflower() instanceof Block) {
             parent::position($frame);
@@ -29,29 +27,25 @@ class Fixed extends Absolute
             $root = $frame->get_root();
             $initialcb = $root->get_containing_block();
             $initialcb_style = $root->get_style();
-
             $p = $frame->find_block_parent();
             if ($p) {
                 $p->add_line();
             }
             // Compute the margins of the @page style
-            $margin_top = (float)$initialcb_style->length_in_pt($initialcb_style->margin_top, $initialcb['h']);
-            $margin_right = (float)$initialcb_style->length_in_pt($initialcb_style->margin_right, $initialcb['w']);
-            $margin_bottom = (float)$initialcb_style->length_in_pt($initialcb_style->margin_bottom, $initialcb['h']);
-            $margin_left = (float)$initialcb_style->length_in_pt($initialcb_style->margin_left, $initialcb['w']);
-
+            $margin_top = (float) $initialcb_style->length_in_pt($initialcb_style->margin_top, $initialcb['h']);
+            $margin_right = (float) $initialcb_style->length_in_pt($initialcb_style->margin_right, $initialcb['w']);
+            $margin_bottom = (float) $initialcb_style->length_in_pt($initialcb_style->margin_bottom, $initialcb['h']);
+            $margin_left = (float) $initialcb_style->length_in_pt($initialcb_style->margin_left, $initialcb['w']);
             // The needed computed style of the element
-            $height = (float)$style->length_in_pt($style->get_specified('height'), $initialcb['h']);
-            $width = (float)$style->length_in_pt($style->get_specified('width'), $initialcb['w']);
-
+            $height = (float) $style->length_in_pt($style->get_specified('height'), $initialcb['h']);
+            $width = (float) $style->length_in_pt($style->get_specified('width'), $initialcb['w']);
             $top = $style->length_in_pt($style->get_specified('top'), $initialcb['h']);
             $right = $style->length_in_pt($style->get_specified('right'), $initialcb['w']);
             $bottom = $style->length_in_pt($style->get_specified('bottom'), $initialcb['h']);
             $left = $style->length_in_pt($style->get_specified('left'), $initialcb['w']);
-
             $y = $margin_top;
             if (isset($top)) {
-                $y = (float)$top + $margin_top;
+                $y = (float) $top + $margin_top;
                 if ($top === 'auto') {
                     $y = $margin_top;
                     if (isset($bottom) && $bottom !== 'auto') {
@@ -64,10 +58,9 @@ class Fixed extends Absolute
                     }
                 }
             }
-
             $x = $margin_left;
             if (isset($left)) {
-                $x = (float)$left + $margin_left;
+                $x = (float) $left + $margin_left;
                 if ($left === 'auto') {
                     $x = $margin_left;
                     if (isset($right) && $right !== 'auto') {
@@ -80,9 +73,7 @@ class Fixed extends Absolute
                     }
                 }
             }
-
             $frame->set_position($x, $y);
-
             foreach ($frame->get_children() as $child) {
                 $child->set_position($x, $y);
             }
